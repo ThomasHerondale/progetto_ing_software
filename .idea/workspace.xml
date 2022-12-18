@@ -7,12 +7,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ede23f35-2b69-4a58-b0ee-11fb8fd54546" name="Changes" comment="Package ssn&#10;SSNComputer">
+    <list default="true" id="ede23f35-2b69-4a58-b0ee-11fb8fd54546" name="Changes" comment="SSNComputer praticamente completo">
+      <change afterPath="$PROJECT_DIR$/mail/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mail/src/main/java/mail/MailManager.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mail/src/main/java/mail/package-info.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mail/src/main/java/module-info.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ssn/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/ssn/src/main/java/module-info.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ssn/src/main/java/ssn/SSNComputer.java" beforeDir="false" afterPath="$PROJECT_DIR$/ssn/src/main/java/ssn/SSNComputer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ssn/src/main/java/ssn/package-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/ssn/src/main/java/ssn/package-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ssn/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ssn/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,10 +24,10 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="JUnit5 Test Class" />
         <option value="module-info" />
         <option value="package-info" />
         <option value="Class" />
-        <option value="JUnit5 Test Class" />
       </list>
     </option>
   </component>
@@ -45,22 +47,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;false&quot;,
-    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary&quot;: &quot;JUnit5&quot;,
-    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5&quot;: &quot;&quot;,
-    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;openjdk-19&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/thoma/IdeaProjects/SSNComputer&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Downloaded.Files.Path.Enabled": "false",
+    "Repository.Attach.Annotations": "false",
+    "Repository.Attach.JavaDocs": "false",
+    "Repository.Attach.Sources": "false",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SONARLINT_PRECOMMIT_ANALYSIS": "false",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5": "",
+    "jdk.selected.JAVA_MODULE": "openjdk-19",
+    "last_opened_file_path": "C:/Users/thoma/IdeaProjects/SSNComputer",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15722656",
+    "project.structure.side.proportion": "0.2",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "editor.preferences.folding",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\thoma\IdeaProjects\SSNComputer\ssn\src\main\resources" />
@@ -72,13 +81,13 @@
       <recent name="ssn" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.SSNComputerTest">
-    <configuration name="SSNComputer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="ssn.SSNComputer" />
-      <module name="ssn" />
+  <component name="RunManager" selected="Application.MailManager">
+    <configuration name="MailManager" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="mail.MailManager" />
+      <module name="mail" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="ssn.*" />
+          <option name="PATTERN" value="mail.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -148,11 +157,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.SSNComputerTest" />
-        <item itemvalue="Application.SSNComputer" />
-        <item itemvalue="JUnit.SSNComputerTest.getPlaceCodeTest" />
+        <item itemvalue="Application.MailManager" />
         <item itemvalue="JUnit.SSNComputerTest,getSurnameConsonantsTest and 3 more" />
+        <item itemvalue="JUnit.SSNComputerTest.getPlaceCodeTest" />
         <item itemvalue="JUnit.SSNComputerTest.getNameConsonantsTest" />
+        <item itemvalue="JUnit.SSNComputerTest" />
       </list>
     </recent_temporary>
   </component>
@@ -174,6 +183,10 @@
       <workItem from="1671277116843" duration="2147000" />
       <workItem from="1671285402521" duration="634000" />
       <workItem from="1671289572805" duration="1000" />
+      <workItem from="1671289585759" duration="289000" />
+      <workItem from="1671289888668" duration="15000" />
+      <workItem from="1671381650660" duration="20000" />
+      <workItem from="1671384021895" duration="4372000" />
     </task>
     <task id="LOCAL-00002" summary="Initial commit">
       <created>1671197334111</created>
@@ -217,7 +230,14 @@
       <option name="project" value="LOCAL" />
       <updated>1671278023299</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="SSNComputer praticamente completo">
+      <created>1671289696309</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1671289696309</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -242,7 +262,8 @@
     <MESSAGE value="Package ssn&#10;SSNComputer" />
     <MESSAGE value="data caricato" />
     <MESSAGE value="SSNComputerTest classe di test completa" />
-    <option name="LAST_COMMIT_MESSAGE" value="SSNComputerTest classe di test completa" />
+    <MESSAGE value="SSNComputer praticamente completo" />
+    <option name="LAST_COMMIT_MESSAGE" value="SSNComputer praticamente completo" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
