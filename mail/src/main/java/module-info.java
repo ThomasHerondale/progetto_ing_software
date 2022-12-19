@@ -3,4 +3,5 @@
  */
 module mail {
     requires java.mail;
+    exports mail;
 }
