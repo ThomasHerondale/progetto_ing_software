@@ -137,8 +137,7 @@ public class MailManager {
      * automatica di un'uscita per un suo turno.
      */
     private static String composeAutoExitRecordedNotice(String name, String surname) {
-        return "Ciao, " +
-                name + " " + surname + ".\n" +
+        return composeHeader(name, surname) +
                 "Ti informiamo che è stata registrata automaticamente un'uscita per il tuo ultimo turno, " +
                 "in quanto risultava mancante di registrazione uscita da più di mezz'ora rispetto all'orario di " +
                 "fine previsto.\n" +
@@ -162,8 +161,7 @@ public class MailManager {
      * di uscite automatiche.
      */
     private static String composeAutoExitLimitReachedNotice(String name, String surname) {
-        return "Ciao, " +
-                name + " " + surname + ".\n" +
+        return composeHeader(name, surname) +
                 "Ti comunichiamo che il sistema ha automaticamente avvisato un impiegato del settore " +
                 "amministrativo, in quanto hai superato il limite di uscite registrate in automatico " +
                 "per questo trimestre.\n" +
@@ -186,8 +184,7 @@ public class MailManager {
      * del suo limite di ritardi.
      */
     private static String composeDelayLimitReachedNotice(String name, String surname) {
-        return "Ciao, " +
-                name + " " + surname + ".\n" +
+        return composeHeader(name, surname) +
                 "Ti comunichiamo che il sistema ha automaticamente avvisato un impiegato del settore " +
                 "amministrativo, in quanto hai superato il limite di ritardi in ingresso " +
                 "per questo trimestre.\n" +
@@ -199,8 +196,7 @@ public class MailManager {
      * proposta di turnazione relativa al successivo trimestre.
      */
     private static String newShiftProposalNotice(String name, String surname) {
-        return "Ciao, " +
-                name + " " + surname + ".\n" +
+        return composeHeader(name, surname) +
                 "Ti scriviamo per notificarti che è disponibile la nuova turnazione per il " +
                 "trimestre successivo. Ti preghiamo di prenderne visione e comunicare in anticipo, " +
                 "se possibile, le tue richieste di astensione.\n" +
@@ -208,12 +204,19 @@ public class MailManager {
     }
 
     /**
+     * Compone l'intestazione della mail con il saluto.
+     */
+    private static String composeHeader(String name, String surname) {
+        return "Ciao, \n" +
+                name + " " + surname + ".\n";
+    }
+
+    /**
      * Compone l'e-mail che sarà inviata al dipendente per comunicargli il calcolo del suo stipendio
      * relativo al mese corrente.
      */
     private static String newSalaryAlert(String name, String surname) {
-        return "Ciao, " +
-                name + " " + surname + ".\n" +
+        return composeHeader(name, surname) +
                 "Ti scriviamo per notificarti che è disponibile il nuovo stipendio " +
                 "calcolato per il mese corrente. Ti preghiamo di prenderne visione.\n" +
                 "Buon lavoro!";
