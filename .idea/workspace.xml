@@ -7,6 +7,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
+    <list default="true" id="ede23f35-2b69-4a58-b0ee-11fb8fd54546" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/model/src/main/java/entities/Shift.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model/src/main/java/entities/Worker.java" beforeDir="false" afterPath="$PROJECT_DIR$/model/src/main/java/entities/Worker.java" afterDir="false" />
     <list default="true" id="0a55aac7-c666-4a99-8fdb-f129917c1d8e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/mail/src/main/java/mail/MailManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/mail/src/main/java/mail/MailManager.java" afterDir="false" />
     </list>
@@ -28,7 +32,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="backend" />
+        <entry key="$PROJECT_DIR$" value="dbms" />
       </map>
     </option>
     <option name="RESET_MODE" value="HARD" />
