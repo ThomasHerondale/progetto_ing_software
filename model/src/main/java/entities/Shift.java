@@ -2,14 +2,13 @@ package entities;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Objects;
 
 public class Shift {
-    private Worker owner;
-    private char rank;
-    private LocalDate date;
-    private LocalTime startTime;
-    private LocalTime endTime;
+    private final Worker owner;
+    private final char rank;
+    private final LocalDate date;
+    private final LocalTime startTime;
+    private final LocalTime endTime;
     private boolean isOvertime;
     private boolean isSubstitution;
 
