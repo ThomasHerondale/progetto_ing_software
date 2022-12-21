@@ -7,14 +7,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ede23f35-2b69-4a58-b0ee-11fb8fd54546" name="Changes" comment="aggiunta notifyNewSalary()">
-    <list default="true" id="ede23f35-2b69-4a58-b0ee-11fb8fd54546" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/model/src/main/java/entities/Shift.java" afterDir="false" />
+    <list default="true" id="0a55aac7-c666-4a99-8fdb-f129917c1d8e" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mail/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/mail/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mail/src/main/java/mail/MailManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/mail/src/main/java/mail/MailManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mail/src/main/java/mail/MailWriter.java" beforeDir="false" afterPath="$PROJECT_DIR$/mail/src/main/java/mail/MailWriter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mail/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/mail/src/main/java/module-info.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -172,18 +169,18 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.MailManager" />
         <item itemvalue="JUnit.SSNComputerTest,getSurnameConsonantsTest and 3 more" />
         <item itemvalue="JUnit.SSNComputerTest.getPlaceCodeTest" />
         <item itemvalue="JUnit.SSNComputerTest.getNameConsonantsTest" />
         <item itemvalue="JUnit.SSNComputerTest" />
-        <item itemvalue="Application.MailManager" />
       </list>
     </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="ede23f35-2b69-4a58-b0ee-11fb8fd54546" name="Changes" comment="" />
+      <changelist id="0a55aac7-c666-4a99-8fdb-f129917c1d8e" name="Changes" comment="" />
       <created>1671121402272</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -210,6 +207,7 @@
       <workItem from="1671567838561" duration="71000" />
       <workItem from="1671618398200" duration="3000" />
       <workItem from="1671618415126" duration="3958000" />
+      <workItem from="1671629185348" duration="1430000" />
     </task>
     <task id="LOCAL-00002" summary="Initial commit">
       <created>1671197334111</created>

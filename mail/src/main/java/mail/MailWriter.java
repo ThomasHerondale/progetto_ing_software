@@ -46,9 +46,9 @@ public class MailWriter {
      * Compone l'e-mail che sarà inviata al dipendente neoassunto per notificargli l'assunzione
      * e comunicargli la sua prima password.
      */
-    static String hiringNotice(String name, String surname, String password) {
+    static String hiringNotice(String fullName, String password) {
         return "Congratulazioni,\n" +
-                name + " " + surname + "!\n" +
+                fullName + "!\n" +
                 "Sei stato assunto presso la nostra azienda! Abbiamo creato per te " +
                 "un account all'interno del nostro sistema.\n" +
                 "La tua prima password è: " + password + "\n" +
@@ -60,9 +60,8 @@ public class MailWriter {
     /**
      * Compone l'e-mail che sarà inviata al dipendente richiedente il reset della password.
      */
-    static String passwordRetrievalEmail(String name, String surname, String password) {
-        return "Ciao, " +
-                name + " " + surname + ".\n" +
+    static String passwordRetrievalEmail(String fullName, String password) {
+        return composeHeader(fullName) +
                 "Come da te richiesto, la tua nuova password è: " + password + ".\n" +
                 SALUTE;
     }
@@ -71,8 +70,8 @@ public class MailWriter {
      * Compone l'e-mail che sarà inviata al dipendente per comunicargli la registrazione
      * automatica di un'uscita per un suo turno.
      */
-    static String autoExitRecordedNotice(String name, String surname) {
-        return composeHeader(name, surname) +
+    static String autoExitRecordedNotice(String fullName) {
+        return composeHeader(fullName) +
                 "Ti informiamo che è stata registrata automaticamente un'uscita per il tuo ultimo turno, " +
                 "in quanto risultava mancante di registrazione uscita da più di mezz'ora rispetto all'orario di " +
                 "fine previsto.\n" +
@@ -84,9 +83,9 @@ public class MailWriter {
      * Compone l'e-mail che sarà inviata all'amministrativo per comunicargli il superamento del limite
      * di uscite automatiche da parte del dipendente specificato.
      */
-    static String autoExitLimitReachedAlert(String name, String surname) {
+    static String autoExitLimitReachedAlert(String fullName) {
         return "Buongiorno.\n" +
-                "Ti scriviamo per notificarti che l'impiegato " + name + " " + surname +
+                "Ti scriviamo per notificarti che l'impiegato " + fullName +
                 " ha superato il limite di uscite registrate in automatico per questo trimestre.\n" +
                 SALUTE;
     }
@@ -95,8 +94,8 @@ public class MailWriter {
      * Compone l'e-mail che sarà inviata al dipendente per comunicargli il superamento del suo limite
      * di uscite automatiche.
      */
-    static String autoExitLimitReachedNotice(String name, String surname) {
-        return composeHeader(name, surname) +
+    static String autoExitLimitReachedNotice(String fullName) {
+        return composeHeader(fullName) +
                 "Ti comunichiamo che il sistema ha automaticamente avvisato un impiegato del settore " +
                 "amministrativo, in quanto hai superato il limite di uscite registrate in automatico " +
                 "per questo trimestre.\n" +
@@ -107,9 +106,9 @@ public class MailWriter {
      * Compone l'e-mail che sarà inviata all'amministrativo per comunicargli il superamento
      * del limite di ritardi da parte del dipendente specificato.
      */
-    static String delayLimitReachedAlert(String name, String surname) {
+    static String delayLimitReachedAlert(String fullName) {
         return "Buongiorno.\n" +
-                "Ti scriviamo per notificarti che l'impiegato " + name + " " + surname +
+                "Ti scriviamo per notificarti che l'impiegato " + fullName +
                 " ha superato il limite di ritardi per questo trimestre.\n" +
                 SALUTE;
     }
@@ -118,8 +117,8 @@ public class MailWriter {
      * Compone l'e-mail che sarà inviata al dipendente per comunicargli il superamento
      * del suo limite di ritardi.
      */
-    static String delayLimitReachedNotice(String name, String surname) {
-        return composeHeader(name, surname) +
+    static String delayLimitReachedNotice(String fullName) {
+        return composeHeader(fullName) +
                 "Ti comunichiamo che il sistema ha automaticamente avvisato un impiegato del settore " +
                 "amministrativo, in quanto hai superato il limite di ritardi in ingresso " +
                 "per questo trimestre.\n" +
@@ -144,8 +143,8 @@ public class MailWriter {
      * Compone l'e-mail che sarà inviata al dipendente per comunicargli il calcolo del suo stipendio
      * relativo al mese corrente.
      */
-    static String newSalaryNotice(String name, String surname, Double salary) {
-        return composeHeader(name, surname) +
+    static String newSalaryNotice(String fullName, Double salary) {
+        return composeHeader(fullName) +
                 "Ti scriviamo per notificarti che è disponibile il nuovo stipendio " +
                 "calcolato per il mese corrente, che ammonta a €" + salary +
                 " netti.\n" +
@@ -158,25 +157,47 @@ public class MailWriter {
      * di sostituire il dipendente {@code absentWorker} per il turno specificato.
      */
     static String substitutionAlert(
-            String recipientName,
-            String recipientSurname,
-            String absentWorkerName,
-            String absentWorkerSurname,
+            String recipientFullName,
+            String absentWorkerFullName,
             LocalDate date,
             LocalTime startTime,
             LocalTime endTime,
             char rank
     ) {
-        return "Ciao, " +
-                recipientName + " " + recipientSurname + ".\n" +
+        return composeHeader(recipientFullName) +
                 "Ti scriviamo per comunicarti che ti è stata assegnata una sostituzione presso l'ufficio " +
                 parseRankChar(rank) + ", per il turno in data " + date.format(DATE_FORMATTER) + ", dalle "
                 + startTime.format(TIME_FORMATTER) + " alle " + endTime.format(TIME_FORMATTER) + ".\n" +
                 "----------------- \n" +
                 "Ecco un riepilogo della sostituzione: \n" +
-                "Impiegato richiedente l'astensione: " + absentWorkerName + " " + absentWorkerSurname + "\n" +
+                "Impiegato richiedente l'astensione: " + absentWorkerFullName + "\n" +
                 "Livello di servizio dell'impiegato: " + parseRankChar(rank) + "\n" +
                 "Data e ora sostituzione: " + date.format(DATE_FORMATTER) + " " +
+                startTime.format(TIME_FORMATTER) + "-" + endTime.format(TIME_FORMATTER) + ".\n" +
+                SALUTE;
+    }
+
+    /**
+     * Compone l'e-mail che sarà inviata al dipendente {@code recipient} per comunicargli l'assegnazione a suo carico
+     * di uno straordinario atto a coprire il dipendente {@code absentWorker} per il turno specificato.
+     */
+    static String overtimeAlert(
+            String recipientFullName,
+            String absentWorkerFullName,
+            LocalDate date,
+            LocalTime startTime,
+            LocalTime endTime,
+            char rank
+    ) {
+        return composeHeader(recipientFullName) +
+                "Ti scriviamo per comunicarti che ti è stato assegnato uno straordinario presso l'ufficio " +
+                parseRankChar(rank) + ", per il tuo turno in data " + date.format(DATE_FORMATTER) + ", dalle " +
+                startTime.format(TIME_FORMATTER) + " alle " + endTime.format(TIME_FORMATTER) + ".\n" +
+                "----------------- \n" +
+                "Ecco un riepilogo dello straordinario: \n" +
+                "Impiegato richiedente l'astensione: " + absentWorkerFullName + "\n" +
+                "Livello di servizio dell'impiegato: " + parseRankChar(rank) + "\n" +
+                "Data e ora straordinario: " + date.format(DATE_FORMATTER) + " " +
                 startTime.format(TIME_FORMATTER) + "-" + endTime.format(TIME_FORMATTER) + ".\n" +
                 SALUTE;
     }
@@ -186,15 +207,13 @@ public class MailWriter {
      * il sistema è riuscito a coprire il turno specificato, ricadente in un periodo di astensione da lui richiesto.
      */
     static String coverageNotice(
-            String name,
-            String surname,
+            String fullName,
             LocalDate date,
             LocalTime startTime,
             LocalTime endTime,
             char rank
     ) {
-        return "Ciao,\n" +
-                name + " " + surname + ".\n" +
+        return composeHeader(fullName) +
                 "Ti scriviamo per comunicarti che il turno in data " + date.format(DATE_FORMATTER) + ", dalle "
                 + startTime.format(TIME_FORMATTER) + " alle " + endTime.format(TIME_FORMATTER) +
                 " presso l'ufficio " + parseRankChar(rank) + ", ricadente in un periodo di astensione " +
@@ -216,10 +235,9 @@ public class MailWriter {
     /**
      * Compone l'intestazione della mail con il saluto.
      */
-    private static String composeHeader(String name, String surname) {
+    private static String composeHeader(String fullName) {
         return "Ciao, \n" +
-                name + " " + surname + ".\n";
+                fullName + ".\n";
     }
 
-    // TODO: overtimeAlert come funziona?
 }

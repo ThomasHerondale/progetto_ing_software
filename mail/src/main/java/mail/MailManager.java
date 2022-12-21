@@ -1,10 +1,13 @@
 package mail;
 
+import entities.Shift;
 import entities.Worker;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 
 import static mail.MailWriter.*;
@@ -67,34 +70,31 @@ public class MailManager {
      * Notifica il dipendente specificato della sua assunzione, e gli comunica la password
      * generata per lui dal sistema.
      * @param mail la mail del nuovo dipendente destinatario
-     * @param name il nome del nuovo dipendente
-     * @param surname il cognome del nuovo dipendente
+     * @param fullName nome e cognome del dipendente destinario
      * @param password la password generata per il nuovo dipendente
      */
-    public void notifyHiring(String mail, String name, String surname, String password) {
-        sendEmail(mail, "Sei assunto!", hiringNotice(name, surname, password));
+    public void notifyHiring(String mail, String fullName, String password) {
+        sendEmail(mail, "Sei assunto!", hiringNotice(fullName, password));
     }
 
     /**
      * Invia la nuova password generata al dipendente specificato, in risposta a una sua richiesta di reset
      * della password.
      * @param mail la mail del dipendente destinatario
-     * @param name il nome del dipendente
-     * @param surname il cognome del dipendente
+     * @param fullName nome e cognome del dipendente destinario
      * @param password la nuova password generata per il dipendente
      */
-    public void notifyNewPassword(String mail, String name, String surname, String password) {
-        sendEmail(mail, "Reset password", passwordRetrievalEmail(name, surname, password));
+    public void notifyNewPassword(String mail, String fullName, String password) {
+        sendEmail(mail, "Reset password", passwordRetrievalEmail(fullName, password));
     }
 
     /**
      * Notifica il dipendente della registrazione automatica di un'uscita a suo nome.
      * @param mail la mail del dipendente destinatario
-     * @param name il nome del dipendente
-     * @param surname il cognome del dipendente
+     * @param fullName nome e cognome del dipendente destinario
      */
-    public void notifyAutoExitRecord(String mail, String name, String surname) {
-        sendEmail(mail, "Uscita automatica registrata", autoExitRecordedNotice(name, surname));
+    public void notifyAutoExitRecord(String mail, String fullName) {
+        sendEmail(mail, "Uscita automatica registrata", autoExitRecordedNotice(fullName));
     }
 
     /**
@@ -103,18 +103,16 @@ public class MailManager {
      * all'amministrativo.
      * @param adminMail la mail dell'amministrativo destinatario
      * @param workerMail la mail del dipendente destinatario
-     * @param workerName il nome del dipendente
-     * @param workerSurname il cognome del dipendente
+     * @param workerFullname nome e cognome del dipendente destinario
      * @apiNote invia due email, una all'amministrativo e una al dipendente
      */
     public void notifyAutoExitLimitReached(String adminMail,
                                            String workerMail,
-                                           String workerName,
-                                           String workerSurname) {
-        var subject = workerName + " " +  workerSurname + " - Limite uscite auto superato";
-        sendEmail(adminMail, subject, autoExitLimitReachedAlert(workerName, workerSurname));
+                                           String workerFullname) {
+        var subject = workerFullname + " - Limite uscite auto superato";
+        sendEmail(adminMail, subject, autoExitLimitReachedAlert(workerFullname));
         sendEmail(workerMail, "Limite uscite auto superato",
-                autoExitLimitReachedNotice(workerName, workerSurname));
+                autoExitLimitReachedNotice(workerFullname));
     }
 
     /**
@@ -122,18 +120,16 @@ public class MailManager {
      * specificato, e notifica il dipendente del superamento e dell'avvertimento all'amministrativo.
      * @param adminMail la mail dell'amministrativo destinatario
      * @param workerMail la mail del dipendente destinatario
-     * @param workerName il nome del dipendente
-     * @param workerSurname il cognome del dipendente
+     * @param workerFullName nome e cognome del dipendente destinario
      * @apiNote invia due email, una all'amministrativo e una al dipendente
      */
     public void notifyDelayLimitReached(String adminMail,
                                         String workerMail,
-                                        String workerName,
-                                        String workerSurname) {
-        var subject = workerName + " " +  workerSurname + " - Limite ritardi superato";
-        sendEmail(adminMail, subject, delayLimitReachedAlert(workerName, workerSurname));
+                                        String workerFullName) {
+        var subject = workerFullName + " - Limite ritardi superato";
+        sendEmail(adminMail, subject, delayLimitReachedAlert(workerFullName));
         sendEmail(workerMail, "Limite ritardi superato",
-                delayLimitReachedNotice(workerName, workerSurname));
+                delayLimitReachedNotice(workerFullName));
     }
 
     /**
@@ -155,12 +151,26 @@ public class MailManager {
         for (var entry : workersMap.entrySet()) {
             /* Una entry workerData è una coppia (mail, stipendio) */
             sendEmail(entry.getKey().getEmail(), "Nuovo stipendio",
-                    newSalaryNotice(entry.getKey().getFullName(), "", entry.getValue()));
+                    newSalaryNotice(entry.getKey().getFullName(), entry.getValue()));
         }
     }
 
-    public void notifySubstitution() {
-        // TODO: Sostituzione model da inserire al posto di tutto
+    public void notifySubstitution(Worker substitute, Worker absent, Shift shift) {
+        sendEmail(substitute.getEmail(), "Sostituzione assegnata",
+                substitutionAlert(
+                        substitute.getFullName(), absent.getFullName(),
+                        shift.getDate(), shift.getStartTime(), shift.getEndTime(), shift.getRank()
+                ));
+        sendCoverageMail(absent, shift);
+    }
+
+    public void notifyOvertime(Worker overtimer, Worker absent, Shift shift) {
+        sendEmail(overtimer.getEmail(), "Straordinario assegnato",
+                overtimeAlert(
+                        overtimer.getFullName(), absent.getFullName(),
+                        shift.getDate(), shift.getStartTime(), shift.getEndTime(), shift.getRank()
+                ));
+        sendCoverageMail(absent, shift);
     }
 
     /**
@@ -184,6 +194,24 @@ public class MailManager {
         }
     }
 
-    // TODO: overtime alert!
+    /**
+     * Intesta e invia la mail di conferma copertura di un turno.
+     */
+    private void sendCoverageMail(Worker absent, Shift shift) {
+        sendEmail(absent.getEmail(), "Assenza coperta",
+                coverageNotice(
+                        absent.getFullName(),
+                        shift.getDate(), shift.getStartTime(), shift.getEndTime(), shift.getRank()
+                ));
+    }
 
+    public static void main(String[] args) {
+        var wk = new Worker("0718424", "Gabriele", "Lombardo",
+                "3203118672", "thomasgabrielherondale@gmail.com", "IBAN");
+        var wk2 = new Worker("009999", "Ale", "Borgy",
+                "3203118672", "thomasgabrielherondale@gmail.com", "IBAN");
+        var sh = new Shift(wk2, 'A', LocalDate.now(), LocalTime.now(), LocalTime.now());
+        var manager = new MailManager();
+        manager.notifyOvertime(wk, wk2, sh);
+    }
 }
