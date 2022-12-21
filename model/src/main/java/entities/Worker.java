@@ -3,24 +3,24 @@ package entities;
 import java.util.Objects;
 
 public class Worker {
-    private String ID;
-    private String name;
-    private String surname;
-    private String phone;
-    private String email;
-    private String IBAN;
+    private final String id;
+    private final String name;
+    private final String surname;
+    private final String phone;
+    private final String email;
+    private final String iban;
 
     public Worker(String id, String name, String surname, String phone, String email, String iban) {
-        this.ID = id;
+        this.id = id;
         this.name = name;
         this.surname = surname;
         this.phone = phone;
         this.email = email;
-        this.IBAN = iban;
+        this.iban = iban;
     }
 
-    public String getID() {
-        return ID;
+    public String getId() {
+        return id;
     }
 
     public String getPhone() {
@@ -31,8 +31,8 @@ public class Worker {
         return email;
     }
 
-    public String getIBAN() {
-        return IBAN;
+    public String getIban() {
+        return iban;
     }
 
     public String getFullName() {
@@ -44,11 +44,11 @@ public class Worker {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Worker worker = (Worker) o;
-        return Objects.equals(ID, worker.ID);
+        return Objects.equals(id, worker.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ID);
+        return Objects.hash(id);
     }
 }
