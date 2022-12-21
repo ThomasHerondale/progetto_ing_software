@@ -21,6 +21,18 @@ public class Worker {
         return ID;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getIBAN() {
+        return IBAN;
+    }
+
     public String getFullName() {
         return name + " " + surname;
     }
