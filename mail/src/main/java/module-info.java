@@ -3,5 +3,6 @@
  */
 module mail {
     requires java.mail;
+    requires model;
     exports mail;
 }

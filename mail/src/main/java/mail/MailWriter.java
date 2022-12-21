@@ -148,8 +148,8 @@ public class MailWriter {
         return composeHeader(name, surname) +
                 "Ti scriviamo per notificarti che è disponibile il nuovo stipendio " +
                 "calcolato per il mese corrente, che ammonta a €" + salary +
-                "netti.\n" +
-                "Per i dettagli, ti preghiamo di accedere al tuo portale." +
+                " netti.\n" +
+                "Per i dettagli, ti preghiamo di accedere al tuo portale.\n" +
                 SALUTE;
     }
 

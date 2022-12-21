@@ -7,12 +7,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ede23f35-2b69-4a58-b0ee-11fb8fd54546" name="Changes" comment="">
+    <list default="true" id="ede23f35-2b69-4a58-b0ee-11fb8fd54546" name="Changes" comment="aggiunta notifyNewSalary()">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mail/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/mail/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mail/src/main/java/mail/MailManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/mail/src/main/java/mail/MailManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mail/src/main/java/mail/MailWriter.java" beforeDir="false" afterPath="$PROJECT_DIR$/mail/src/main/java/mail/MailWriter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mail/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/mail/src/main/java/module-info.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/src/main/java/entities/Worker.java" beforeDir="false" afterPath="$PROJECT_DIR$/model/src/main/java/entities/Worker.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -207,7 +207,7 @@
       <workItem from="1671441037089" duration="8692000" />
       <workItem from="1671567838561" duration="71000" />
       <workItem from="1671618398200" duration="3000" />
-      <workItem from="1671618415126" duration="2843000" />
+      <workItem from="1671618415126" duration="3958000" />
     </task>
     <task id="LOCAL-00002" summary="Initial commit">
       <created>1671197334111</created>
@@ -321,7 +321,14 @@
       <option name="project" value="LOCAL" />
       <updated>1671620002737</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="aggiunta equals e hashcode">
+      <created>1671621294572</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1671621294572</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -367,7 +374,8 @@
     <MESSAGE value="classe worker completata" />
     <MESSAGE value="aggiunta exports in modulo model" />
     <MESSAGE value="aggiunta getter" />
-    <option name="LAST_COMMIT_MESSAGE" value="aggiunta getter" />
+    <MESSAGE value="aggiunta equals e hashcode" />
+    <option name="LAST_COMMIT_MESSAGE" value="aggiunta equals e hashcode" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

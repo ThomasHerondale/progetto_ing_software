@@ -1,12 +1,11 @@
 package mail;
 
+import entities.Worker;
+
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 
 import static mail.MailWriter.*;
 
@@ -147,12 +146,16 @@ public class MailManager {
         }
     }
 
-    // TODO: Worker model da inserire al posto di String!
-    public void notifyNewSalary(Map<String, Double> data) {
-        for (var workerData : data.entrySet()) {
+    /**
+     * Notifica tutti i dipendenti specificati del calcolo del nuovo stipendio del mese corrente, e del suo
+     * importo.
+     * @param workersMap una mappa contenente coppie (dipendente, stipendio)
+     */
+    public void notifyNewSalary(Map<Worker, Double> workersMap) {
+        for (var entry : workersMap.entrySet()) {
             /* Una entry workerData è una coppia (mail, stipendio) */
-            sendEmail(workerData.getKey(), "Nuovo stipendio",
-                    newSalaryNotice("*nome*", "*cognome*", workerData.getValue()));
+            sendEmail(entry.getKey().getEmail(), "Nuovo stipendio",
+                    newSalaryNotice(entry.getKey().getFullName(), "", entry.getValue()));
         }
     }
 
