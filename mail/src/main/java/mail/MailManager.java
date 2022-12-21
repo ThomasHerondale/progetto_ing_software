@@ -6,9 +6,10 @@ import entities.Worker;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
 
 import static mail.MailWriter.*;
 
@@ -155,6 +156,14 @@ public class MailManager {
         }
     }
 
+    /**
+     * Notifica il dipendente a cui è stata assegnata una sostituzione a favore di un altro dipendente, e
+     * il dipendente in questione dell'avvenuta copertura di un turno.
+     * @param substitute il dipendente assegnatario della sostituzione
+     * @param absent il dipendente da sostituire
+     * @param shift il turno cui fa riferimento la sostituzione
+     * @apiNote invia due email, una al sostituto e una al richiedente astensione
+     */
     public void notifySubstitution(Worker substitute, Worker absent, Shift shift) {
         sendEmail(substitute.getEmail(), "Sostituzione assegnata",
                 substitutionAlert(
@@ -164,6 +173,13 @@ public class MailManager {
         sendCoverageMail(absent, shift);
     }
 
+    /**
+     * Notifica il dipendente a cui è stato assegnato uno straordinario a favore di un altro dipendente.
+     * @param overtimer il dipendente assegnatario dello straordinario
+     * @param absent il dipendente da coprire
+     * @param shift il turno cui fa riferimento lo straordinario
+     * @apiNote invia due email, una all'assegnatario dello straordinario e una al richiedente astensione
+     */
     public void notifyOvertime(Worker overtimer, Worker absent, Shift shift) {
         sendEmail(overtimer.getEmail(), "Straordinario assegnato",
                 overtimeAlert(
@@ -203,15 +219,5 @@ public class MailManager {
                         absent.getFullName(),
                         shift.getDate(), shift.getStartTime(), shift.getEndTime(), shift.getRank()
                 ));
-    }
-
-    public static void main(String[] args) {
-        var wk = new Worker("0718424", "Gabriele", "Lombardo",
-                "3203118672", "thomasgabrielherondale@gmail.com", "IBAN");
-        var wk2 = new Worker("009999", "Ale", "Borgy",
-                "3203118672", "thomasgabrielherondale@gmail.com", "IBAN");
-        var sh = new Shift(wk2, 'A', LocalDate.now(), LocalTime.now(), LocalTime.now());
-        var manager = new MailManager();
-        manager.notifyOvertime(wk, wk2, sh);
     }
 }
