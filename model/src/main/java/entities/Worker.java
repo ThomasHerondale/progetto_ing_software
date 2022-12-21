@@ -1,5 +1,7 @@
 package entities;
 
+import java.util.Objects;
+
 public class Worker {
     private String ID;
     private String name;
@@ -35,5 +37,18 @@ public class Worker {
 
     public String getFullName() {
         return name + " " + surname;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Worker worker = (Worker) o;
+        return Objects.equals(ID, worker.ID);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ID);
     }
 }
