@@ -2,10 +2,7 @@ package database;
 
 import entities.Worker;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -42,23 +39,24 @@ public class DBMSDaemon {
      * @return true se le credenziali corrispondono, false altrimenti.
      */
     public boolean checkCredentials(String id, String password) {
-        ResultSet resultSet = formatExecute("""
+        try (
+                var st = connection.prepareStatement("""
                 select w.ID, s.workerPassword
                 from worker w join security s on w.ID = s.refWorkerID
-                where ID = %s
-                """, id);
+                where ID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet  = st.executeQuery();
 
+            if (isResultEmpty(resultSet)) {
+                /* Se la query ha ritornato l'insieme vuoto, la matricola non esiste */
+                return false;
+            } else {
+                String dbId;
+                String dbPassword;
 
-        assert resultSet != null; /* Solo per non fare lamentare il linter */
-        if (isResultEmpty(resultSet)) {
-            /* Se la query ha ritornato l'insieme vuoto, la matricola non esiste */
-            return false;
-        } else {
-            String dbId = null;
-            String dbPassword = null;
-
-            /* Altrimenti ottieni le credenziali dal resultSet e controlla che corrispondano */
-            try {
+                /* Altrimenti ottieni le credenziali dal resultSet e controlla che corrispondano */
                 List<HashMap<String, String>> maps = extractResults(resultSet);
                 assert maps.size() == 1; /* Dovrebbe esserci solo una tupla nel risultato */
 
@@ -66,24 +64,13 @@ public class DBMSDaemon {
 
                 dbId = result.get("ID");
                 dbPassword = result.get("workerPassword");
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            return id.equals(dbId) && dbPassword.equals(password);
-        }
-    }
 
-    /**
-     * Esegue la query specificata nella stringa, formattata <i>c-printf-like</i> con gli argomenti specificati.
-     */
-    private ResultSet formatExecute(String query, Object... args) {
-        try {
-            var st = connection.createStatement();
-            return st.executeQuery(String.format(query, args));
+                return id.equals(dbId) && dbPassword.equals(password);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null; /* Non dovrebbe ritornare mai */
+        return false;
     }
 
     /**
