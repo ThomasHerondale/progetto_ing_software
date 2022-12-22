@@ -34,7 +34,7 @@ public class DBMSDaemon {
 
     public static void main(String[] args) throws SQLException {
         var db = new DBMSDaemon();
-        System.out.println(db.getQuestionsList());
+        db.registerSafetyQuestion("0718424", "2", "prova");
     }
 
     /**
@@ -145,9 +145,31 @@ public class DBMSDaemon {
         }
     }
 
-    public void registerSafetyQuestion(String id, String question, String answer) {
-        // TODO:
+    /**
+     * Registra la domanda di sicurezza specificata e la relativa risposta per l'utente specificato.
+     * Imposta inoltre a vero il flag di primo accesso per l'utente specificato.
+     * @param id la matricola dell'utente
+     * @param questionId l'id della domanda di sicurezza nel database
+     * @param answer la risposta da associare alla domanda
+     * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void registerSafetyQuestion(String id, String questionId, String answer) throws SQLException {
+        try (
+                var st = connection.prepareStatement("""
+                update security
+                set firstAccessFlag = true,
+                    refQuestionID = ?,
+                    answer = ?
+                where refWorkerID = ?
+                """)
+        ) {
+            st.setString(1, questionId);
+            st.setString(2, answer);
+            st.setString(3, id);
+            st.execute();
+        }
     }
+
 
     public Map<String, String> getPasswordRetrievalInfo(String id) {
         // TODO:

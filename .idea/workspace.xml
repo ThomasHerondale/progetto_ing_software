@@ -219,7 +219,7 @@
       <workItem from="1671642463318" duration="5709000" />
       <workItem from="1671708284854" duration="1854000" />
       <workItem from="1671718434276" duration="205000" />
-      <workItem from="1671727816383" duration="5082000" />
+      <workItem from="1671727816383" duration="6024000" />
     </task>
     <task id="LOCAL-00002" summary="Initial commit">
       <created>1671197334111</created>
@@ -396,7 +396,21 @@
       <option name="project" value="LOCAL" />
       <updated>1671731856164</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="getquestionsList">
+      <created>1671733008678</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1671733008678</updated>
+    </task>
+    <task id="LOCAL-00028" summary="javadoc">
+      <created>1671733080431</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1671733080431</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -450,6 +464,7 @@
     <MESSAGE value="checkCredentials, possibile refactoring da fare" />
     <MESSAGE value="refactor, api di mrd" />
     <MESSAGE value="refactor e il secondo checkCredentials&#10;entrambi funzionano&#10;sempre api di mrd" />
+    <MESSAGE value="getquestionsList" />
     <MESSAGE value="javadoc" />
     <option name="LAST_COMMIT_MESSAGE" value="javadoc" />
   </component>
