@@ -36,9 +36,10 @@ public class DBMSDaemon {
      * Verifica che le credenziali specificate esistano e corrispondano con quelle nel database.
      * @param id la matricola da controllare
      * @param password la password da controllare
-     * @return true se le credenziali corrispondono, false altrimenti.
+     * @return true se le credenziali corrispondono, false altrimenti
+     * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
      */
-    public boolean checkCredentials(String id, String password) {
+    public boolean checkCredentials(String id, String password) throws SQLException {
         try (
                 var st = connection.prepareStatement("""
                 select w.ID, s.workerPassword
@@ -53,24 +54,17 @@ public class DBMSDaemon {
                 /* Se la query ha ritornato l'insieme vuoto, la matricola non esiste */
                 return false;
             } else {
-                String dbId;
-                String dbPassword;
-
                 /* Altrimenti ottieni le credenziali dal resultSet e controlla che corrispondano */
                 List<HashMap<String, String>> maps = extractResults(resultSet);
                 assert maps.size() == 1; /* Dovrebbe esserci solo una tupla nel risultato */
 
-                var result = maps.get(0);
-
-                dbId = result.get("ID");
-                dbPassword = result.get("workerPassword");
+                HashMap<String, String> result = maps.get(0);
+                var dbId = result.get("ID");
+                var dbPassword = result.get("workerPassword");
 
                 return id.equals(dbId) && dbPassword.equals(password);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-        return false;
     }
 
     /**
@@ -128,9 +122,33 @@ public class DBMSDaemon {
         return true;
     }
 
-    public boolean checkCredentials(String id, String name, String surname) {
-        // TODO:
-        return false;
+    public boolean checkCredentials(String id, String name, String surname) throws SQLException {
+        try (
+                var st = connection.prepareStatement("""
+                select w.ID, w.workerName, w.workerSurname
+                from worker w
+                where w.ID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+
+            if (isResultEmpty(resultSet)) {
+                /* Se la query ha ritornato l'insieme vuoto, la matricola non esiste */
+                return false;
+            } else {
+                /* Altrimenti ottieni le credenziali dal resultSet e controlla che corrispondano */
+                List<HashMap<String, String>> maps = extractResults(resultSet);
+                assert maps.size() == 1; /* Dovrebbe esserci solo una tupla nel risultato */
+
+                HashMap<String, String> result = maps.get(0);
+                var dbId = result.get("ID");
+                var dbName = result.get("workerName");
+                var dbSurname = result.get("workerSurname");
+
+                return id.equals(dbId) && name.equals(dbName) && surname.equals(dbSurname);
+            }
+        }
     }
 
     public String getFullName(String id) {
