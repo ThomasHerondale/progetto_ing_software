@@ -34,7 +34,7 @@ public class DBMSDaemon {
 
     public static void main(String[] args) throws SQLException {
         var db = new DBMSDaemon();
-        System.out.println(db.checkCredentials("0718424", "Gabriele", "vv"));
+        System.out.println(db.getQuestionsList());
     }
 
     /**
@@ -119,9 +119,25 @@ public class DBMSDaemon {
         return false;
     }
 
-    public Map<String, String> getQuestionsList() {
-        // TODO:
-        return null;
+    public Map<String, String> getQuestionsList() throws SQLException {
+        try (
+                var st = connection.prepareStatement("""
+                select q.IDQuestion, q.question
+                from securityquestion q
+                """)
+        ) {
+            var resultSet = st.executeQuery();
+            assert !isResultEmpty(resultSet); /* Dovrebbero sempre esserci domande nel database */
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+
+            var questionsList = new HashMap<String, String>();
+            for (var map : maps) {
+                /* Rimuovi i nomi delle colonne, creando coppie (ID, domanda) */
+                questionsList.put(map.get("IDQuestion"), map.get("question"));
+            }
+            return questionsList;
+        }
     }
 
     public void registerSafetyQuestion(String id, String question, String answer) {
