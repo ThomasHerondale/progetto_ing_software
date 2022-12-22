@@ -119,6 +119,11 @@ public class DBMSDaemon {
         return false;
     }
 
+    /**
+     * Ottiene dal database la lista di tutte le possibili domande di sicurezza, insieme al loro ID.
+     * @return una mappa contenente coppie (ID, domanda)
+     * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public Map<String, String> getQuestionsList() throws SQLException {
         try (
                 var st = connection.prepareStatement("""
