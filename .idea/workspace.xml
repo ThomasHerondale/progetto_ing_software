@@ -217,7 +217,9 @@
       <workItem from="1671629185348" duration="3074000" />
       <workItem from="1671635812764" duration="2011000" />
       <workItem from="1671642463318" duration="5709000" />
-      <workItem from="1671708284854" duration="521000" />
+      <workItem from="1671708284854" duration="1854000" />
+      <workItem from="1671718434276" duration="205000" />
+      <workItem from="1671727816383" duration="2022000" />
     </task>
     <task id="LOCAL-00002" summary="Initial commit">
       <created>1671197334111</created>
@@ -359,7 +361,14 @@
       <option name="project" value="LOCAL" />
       <updated>1671631069905</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="una prima istanza, poor design">
+      <created>1671709082381</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1671709082381</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -409,7 +418,8 @@
     <MESSAGE value="ignore" />
     <MESSAGE value="notifica straordinario implementata" />
     <MESSAGE value="javadocs" />
-    <option name="LAST_COMMIT_MESSAGE" value="javadocs" />
+    <MESSAGE value="una prima istanza, poor design" />
+    <option name="LAST_COMMIT_MESSAGE" value="una prima istanza, poor design" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
