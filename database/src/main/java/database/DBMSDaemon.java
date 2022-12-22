@@ -32,6 +32,11 @@ public class DBMSDaemon {
 
     // TODO: err cmmdbms
 
+    public static void main(String[] args) throws SQLException {
+        var db = new DBMSDaemon();
+        System.out.println(db.checkCredentials("0718424", "Gabriele", "vv"));
+    }
+
     /**
      * Verifica che le credenziali specificate esistano e corrispondano con quelle nel database.
      * @param id la matricola da controllare
@@ -68,60 +73,13 @@ public class DBMSDaemon {
     }
 
     /**
-     * Estrae tutte le righe del resultSet specificato, convertendole in mappe (nome_colonna, valore_colonna).
+     * Verifica che le credenziali specificate esistano e corrispondano con quelle nel database.
+     * @param id la matricola da controllare
+     * @param name il nome da controllare
+     * @param surname il cognome da controllare
+     * @return true se le credenziali corrispondono, false altrimenti
+     * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
      */
-    private List<HashMap<String, String>> extractResults(ResultSet resultSet) throws SQLException {
-        var results = new ArrayList<HashMap<String, String>>();
-
-        /* Fino a quando c'è un'altra riga, vacci ed estrai i risultati in una mappa */
-        while (resultSet.next()) {
-            var rowMap = extractRow(resultSet);
-            results.add(rowMap); /* Aggiungi la mappa all'array di mappe */
-        }
-        return results;
-    }
-
-    /**
-     * Estrae una riga dal resultSet specificato e la converte in una mappa (nome_colonna, valore_colonna).
-     */
-    private HashMap<String, String> extractRow(ResultSet resultSet) throws SQLException {
-        var labels = getColumnLabels(resultSet);
-        var rowMap = new HashMap<String, String>();
-
-        /* Per ogni colonna del risultato */
-        for (String label : labels) {
-            rowMap.put(label, resultSet.getString(label));
-        }
-        return rowMap;
-    }
-
-    /**
-     * Ottiene i nomi delle colonne del resultSet specificato.
-     */
-    private String[] getColumnLabels(ResultSet resultSet) throws SQLException {
-        var meta = resultSet.getMetaData();
-        var labels = new ArrayList<String>();
-
-        /* 1 ... il numero delle colonne + 1, poiché gli indici vanno da 1 */
-        for (var i = 1; i < meta.getColumnCount() + 1; i++) {
-            labels.add(meta.getColumnLabel(i));
-        }
-
-        return labels.toArray(new String[0]);
-    }
-
-    /**
-     * Ritorna vero se il resultSet specificato è vuoto.
-     */
-    private boolean isResultEmpty(ResultSet resultSet) {
-        try {
-            return !resultSet.isBeforeFirst();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return true;
-    }
-
     public boolean checkCredentials(String id, String name, String surname) throws SQLException {
         try (
                 var st = connection.prepareStatement("""
@@ -257,7 +215,61 @@ public class DBMSDaemon {
     public void setParentalLeavePeriod(String id, LocalDate startDate, LocalDate endDate) {
         // TODO:    
     }
-    
+
+    /**
+     * Estrae tutte le righe del resultSet specificato, convertendole in mappe (nome_colonna, valore_colonna).
+     */
+    private List<HashMap<String, String>> extractResults(ResultSet resultSet) throws SQLException {
+        var results = new ArrayList<HashMap<String, String>>();
+
+        /* Fino a quando c'è un'altra riga, vacci ed estrai i risultati in una mappa */
+        while (resultSet.next()) {
+            var rowMap = extractRow(resultSet);
+            results.add(rowMap); /* Aggiungi la mappa all'array di mappe */
+        }
+        return results;
+    }
+
+    /**
+     * Estrae una riga dal resultSet specificato e la converte in una mappa (nome_colonna, valore_colonna).
+     */
+    private HashMap<String, String> extractRow(ResultSet resultSet) throws SQLException {
+        var labels = getColumnLabels(resultSet);
+        var rowMap = new HashMap<String, String>();
+
+        /* Per ogni colonna del risultato */
+        for (String label : labels) {
+            rowMap.put(label, resultSet.getString(label));
+        }
+        return rowMap;
+    }
+
+    /**
+     * Ottiene i nomi delle colonne del resultSet specificato.
+     */
+    private String[] getColumnLabels(ResultSet resultSet) throws SQLException {
+        var meta = resultSet.getMetaData();
+        var labels = new ArrayList<String>();
+
+        /* 1 ... il numero delle colonne + 1, poiché gli indici vanno da 1 */
+        for (var i = 1; i < meta.getColumnCount() + 1; i++) {
+            labels.add(meta.getColumnLabel(i));
+        }
+
+        return labels.toArray(new String[0]);
+    }
+
+    /**
+     * Ritorna vero se il resultSet specificato è vuoto.
+     */
+    private boolean isResultEmpty(ResultSet resultSet) {
+        try {
+            return !resultSet.isBeforeFirst();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
     
 
 }
