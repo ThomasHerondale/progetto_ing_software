@@ -114,9 +114,27 @@ public class DBMSDaemon {
         return null;
     }
 
-    public boolean isFirstAccess(String id) {
-        // TODO:
-        return false;
+    // TODO: tinyInt issue
+    public boolean isFirstAccess(String id) throws SQLException {
+        try (
+                var st = connection.prepareStatement("""
+                select firstAccessFlag
+                from worker join security s on worker.ID = s.refWorkerID
+                where worker.ID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+
+            assert !isResultEmpty(resultSet); /* Le credenziali esistono, viene controllato prima */
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Dovrebbe esserci un solo flag per matricola */
+
+            HashMap<String, String> result = maps.get(0);
+
+            return Boolean.parseBoolean(result.get("firstAccessFlag"));
+        }
     }
 
     /**
