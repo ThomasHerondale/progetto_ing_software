@@ -34,7 +34,7 @@ public class DBMSDaemon {
 
     public static void main(String[] args) throws SQLException {
         var db = new DBMSDaemon();
-        System.out.println(db.getFullName("0718424"));
+        System.out.println(db.checkAnswer("0718424", "prova"));
     }
 
     /**
@@ -223,9 +223,26 @@ public class DBMSDaemon {
         return null;
     }
 
-    public boolean checkAnswer(String id, String answer) {
-        // TODO:
-        return false;
+    public boolean checkAnswer(String id, String answer) throws SQLException {
+        try (
+                var st = connection.prepareStatement("""
+                select s.answer
+                from worker w join security s on w.ID = s.refWorkerID
+                where w.ID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+
+            assert !isResultEmpty(resultSet);
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Dovrebbe esserci un solo dipendente per id */
+
+            HashMap<String, String> result = maps.get(0);
+
+            return answer.equals(result.get("answer"));
+        }
     }
 
     // TODO: tre metodi getMailData da analizzare?
