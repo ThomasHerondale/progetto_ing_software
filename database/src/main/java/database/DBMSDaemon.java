@@ -34,7 +34,7 @@ public class DBMSDaemon {
 
     public static void main(String[] args) throws SQLException {
         var db = new DBMSDaemon();
-        db.registerSafetyQuestion("0718424", "2", "prova");
+        System.out.println(db.isFirstAccess("0718424"));
     }
 
     /**
@@ -114,7 +114,12 @@ public class DBMSDaemon {
         return null;
     }
 
-    // TODO: tinyInt issue
+    /**
+     * Verifica che il dipendente associato alla matricola specificata debba ancora eseguire il primo accesso.
+     * @param id la matricola del dipendente
+     * @return true se il dipendente non ha ancora effettuato il primo accesso, false altrimenti
+     * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public boolean isFirstAccess(String id) throws SQLException {
         try (
                 var st = connection.prepareStatement("""
@@ -133,7 +138,8 @@ public class DBMSDaemon {
 
             HashMap<String, String> result = maps.get(0);
 
-            return Boolean.parseBoolean(result.get("firstAccessFlag"));
+            /* Se il flag è settato a 0, il primo accesso è ancora da fare */
+            return result.get("firstAccessFlag").equals("0");
         }
     }
 
