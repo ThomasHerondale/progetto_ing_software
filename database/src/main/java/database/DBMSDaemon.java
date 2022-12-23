@@ -34,7 +34,7 @@ public class DBMSDaemon {
 
     public static void main(String[] args) throws SQLException {
         var db = new DBMSDaemon();
-        System.out.println(db.isFirstAccess("0718424"));
+        System.out.println(db.getFullName("0718424"));
     }
 
     /**
@@ -109,9 +109,32 @@ public class DBMSDaemon {
         }
     }
 
-    public String getFullName(String id) {
-        // TODO:
-        return null;
+    /**
+     * Ottiene dal database il nome completo del dipendente associato alla matricola specificata.
+     * @param id la matricola del dipendente
+     * @return una stringa del tipo "nome cognome" del dipendente
+     * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public String getFullName(String id) throws SQLException {
+        try (
+                var st = connection.prepareStatement("""
+                select w.workerName, w.workerSurname
+                from worker w
+                where w.ID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+
+            assert !isResultEmpty(resultSet);
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Dovrebbe esserci un solo dipendente per id */
+
+            HashMap<String, String> result = maps.get(0);
+
+            return result.get("workerName") + " " + result.get("workerSurname");
+        }
     }
 
     /**
