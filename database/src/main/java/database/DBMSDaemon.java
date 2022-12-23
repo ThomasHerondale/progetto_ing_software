@@ -223,6 +223,14 @@ public class DBMSDaemon {
         return null;
     }
 
+    /**
+     * Controlla che la risposta specificata alla domanda di sicurezza del dipendente specificato
+     * corrisponda con quella inserita al momento del primo accesso.
+     * @param id la matricola del dipendente
+     * @param answer la risposta da controllare
+     * @return true se la risposta corrisponde, false altrimenti
+     * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public boolean checkAnswer(String id, String answer) throws SQLException {
         try (
                 var st = connection.prepareStatement("""
