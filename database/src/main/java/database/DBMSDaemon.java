@@ -34,7 +34,7 @@ public class DBMSDaemon {
 
     public static void main(String[] args) throws SQLException {
         var db = new DBMSDaemon();
-        System.out.println(db.checkAnswer("0718424", "prova"));
+        System.out.println(db.getLastid());
     }
 
     /**
@@ -255,8 +255,26 @@ public class DBMSDaemon {
 
     // TODO: tre metodi getMailData da analizzare?
 
-    public long getLastid() {
-        return 0;
+
+    /**
+     * Ottiene la matricola più grande presente nel database.
+     * @return il massimo dell'insieme delle matricole dei dipendenti nel database
+     * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public long getLastid() throws SQLException {
+        try (
+                var st = connection.prepareStatement("""
+                select max(w.ID) as lastId
+                from worker w
+                """)
+        ) {
+            var resultSet = st.executeQuery();
+
+            /* Spostati sulla prima e unica riga */
+            resultSet.next();
+
+            return resultSet.getLong(1);
+        }
     }
 
     public void createWorker(Worker worker, LocalDate birthDate, String birthPlace,
