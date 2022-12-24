@@ -54,7 +54,6 @@ public class FirstAccessPopup {
                 }
             });
         });
-
     }
     @FXML
     public void clickConfirm(ActionEvent event) {
