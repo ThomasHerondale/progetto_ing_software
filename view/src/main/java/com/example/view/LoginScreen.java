@@ -31,12 +31,13 @@ public class LoginScreen {
         loginHandler = new LoginHandler();
     }
     @FXML
-    void clickLogin(ActionEvent event) {
+    public void clickLogin(ActionEvent event) {
+
         loginHandler.clickedLogin(idField.getText(), passwordField.getText());
     }
 
     @FXML
-    void clickRetrievePassword(ActionEvent event) {
+    public void clickRetrievePassword(ActionEvent event) {
 
     }
 }
