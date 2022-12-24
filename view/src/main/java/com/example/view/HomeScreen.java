@@ -29,32 +29,32 @@ public class HomeScreen {
     private Group workersCard;
 
     @FXML
-    void clickPresences(MouseEvent event) {
+    public void clickPresences(MouseEvent event) {
 
     }
 
     @FXML
-    void clickProfile(MouseEvent event) {
+    public void clickProfile(MouseEvent event) {
 
     }
 
     @FXML
-    void clickShiftsRecap(MouseEvent event) {
+    public void clickShiftsRecap(MouseEvent event) {
 
     }
 
     @FXML
-    void clickShowShifts(MouseEvent event) {
+    public void clickShowShifts(MouseEvent event) {
 
     }
 
     @FXML
-    void clickViewSalary(MouseEvent event) {
+    public void clickViewSalary(MouseEvent event) {
 
     }
 
     @FXML
-    void clickWorkers(MouseEvent event) {
+    public void clickWorkers(MouseEvent event) {
 
     }
 
