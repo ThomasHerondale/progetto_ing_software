@@ -32,11 +32,6 @@ public class DBMSDaemon {
 
     // TODO: err cmmdbms
 
-    public static void main(String[] args) throws SQLException {
-        var db = new DBMSDaemon();
-        System.out.println(db.getLastid());
-    }
-
     /**
      * Verifica che le credenziali specificate esistano e corrispondano con quelle nel database.
      * @param id la matricola da controllare
@@ -44,7 +39,7 @@ public class DBMSDaemon {
      * @return true se le credenziali corrispondono, false altrimenti
      * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
      */
-    public boolean checkCredentials(String id, String password) throws SQLException {
+    public boolean checkCredentials(String id, String password) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
                 select w.ID, s.workerPassword
@@ -69,6 +64,8 @@ public class DBMSDaemon {
 
                 return id.equals(dbId) && dbPassword.equals(password);
             }
+        } catch (SQLException e) {
+            throw new DBMSException(e);
         }
     }
 
@@ -80,7 +77,7 @@ public class DBMSDaemon {
      * @return true se le credenziali corrispondono, false altrimenti
      * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
      */
-    public boolean checkCredentials(String id, String name, String surname) throws SQLException {
+    public boolean checkCredentials(String id, String name, String surname) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
                 select w.ID, w.workerName, w.workerSurname
@@ -106,6 +103,8 @@ public class DBMSDaemon {
 
                 return id.equals(dbId) && name.equals(dbName) && surname.equals(dbSurname);
             }
+        } catch (SQLException e) {
+            throw new DBMSException(e);
         }
     }
 
@@ -115,7 +114,7 @@ public class DBMSDaemon {
      * @return una stringa del tipo "nome cognome" del dipendente
      * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
      */
-    public String getFullName(String id) throws SQLException {
+    public String getFullName(String id) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
                 select w.workerName, w.workerSurname
@@ -134,6 +133,8 @@ public class DBMSDaemon {
             HashMap<String, String> result = maps.get(0);
 
             return result.get("workerName") + " " + result.get("workerSurname");
+        } catch (SQLException e) {
+            throw new DBMSException(e);
         }
     }
 
@@ -143,7 +144,7 @@ public class DBMSDaemon {
      * @return true se il dipendente non ha ancora effettuato il primo accesso, false altrimenti
      * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
      */
-    public boolean isFirstAccess(String id) throws SQLException {
+    public boolean isFirstAccess(String id) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
                 select firstAccessFlag
@@ -163,6 +164,8 @@ public class DBMSDaemon {
 
             /* Se il flag è settato a 0, il primo accesso è ancora da fare */
             return result.get("firstAccessFlag").equals("0");
+        } catch (SQLException e) {
+            throw new DBMSException(e);
         }
     }
 
@@ -171,7 +174,7 @@ public class DBMSDaemon {
      * @return una mappa contenente coppie (ID, domanda)
      * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
      */
-    public Map<String, String> getQuestionsList() throws SQLException {
+    public Map<String, String> getQuestionsList() throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
                 select q.IDQuestion, q.question
@@ -189,6 +192,8 @@ public class DBMSDaemon {
                 questionsList.put(map.get("IDQuestion"), map.get("question"));
             }
             return questionsList;
+        } catch (SQLException e) {
+            throw new DBMSException(e);
         }
     }
 
@@ -200,7 +205,7 @@ public class DBMSDaemon {
      * @param answer la risposta da associare alla domanda
      * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
      */
-    public void registerSafetyQuestion(String id, String questionId, String answer) throws SQLException {
+    public void registerSafetyQuestion(String id, String questionId, String answer) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
                 update security
@@ -214,6 +219,8 @@ public class DBMSDaemon {
             st.setString(2, answer);
             st.setString(3, id);
             st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
         }
     }
 
@@ -231,7 +238,7 @@ public class DBMSDaemon {
      * @return true se la risposta corrisponde, false altrimenti
      * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
      */
-    public boolean checkAnswer(String id, String answer) throws SQLException {
+    public boolean checkAnswer(String id, String answer) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
                 select s.answer
@@ -250,6 +257,8 @@ public class DBMSDaemon {
             HashMap<String, String> result = maps.get(0);
 
             return answer.equals(result.get("answer"));
+        } catch (SQLException e) {
+            throw new DBMSException(e);
         }
     }
 
@@ -261,7 +270,7 @@ public class DBMSDaemon {
      * @return il massimo dell'insieme delle matricole dei dipendenti nel database
      * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
      */
-    public long getLastid() throws SQLException {
+    public long getLastid() throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
                 select max(w.ID) as lastId
@@ -274,6 +283,8 @@ public class DBMSDaemon {
             resultSet.next();
 
             return resultSet.getLong(1);
+        } catch (SQLException e) {
+            throw new DBMSException(e);
         }
     }
 
