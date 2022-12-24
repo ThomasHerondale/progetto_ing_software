@@ -1,4 +1,4 @@
-module com.example.view {
+module view {
     requires javafx.controls;
     requires javafx.fxml;
     requires model;

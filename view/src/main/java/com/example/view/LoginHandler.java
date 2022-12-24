@@ -3,8 +3,6 @@ package com.example.view;
 import database.DBMSDaemon;
 import database.DBMSException;
 import entities.Worker;
-
-import java.sql.SQLException;
 import java.util.HashMap;
 
 public class LoginHandler {
@@ -27,8 +25,8 @@ public class LoginHandler {
                     questionsList.put("1", "Ti piace la banana?");
                     questionsList.put("22", "Ti piace la mela?");
                     questionsList.put("3", "Ti piace la pera?");
-                    Worker worker = new Worker("1234567", "alessandro", "borgese", "3331234567", "ale@gmail.com", "IT000");
-                    NavigationManager.getInstance().createPopup("Primo Accesso", controllerClass -> new FirstAccessPopup(questionsList, worker, this));
+                    Worker worker2 = new Worker("1234567", "alessandro", "borgese", "3331234567", "ale@gmail.com", "IT000");
+                    NavigationManager.getInstance().createPopup("Primo Accesso", controllerClass -> new FirstAccessPopup(questionsList, worker2, this));
                     //NavigationManager.getInstance().createScreen("Home (Admin)", controllerClass -> new HomeScreen());
                     //}
                     //}
