@@ -1,5 +1,6 @@
 package com.example.view;
 
+import database.DBMSException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -32,7 +33,6 @@ public class LoginScreen {
     }
     @FXML
     public void clickLogin(ActionEvent event) {
-
         loginHandler.clickedLogin(idField.getText(), passwordField.getText());
     }
 
