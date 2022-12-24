@@ -57,7 +57,7 @@ public class FirstAccessPopup {
 
     }
     @FXML
-    void clickConfirm(ActionEvent event) {
+    public void clickConfirm(ActionEvent event) {
         loginHandler.clickedConfirm(questionSelected, answerField.getText());
     }
 }
