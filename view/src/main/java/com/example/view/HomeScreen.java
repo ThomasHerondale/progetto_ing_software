@@ -1,5 +1,6 @@
 package com.example.view;
 
+import entities.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
@@ -27,6 +28,12 @@ public class HomeScreen {
 
     @FXML
     private Group workersCard;
+
+    private Worker worker;
+
+    public HomeScreen(Worker worker){
+        this.worker = worker;
+    }
 
     @FXML
     public void clickPresences(MouseEvent event) {

@@ -34,6 +34,7 @@ public class LoginScreen {
     @FXML
     public void clickLogin(ActionEvent event) {
         loginHandler.clickedLogin(idField.getText(), passwordField.getText());
+
     }
 
     @FXML
