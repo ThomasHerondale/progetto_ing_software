@@ -13,7 +13,7 @@ public class LoginHandler {
 
 
     public void clickedLogin(String id, String password) {
-        // Non sono sicuro che la successiva riga serva realmente.
+        //TODO:
         DBMSDaemon.getInstance();
         try {
             /* Il seguente if verifica che le credenziali inserite siano corrette */
@@ -74,6 +74,7 @@ public class LoginHandler {
         */
     }
     public void clickedConfirm(String question, String answer){
+        //TODO:
         //DBMSDaemon.registerSafetyQuestion(id, question, answer);
         NavigationManager.getInstance().closePopup("Primo Accesso");
         System.out.println("Hai chiuso e fatto tutto");

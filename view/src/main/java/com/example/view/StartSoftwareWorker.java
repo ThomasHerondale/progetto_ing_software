@@ -2,7 +2,6 @@ package com.example.view;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 
 /**
  * Questa classe è il punto di ingresso dell'applicazione javafx. Essa effettua un override del metodo

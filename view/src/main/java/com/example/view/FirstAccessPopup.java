@@ -50,6 +50,7 @@ public class FirstAccessPopup {
         questionBox.setOnAction(this::onQuestionSelected);
     }
     private void onQuestionSelected(ActionEvent event){
+        //TODO:
         questionsList.forEach((chiave,valore) -> {
             if (questionBox.getValue().equals(valore)){
                 questionSelected = valore;

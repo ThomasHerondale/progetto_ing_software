@@ -34,35 +34,39 @@ public class HomeScreen {
     public HomeScreen(Worker worker){
         this.worker = worker;
     }
+    @FXML
+    public void initialize(){
+        //TODO:
+    }
 
     @FXML
     public void clickPresences(MouseEvent event) {
-
+        //TODO:
     }
 
     @FXML
     public void clickProfile(MouseEvent event) {
-
+        //TODO:
     }
 
     @FXML
     public void clickShiftsRecap(MouseEvent event) {
-
+        //TODO:
     }
 
     @FXML
     public void clickShowShifts(MouseEvent event) {
-
+        //TODO:
     }
 
     @FXML
     public void clickViewSalary(MouseEvent event) {
-
+        //TODO:
     }
 
     @FXML
     public void clickWorkers(MouseEvent event) {
-
+        //TODO:
     }
 
 }

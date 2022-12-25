@@ -27,18 +27,15 @@ public class LoginScreen {
     private Hyperlink passwordRetrievalLink;
 
     private LoginHandler loginHandler;
-    public LoginScreen() {
-
+    public LoginScreen(){
         loginHandler = new LoginHandler();
     }
     @FXML
     public void clickLogin(ActionEvent event) {
         loginHandler.clickedLogin(idField.getText(), passwordField.getText());
-
     }
-
     @FXML
     public void clickRetrievePassword(ActionEvent event) {
-
+        //TODO:
     }
 }
