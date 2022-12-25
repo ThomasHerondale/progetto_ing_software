@@ -12,7 +12,7 @@ public class StartSoftwareWorker extends Application{
     /**
      * Mostra la prima schermata del software,
      * ovvero la schermata di login.
-     * @param primaryStage è lo stage principale dell'applicazione in cui viene caricato una scena
+     * @param primaryStage è lo stage principale dell'applicazione in cui viene caricata una scena.
      */
     @Override
     public void start(Stage primaryStage){
