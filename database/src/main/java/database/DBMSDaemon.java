@@ -3,6 +3,7 @@ package database;
 import entities.Worker;
 
 import java.sql.*;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -300,7 +301,7 @@ public class DBMSDaemon {
             st.setString(1, worker.getId());
             st.setString(2, worker.getName());
             st.setString(3, worker.getSurname());
-            st.setString(4, birthDate.toString());
+            st.setDate(4, Date.valueOf(birthDate));
             st.setString(5, birthPlace);
             st.setString(6, String.valueOf(sex));
             st.setString(7, ssn);
@@ -329,8 +330,43 @@ public class DBMSDaemon {
         }
     }
 
-    public void createStrike(String name, String description, LocalDate date, Map<String, String> ranks) {
-        // TODO:
+    public void createStrike(String name, String description, LocalDate date, Map<Character, String> ranks)
+            throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                insert into Strike(strikeName, strikeDate, descriptionStrike, A, B, C, D, Adm)
+                values (?, ?, ?, ?, ?, ?, ?, ?)
+                """)
+        ) {
+            /* Assicurati che i valori della mappa siano solo stringhe "true" e "false" */
+            if (!ranks.values().stream().allMatch(str -> str.equals("true") || str.equals("false")))
+                throw new AssertionError("ranks deve contenere solo flag, i.e." +
+                        "stringhe \"true\" o \"false\".");
+            /* Assicurati che le chiavi della mappa siano solo caratteri corrispondenti ai ranghi */
+            if (!ranks.keySet().containsAll(List.of('A', 'B', 'C', 'D', 'H')))
+                throw new AssertionError("ranks risulta mancante dei flag per alcuni livelli.");
+
+            st.setString(1, name);
+            st.setDate(2, Date.valueOf(date));
+            st.setString(3, description);
+
+            /* Setta i flag dei livelli nella query */
+            int paramCounter = 4;
+            for (var rank : List.of('A', 'B', 'C', 'D', 'H')) {
+
+                var strFlag = ranks.get(rank);
+                var intflag = strFlag.equals("true") ? 1 : 0;
+
+                st.setInt(paramCounter, intflag);
+                paramCounter++;
+            }
+
+            assert paramCounter == 8;
+
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     public void insertHolidayInterruption(LocalDate startDate, LocalDate endDate) {
