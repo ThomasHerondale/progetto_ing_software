@@ -5,6 +5,7 @@ import entities.Worker;
 import java.sql.*;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 
 public class DBMSDaemon {
@@ -264,7 +265,6 @@ public class DBMSDaemon {
     }
 
     // TODO: tre metodi getMailData da analizzare?
-
 
     /**
      * Ottiene la matricola più grande presente nel database.
@@ -643,12 +643,42 @@ public class DBMSDaemon {
 
     // TODO: metodo setStrikeParticipation?
 
+    /* TODO: e chi minchia ava a controllari senza id? */
     public void checkParentalLeaveCounter(LocalDate startDate, LocalDate endDate) {
-        // TODO:
+        /* Aggiungendo un giorno a endDate perché between() ha endDate esclusa
+        * Ottiene i giorni e moltiplica per 24 per le ore */
+        var dayCount = Period.between(startDate, endDate.plusDays(1)).getDays() * 24;
     }
 
-    public void setParentalLeavePeriod(String id, LocalDate startDate, LocalDate endDate) {
-        // TODO:    
+    public void setParentalLeavePeriod(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
+        try (
+                var inSt = connection.prepareStatement("""
+                insert into abstention (refWorkerID, startDate, endDate, type)
+                values (?, ?, ?, 'ParentalLeave')
+                """);
+                var upSt = connection.prepareStatement("""
+                update Counters
+                set parentalLeaveCount = parentalLeaveCount - ?
+                where refWorkerID = ?
+                """)
+        ) {
+            /* Riempi l'insert */
+            inSt.setString(1, id);
+            inSt.setDate(2, Date.valueOf(startDate));
+            inSt.setDate(3, Date.valueOf(endDate));
+
+            /* Calcola le ore di congedo parentale */
+            var dayCount = Period.between(startDate, endDate.plusDays(1)).getDays() * 24;
+
+            /* Riempi l'update */
+            upSt.setInt(1, dayCount);
+            upSt.setString(2, id);
+
+            inSt.execute();
+            upSt.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     /**
