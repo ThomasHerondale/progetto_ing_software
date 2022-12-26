@@ -489,14 +489,47 @@ public class DBMSDaemon {
         }
     }
 
-    // TODO: getWorkerRank da fare
+    /**
+     * Promuove il dipendente specificato al livello successivo, secondo la scala D > C > B > A.
+     * @param id la matricola del dipendente
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     * @apiNote gli impiegati del livello Amministrativo 'H' non possono essere promossi
+     */
+    public void promoteWorker(String id) throws DBMSException {
+        var rankSuccession = List.of('D', 'C', 'B', 'A');
 
-    public void promoteWorker(String id) {
-        // TODO: getWorkerRank da fare
+        /* Calcola il livello dopo la promozione */
+        var currentRank = getWorkerRank(id);
+        assert rankSuccession.contains(currentRank);
+        var newRank = rankSuccession.get(rankSuccession.indexOf(currentRank) + 1);
+
+        try (
+                var st = connection.prepareStatement("""
+                update Worker
+                set workerRank = ?
+                where ID = ?
+                """)
+        ) {
+            st.setString(1, String.valueOf(newRank));
+            st.setString(2, id);
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
-    public void removeWorker(String id) {
-        // TODO:
+    public void removeWorker(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                delete from worker
+                where ID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     /**
@@ -549,7 +582,7 @@ public class DBMSDaemon {
 
     public static void main(String[] args) throws DBMSException {
         var db = new DBMSDaemon();
-        System.out.println(db.getWorkerRank("98765"));
+        db.promoteWorker("0718424");
     }
 
     /**
