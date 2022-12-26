@@ -298,6 +298,16 @@ public class DBMSDaemon {
                 """)
         ) {
             st.setString(1, worker.getId());
+            st.setString(2, worker.getName());
+            st.setString(3, worker.getSurname());
+            st.setString(4, birthDate.toString());
+            st.setString(5, birthPlace);
+            st.setString(6, String.valueOf(sex));
+            st.setString(7, ssn);
+            st.setString(8, String.valueOf(rank));
+            st.setString(9, worker.getIban());
+            st.setString(10, worker.getPhone());
+            st.setString(11, worker.getEmail());
             st.execute();
         } catch (SQLException e) {
             throw new DBMSException(e);
