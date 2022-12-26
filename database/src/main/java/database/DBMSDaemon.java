@@ -38,7 +38,7 @@ public class DBMSDaemon {
      * @param id la matricola da controllare
      * @param password la password da controllare
      * @return true se le credenziali corrispondono, false altrimenti
-     * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public boolean checkCredentials(String id, String password) throws DBMSException {
         try (
@@ -76,7 +76,7 @@ public class DBMSDaemon {
      * @param name il nome da controllare
      * @param surname il cognome da controllare
      * @return true se le credenziali corrispondono, false altrimenti
-     * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public boolean checkCredentials(String id, String name, String surname) throws DBMSException {
         try (
@@ -113,7 +113,7 @@ public class DBMSDaemon {
      * Ottiene dal database il nome completo del dipendente associato alla matricola specificata.
      * @param id la matricola del dipendente
      * @return una stringa del tipo "nome cognome" del dipendente
-     * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public String getFullName(String id) throws DBMSException {
         try (
@@ -143,7 +143,7 @@ public class DBMSDaemon {
      * Verifica che il dipendente associato alla matricola specificata debba ancora eseguire il primo accesso.
      * @param id la matricola del dipendente
      * @return true se il dipendente non ha ancora effettuato il primo accesso, false altrimenti
-     * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public boolean isFirstAccess(String id) throws DBMSException {
         try (
@@ -173,7 +173,7 @@ public class DBMSDaemon {
     /**
      * Ottiene dal database la lista di tutte le possibili domande di sicurezza, insieme al loro ID.
      * @return una mappa contenente coppie (ID, domanda)
-     * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public Map<String, String> getQuestionsList() throws DBMSException {
         try (
@@ -204,7 +204,7 @@ public class DBMSDaemon {
      * @param id la matricola dell'utente
      * @param questionId l'id della domanda di sicurezza nel database
      * @param answer la risposta da associare alla domanda
-     * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public void registerSafetyQuestion(String id, String questionId, String answer) throws DBMSException {
         try (
@@ -237,7 +237,7 @@ public class DBMSDaemon {
      * @param id la matricola del dipendente
      * @param answer la risposta da controllare
      * @return true se la risposta corrisponde, false altrimenti
-     * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public boolean checkAnswer(String id, String answer) throws DBMSException {
         try (
@@ -269,7 +269,7 @@ public class DBMSDaemon {
     /**
      * Ottiene la matricola più grande presente nel database.
      * @return il massimo dell'insieme delle matricole dei dipendenti nel database
-     * @throws SQLException se si verifica un errore di qualunque tipo, in relazione al database
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public long getLastid() throws DBMSException {
         try (
@@ -482,7 +482,9 @@ public class DBMSDaemon {
     }
 
     // TODO: getWorkerRank da fare
+
     public void promoteWorker(String id) {
+        // TODO: getWorkerRank da fare
     }
 
     public void removeWorker(String id) {
@@ -498,7 +500,7 @@ public class DBMSDaemon {
         try (
                 var st = connection.prepareStatement("""
                 update Counters
-                set delayCount = 0 , autoExitCount = 0, holidayCount = 0, parentalLeaveCount = 0
+                set delayCount = 0 , autoExitCount = 0, holidayCount = 0
                 """)
         ) {
             st.execute();
@@ -507,14 +509,33 @@ public class DBMSDaemon {
         }
     }
 
+    // TODO: analizzare
     public void getWorkersList() {
         // TODO:
     }
 
     // TODO: metodo getAccountData?
 
-    public void enableParentalLeave(String id, int hours) {
-        // TODO:
+    public void enableParentalLeave(String id, int hours) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                insert into counters(refWorkerID, parentalLeaveCount)
+                values(?, ?)
+                on duplicate key update parentalLeaveCount = ?
+                """)
+        ) {
+            st.setString(1, id);
+            st.setInt(2, hours);
+            st.setInt(3, hours);
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    public static void main(String[] args) throws DBMSException {
+        var db = new DBMSDaemon();
+        db.enableParentalLeave("0718424", 100);
     }
 
     public void getAuthorizedStrikes(char rank) {
