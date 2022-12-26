@@ -389,8 +389,25 @@ public class DBMSDaemon {
         }
     }
 
-    public void insertHolidayInterruption(LocalDate startDate, LocalDate endDate) {
-        // TODO:
+    /**
+     * Inserisce un periodo di blocco delle ferie nel database.
+     * @param startDate la data di inizio del periodo di blocco
+     * @param endDate la data di fine del periodo di blocco
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void insertHolidayInterruption(LocalDate startDate, LocalDate endDate) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                insert into HolidayInterruption(startDate, endDate)
+                values (?, ?)
+                """)
+        ) {
+            st.setDate(1, Date.valueOf(startDate));
+            st.setDate(2, Date.valueOf(endDate));
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     public void getWorkerInfo(String id) {
