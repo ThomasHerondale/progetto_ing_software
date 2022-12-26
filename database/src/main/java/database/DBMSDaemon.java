@@ -518,6 +518,11 @@ public class DBMSDaemon {
         }
     }
 
+    /**
+     * Rimuove dal database il dipendente specificato e tutti i dati ad esso associati.
+     * @param id la matricola del dipendente
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public void removeWorker(String id) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
