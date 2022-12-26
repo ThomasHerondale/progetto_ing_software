@@ -325,16 +325,24 @@ public class DBMSDaemon {
         }
     }
 
-    // TODO: problema perché è update o insert?
+    /**
+     * Memorizza nel database la password specificata per il dipendente specificato, eventualmente
+     * sovrascrivendo quella precedente.
+     * @param id la matricola del dipendente
+     * @param password la nuova password del dipendente
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public void registerPassword(String id, String password) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
                 insert into Security (refWorkerID, workerPassword)
                 values (?, ?)
+                on duplicate key update workerPassword = ?
                 """)
         ) {
             st.setString(1, id);
             st.setString(2, password);
+            st.setString(3, password);
             st.execute();
         } catch (SQLException e) {
             throw new DBMSException(e);
@@ -516,6 +524,12 @@ public class DBMSDaemon {
 
     // TODO: metodo getAccountData?
 
+    /**
+     * Abilita il dipendente specificato a ricevere il congedo parentale per un totale di ore specificato.
+     * @param id la matricola del dipendente
+     * @param hours il numero di ore di congedo concesse
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public void enableParentalLeave(String id, int hours) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
@@ -535,7 +549,7 @@ public class DBMSDaemon {
 
     public static void main(String[] args) throws DBMSException {
         var db = new DBMSDaemon();
-        db.enableParentalLeave("0718424", 100);
+        db.registerPassword("098765", "camnbio2");
     }
 
     public void getAuthorizedStrikes(char rank) {
