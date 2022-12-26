@@ -3,6 +3,7 @@ package database;
 import entities.Worker;
 
 import java.sql.*;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -288,60 +289,222 @@ public class DBMSDaemon {
         }
     }
 
+    /**
+     * Inserisce un dipendente nel database usando i dati specificati.
+     * @param worker l'oggetto {@link Worker} contenente alcuni dei dati
+     * @param birthDate la data di nascita del dipendente
+     * @param birthPlace il luogo di nascita del dipendente
+     * @param sex il sesso del dipendente
+     * @param ssn il codice fiscale del dipendente
+     * @param rank il livello del dipendente
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public void createWorker(Worker worker, LocalDate birthDate, String birthPlace,
                              char sex, String ssn, char rank) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
-                insert into Worker(ID, workerName, workerSurname, birthDate, birthplace, sex, \
-                SSN, workerRank, IBAN, telNumber, email)\s
+                insert into Worker(ID, workerName, workerSurname, birthDate, birthplace, sex,
+                SSN, workerRank, IBAN, telNumber, email)
                 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """)
         ) {
             st.setString(1, worker.getId());
+            st.setString(2, worker.getName());
+            st.setString(3, worker.getSurname());
+            st.setDate(4, Date.valueOf(birthDate));
+            st.setString(5, birthPlace);
+            st.setString(6, String.valueOf(sex));
+            st.setString(7, ssn);
+            st.setString(8, String.valueOf(rank));
+            st.setString(9, worker.getIban());
+            st.setString(10, worker.getPhone());
+            st.setString(11, worker.getEmail());
             st.execute();
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
     }
 
-    public void registerPassword(String id, String password) {
-        // TODO:
+    // TODO: problema perché è update o insert?
+    public void registerPassword(String id, String password) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                insert into Security (refWorkerID, workerPassword)
+                values (?, ?)
+                """)
+        ) {
+            st.setString(1, id);
+            st.setString(2, password);
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
-    public void createStrike(String name, String description, LocalDate date, Map<String, String> ranks) {
-        // TODO:
+    /**
+     * Inserisce uno sciopero nel database usando i dati specificati.
+     * @param name il nome dello sciopero
+     * @param description la descrizione dello sciopero
+     * @param date la data dello sciopero
+     * @param ranks una mappa di coppie (livello, stringa_flag), dove stringa_flag è una stringa
+     *              "true" o "false"
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void createStrike(String name, String description, LocalDate date, Map<Character, String> ranks)
+            throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                insert into Strike(strikeName, strikeDate, descriptionStrike, A, B, C, D, Adm)
+                values (?, ?, ?, ?, ?, ?, ?, ?)
+                """)
+        ) {
+            /* Assicurati che i valori della mappa siano solo stringhe "true" e "false" */
+            if (!ranks.values().stream().allMatch(str -> str.equals("true") || str.equals("false")))
+                throw new AssertionError("ranks deve contenere solo flag, i.e." +
+                        "stringhe \"true\" o \"false\".");
+            /* Assicurati che le chiavi della mappa siano solo caratteri corrispondenti ai ranghi */
+            if (!ranks.keySet().containsAll(List.of('A', 'B', 'C', 'D', 'H')))
+                throw new AssertionError("ranks risulta mancante dei flag per alcuni livelli.");
+
+            st.setString(1, name);
+            st.setDate(2, Date.valueOf(date));
+            st.setString(3, description);
+
+            /* Setta i flag dei livelli nella query */
+            int paramCounter = 4;
+            for (var rank : List.of('A', 'B', 'C', 'D', 'H')) {
+
+                var strFlag = ranks.get(rank);
+                var intflag = strFlag.equals("true") ? 1 : 0;
+
+                st.setInt(paramCounter, intflag);
+                paramCounter++;
+            }
+
+            assert paramCounter == 8;
+
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
-    public void insertHolidayInterruption(LocalDate startDate, LocalDate endDate) {
-        // TODO:
+    /**
+     * Inserisce un periodo di blocco delle ferie nel database.
+     * @param startDate la data di inizio del periodo di blocco
+     * @param endDate la data di fine del periodo di blocco
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void insertHolidayInterruption(LocalDate startDate, LocalDate endDate) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                insert into HolidayInterruption(startDate, endDate)
+                values (?, ?)
+                """)
+        ) {
+            st.setDate(1, Date.valueOf(startDate));
+            st.setDate(2, Date.valueOf(endDate));
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     public void getWorkerInfo(String id) {
         // TODO:
     }
 
-    public void changeEmail(String id, String newMail) {
-        // TODO:
+    /**
+     * Sostituisce la mail dell'impiegato specificato memorizzata nel database con quella specificata.
+     * @param id la matricola dell'impiegato
+     * @param newMail la nuova mail
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void changeEmail(String id, String newMail) throws DBMSException {
+       try (
+               var st = connection.prepareStatement("""
+               update Worker
+               set email = ?
+               where ID = ?
+               """)
+       ) {
+           st.setString(1, newMail);
+           st.setString(2, id);
+           st.execute();
+       } catch (SQLException e) {
+           throw new DBMSException(e);
+       }
     }
 
-    public void changeIban(String id, String newIban) {
-        // TODO:
+    /**
+     * Sostituisce l'iban dell'impiegato specificato memorizzato nel database con quello specificato.
+     * @param id la matricola dell'impiegato
+     * @param newIban il nuovo iban
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void changeIban(String id, String newIban) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                update Worker
+                set IBAN = ?
+                where ID = ?
+                """)
+        ) {
+            st.setString(1, newIban);
+            st.setString(2, id);
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
-    public void changePhone(String id, String newPhone) {
-        // TODO:
+    /**
+     * Sostituisce il numero di telefono dell'impiegato specificato memorizzato nel database
+     * con quello specificato.
+     * @param id la matricola dell'impiegato
+     * @param newPhone il nuovo numero di telefono
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void changePhone(String id, String newPhone) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                update Worker
+                set telNumber = ?
+                where ID = ?
+                """)
+        ) {
+            st.setString(1, newPhone);
+            st.setString(2, id);
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
+    // TODO: getWorkerRank da fare
     public void promoteWorker(String id) {
-        // TODO:
     }
 
     public void removeWorker(String id) {
         // TODO:
     }
 
-    public void resetCounters() {
-        // TODO:
+    /**
+     * Resetta i contatori di tutti i dipendenti presenti nel database.
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void resetCounters() throws DBMSException {
+        //noinspection SqlWithoutWhere
+        try (
+                var st = connection.prepareStatement("""
+                update Counters
+                set delayCount = 0 , autoExitCount = 0, holidayCount = 0, parentalLeaveCount = 0
+                """)
+        ) {
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     public void getWorkersList() {
