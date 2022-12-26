@@ -289,6 +289,16 @@ public class DBMSDaemon {
         }
     }
 
+    /**
+     * Inserisce un dipendente nel database usando i dati specificati.
+     * @param worker l'oggetto {@link Worker} contenente alcuni dei dati
+     * @param birthDate la data di nascita del dipendente
+     * @param birthPlace il luogo di nascita del dipendente
+     * @param sex il sesso del dipendente
+     * @param ssn il codice fiscale del dipendente
+     * @param rank il livello del dipendente
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public void createWorker(Worker worker, LocalDate birthDate, String birthPlace,
                              char sex, String ssn, char rank) throws DBMSException {
         try (
@@ -315,6 +325,7 @@ public class DBMSDaemon {
         }
     }
 
+    // TODO: problema perché è update o insert?
     public void registerPassword(String id, String password) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
@@ -330,6 +341,15 @@ public class DBMSDaemon {
         }
     }
 
+    /**
+     * Inserisce uno sciopero nel database usando i dati specificati.
+     * @param name il nome dello sciopero
+     * @param description la descrizione dello sciopero
+     * @param date la data dello sciopero
+     * @param ranks una mappa di coppie (livello, stringa_flag), dove stringa_flag è una stringa
+     *              "true" o "false"
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public void createStrike(String name, String description, LocalDate date, Map<Character, String> ranks)
             throws DBMSException {
         try (
