@@ -414,16 +414,71 @@ public class DBMSDaemon {
         // TODO:
     }
 
-    public void changeEmail(String id, String newMail) {
-        // TODO:
+    /**
+     * Sostituisce la mail dell'impiegato specificato memorizzata nel database con quella specificata.
+     * @param id la matricola dell'impiegato
+     * @param newMail la nuova mail
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void changeEmail(String id, String newMail) throws DBMSException {
+       try (
+               var st = connection.prepareStatement("""
+               update Worker
+               set email = ?
+               where ID = ?
+               """)
+       ) {
+           st.setString(1, newMail);
+           st.setString(2, id);
+           st.execute();
+       } catch (SQLException e) {
+           throw new DBMSException(e);
+       }
     }
 
-    public void changeIban(String id, String newIban) {
-        // TODO:
+    /**
+     * Sostituisce l'iban dell'impiegato specificato memorizzato nel database con quello specificato.
+     * @param id la matricola dell'impiegato
+     * @param newIban il nuovo iban
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void changeIban(String id, String newIban) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                update Worker
+                set IBAN = ?
+                where ID = ?
+                """)
+        ) {
+            st.setString(1, newIban);
+            st.setString(2, id);
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
-    public void changePhone(String id, String newPhone) {
-        // TODO:
+    /**
+     * Sostituisce il numero di telefono dell'impiegato specificato memorizzato nel database
+     * con quello specificato.
+     * @param id la matricola dell'impiegato
+     * @param newPhone il nuovo numero di telefono
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void changePhone(String id, String newPhone) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                update Worker
+                set telNumber = ?
+                where ID = ?
+                """)
+        ) {
+            st.setString(1, newPhone);
+            st.setString(2, id);
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     public void promoteWorker(String id) {
