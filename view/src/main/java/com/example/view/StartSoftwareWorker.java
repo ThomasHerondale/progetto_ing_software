@@ -21,6 +21,7 @@ public class StartSoftwareWorker extends Application{
 
     /**
      * Il metodo che fa partire l'applicazione.
+     *
      */
     public static void main(String[] args) {
         launch();

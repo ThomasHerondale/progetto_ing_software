@@ -30,16 +30,17 @@ public class FirstAccessPopup {
 
     @FXML
     private ComboBox<String> questionBox;
+    private HashMap<String, String> questionsList;  
 
     private Worker worker;
-    private HashMap<String, String> questionsList;
+
     private String questionSelected;
     private LoginHandler loginHandler;
 
     //costruttore
-    public FirstAccessPopup(HashMap<String, String> questionsList, Worker worker, LoginHandler handler) {
+    public FirstAccessPopup(Map<String, String> questionsList, Worker worker, LoginHandler handler) {
         this.worker = worker;
-        this.questionsList = questionsList;
+        this.questionsList = (HashMap<String, String>) questionsList;
         this.loginHandler = handler;
     }
 

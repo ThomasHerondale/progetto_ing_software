@@ -12,7 +12,6 @@ public class LoginHandler {
 
     public void clickedLogin(String id, String password) {
         //TODO:
-        DBMSDaemon.getInstance();
         try {
             /* Il seguente if verifica che le credenziali inserite siano corrette */
             if (DBMSDaemon.getInstance().checkCredentials(id, password)){
@@ -44,7 +43,7 @@ public class LoginHandler {
             }
 
         } catch (DBMSException e) {
-            throw new RuntimeException(e);
+            //TODO:
         }
         /*
         DBMSDeamon è una variabile d'istanza?
