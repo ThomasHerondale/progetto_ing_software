@@ -481,16 +481,30 @@ public class DBMSDaemon {
         }
     }
 
+    // TODO: getWorkerRank da fare
     public void promoteWorker(String id) {
-        // TODO:
     }
 
     public void removeWorker(String id) {
         // TODO:
     }
 
-    public void resetCounters() {
-        // TODO:
+    /**
+     * Resetta i contatori di tutti i dipendenti presenti nel database.
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void resetCounters() throws DBMSException {
+        //noinspection SqlWithoutWhere
+        try (
+                var st = connection.prepareStatement("""
+                update Counters
+                set delayCount = 0 , autoExitCount = 0, holidayCount = 0, parentalLeaveCount = 0
+                """)
+        ) {
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     public void getWorkersList() {
