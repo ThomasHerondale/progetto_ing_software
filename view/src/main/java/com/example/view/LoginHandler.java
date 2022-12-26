@@ -9,8 +9,6 @@ public class LoginHandler {
 
     private String id;
 
-    public LoginHandler(){}
-
 
     public void clickedLogin(String id, String password) {
         //TODO:
