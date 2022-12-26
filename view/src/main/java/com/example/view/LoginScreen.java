@@ -1,12 +1,12 @@
 package com.example.view;
 
-import database.DBMSException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 
 public class LoginScreen {
 
@@ -25,10 +25,14 @@ public class LoginScreen {
 
     @FXML
     private Hyperlink passwordRetrievalLink;
+    @FXML
+    private ImageView logo;
 
     private LoginHandler loginHandler;
+    private RetrievePasswordHandler retrievePasswordHandler;
     public LoginScreen(){
         loginHandler = new LoginHandler();
+        retrievePasswordHandler = new RetrievePasswordHandler();
     }
     @FXML
     public void clickLogin(ActionEvent event) {
@@ -36,6 +40,6 @@ public class LoginScreen {
     }
     @FXML
     public void clickRetrievePassword(ActionEvent event) {
-        //TODO:
+        retrievePasswordHandler.clickedRetrievePassword();
     }
 }
