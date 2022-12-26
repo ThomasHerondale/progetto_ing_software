@@ -289,8 +289,19 @@ public class DBMSDaemon {
     }
 
     public void createWorker(Worker worker, LocalDate birthDate, String birthPlace,
-                             char sex, String ssn, char rank) {
-        // TODO:
+                             char sex, String ssn, char rank) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                insert into Worker(ID, workerName, workerSurname, birthDate, birthplace, sex, \
+                SSN, workerRank, IBAN, telNumber, email)\s
+                values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """)
+        ) {
+            st.setString(1, worker.getId());
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     public void registerPassword(String id, String password) {
