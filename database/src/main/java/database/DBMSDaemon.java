@@ -549,11 +549,31 @@ public class DBMSDaemon {
 
     public static void main(String[] args) throws DBMSException {
         var db = new DBMSDaemon();
-        db.registerPassword("098765", "camnbio2");
+        System.out.println(db.getAuthorizedStrikes('A'));
     }
 
-    public void getAuthorizedStrikes(char rank) {
-        // TODO:
+    /**
+     * Ottiene la lista degli scioperi autorizzati presenti nel database per il livello specificato.
+     * @param rank il livello di cui ottenere gli scioperi
+     * @return una lista di mappe, ognuna rappresentante un singolo sciopero. Ogni mappa è formata da coppie
+     * (nome_attributo, valore_attributo)
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public List<HashMap<String, String>> getAuthorizedStrikes(char rank) throws DBMSException {
+        var queryStr = """
+                select strikeName, strikeDate, descriptionStrike
+                from Strike
+                """;
+        queryStr = queryStr + "where Strike." + rank + " = true";
+        try (
+                var st = connection.createStatement()
+        ) {
+            var resultSet = st.executeQuery(queryStr);
+
+            return extractResults(resultSet);
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
     public void getWorkerRank(String id) {
         // TODO:
