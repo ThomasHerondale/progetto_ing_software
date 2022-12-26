@@ -292,8 +292,8 @@ public class DBMSDaemon {
                              char sex, String ssn, char rank) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
-                insert into Worker(ID, workerName, workerSurname, birthDate, birthplace, sex, \
-                SSN, workerRank, IBAN, telNumber, email)\s
+                insert into Worker(ID, workerName, workerSurname, birthDate, birthplace, sex,
+                SSN, workerRank, IBAN, telNumber, email)
                 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """)
         ) {
@@ -314,8 +314,19 @@ public class DBMSDaemon {
         }
     }
 
-    public void registerPassword(String id, String password) {
-        // TODO:
+    public void registerPassword(String id, String password) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                insert into Security (refWorkerID, workerPassword)
+                values (?, ?)
+                """)
+        ) {
+            st.setString(1, id);
+            st.setString(2, password);
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     public void createStrike(String name, String description, LocalDate date, Map<String, String> ranks) {
