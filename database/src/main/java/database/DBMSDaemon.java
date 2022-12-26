@@ -549,7 +549,7 @@ public class DBMSDaemon {
 
     public static void main(String[] args) throws DBMSException {
         var db = new DBMSDaemon();
-        System.out.println(db.getAuthorizedStrikes('A'));
+        System.out.println(db.getWorkerRank("98765"));
     }
 
     /**
@@ -575,8 +575,32 @@ public class DBMSDaemon {
             throw new DBMSException(e);
         }
     }
-    public void getWorkerRank(String id) {
-        // TODO:
+
+    /**
+     * Ottiene il livello del dipendente specificato.
+     * @param id la matricola del dipendente
+     * @return il carattere associato al livello del dipendente ('H' per Amministrativo)
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public Character getWorkerRank(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT workerRank
+                FROM Worker
+                WHERE ID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Dovrebbe esserci un solo dipendente con un id */
+
+            var map = maps.get(0);
+            return map.get("workerRank").charAt(0); /* Converte la stringa in char */
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     // TODO: metodo setStrikeParticipation?
