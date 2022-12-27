@@ -4,6 +4,7 @@ import database.DBMSDaemon;
 import database.DBMSException;
 import mail.MailManager;
 
+import java.util.Map;
 import java.util.Random;
 
 public class RetrievePasswordHandler {
@@ -23,8 +24,9 @@ public class RetrievePasswordHandler {
             if (DBMSDaemon.getInstance().checkAnswer(id, answer)){
                 String newPassword = generatePassword();
                 DBMSDaemon.getInstance().registerPassword(id, newPassword);
-                DBMSDaemon.getInstance().getMailData(id);
-                MailManager.getInstance().notifyNewPassword();
+                Map<String, String> mailData = DBMSDaemon.getInstance().getMailData(id);
+                String fullName = mailData.get("name") + " " + mailData.get("surname");
+                MailManager.getInstance().notifyNewPassword(mailData.get("email"), fullName, newPassword);
                 NavigationManager.getInstance().closePopup("Safety Question");
             } else {
                 NavigationManager.getInstance().createPopup("Error Message",
