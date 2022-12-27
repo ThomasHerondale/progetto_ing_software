@@ -257,7 +257,7 @@ public class DBMSDaemon {
     /**
      * Ottiene le informazioni relative al recupero della password per il dipendente specificato.
      * @param id la matricola del dipendente
-     * @return una mappa del tipo {("flag", int), ("questionID", string), ("question", string)} se
+     * @return una mappa del tipo {("firstAccessFlag", int), ("questionID", string), ("question", string)} se
      * la matricola specificata ha trovato riscontro nel database, altrimenti una mappa vuota {}
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
@@ -792,6 +792,11 @@ public class DBMSDaemon {
         }
     }
 
+    /**
+     * Ottiene tutti i periodi di blocco delle ferie memorizzati nel database.
+     * @return una lista di oggetti {@link Period} rappresentanti ciascuno un periodo di blocco
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public List<Period> getHolidayInterruptions() throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
@@ -811,6 +816,32 @@ public class DBMSDaemon {
             }
 
             return holidayInterruptions;
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    public boolean checkHolidayCounter(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
+        /* Aggiungendo un giorno a endDate perché between() ha endDate esclusa
+         *  Ottiene i giorni e moltiplica per 24 per le ore */
+        var dayCount = java.time.Period.between(startDate, endDate.plusDays(1)).getDays() * 24;
+
+        try (
+                var st = connection.prepareStatement("""
+                select parentalLeaveCount
+                from counters
+                where refWorkerID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Ci dovrebbe essere un solo conteggio per dipendente */
+
+            var map = maps.get(0);
+            var counter = Integer.parseInt(map.get("parentalLeaveCount"));
+            return counter >= dayCount;
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
