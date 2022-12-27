@@ -26,20 +26,16 @@ public class MailManager {
     /**
      * L'istanza di questa classe, secondo il pattern <i>Singleton</i>.
      */
-    MailManager instance;
-    /**
-     * Le variabili di sistema e del protoccolo SMTP.
-     */
-    Properties properties;
+    private static MailManager instance;
     /**
      * La sessione di SMTP che la classe useerà per inviare le mail.
      */
-    Session session;
+    private final Session session;
 
     /* Costruttore privato per impedire l'istanziazione di questa classe. */
     private MailManager() {
         /* Imposta le variabili relative al protocollo SMTP */
-        this.properties = System.getProperties();
+        Properties properties = System.getProperties();
         properties.put("mail.smtp.host", "smtp.gmail.com");
         properties.put("mail.smtp.port", "465");
         properties.put("mail.smtp.ssl.enable", "true");
@@ -62,7 +58,7 @@ public class MailManager {
      * Ritorna l'unica istanza possibile di {@link MailManager}, creandola se questa non è mai stata creata.
      * @return l'istanza di {@link MailManager}
      */
-    public MailManager getInstance() {
+    public static MailManager getInstance() {
         /* Se instance è null ritorna una nuova instanza, altrimenti ritorna instance */
         return Objects.requireNonNullElseGet(instance, MailManager::new);
     }
