@@ -10,12 +10,12 @@ import java.util.Random;
 public class RetrievePasswordHandler {
     private String id;
     public void clickedConfirm(String id){
-
         try {
-            DBMSDaemon.getInstance().getPasswordRetrievalInfo(id);
-        } catch (DBMSException e){
-            //TODO:
+            Map<String,String> passwordRetrievalInfo = DBMSDaemon.getInstance().getPasswordRetrievalInfo(id);
+        } catch (DBMSException e) {
+            throw new RuntimeException(e);
         }
+
         this.id = id;
         //continua...
     }
