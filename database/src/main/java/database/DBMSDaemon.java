@@ -257,14 +257,14 @@ public class DBMSDaemon {
     /**
      * Ottiene le informazioni relative al recupero della password per il dipendente specificato.
      * @param id la matricola del dipendente
-     * @return una mappa del tipo {("firstAccessFlag", int), ("questionID", string), ("question", string)} se
+     * @return una mappa del tipo {("firstAccessFlag", int), ("question", string)} se
      * la matricola specificata ha trovato riscontro nel database, altrimenti una mappa vuota {}
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public Map<String, String> getPasswordRetrievalInfo(String id) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
-                select firstAccessFlag, refQuestionID as questionID, question
+                select firstAccessFlag, question
                 from security join securityquestion on refQuestionID = IDQuestion
                 where refWorkerID = ?
                 """)
@@ -849,6 +849,18 @@ public class DBMSDaemon {
             var map = maps.get(0);
             var counter = Integer.parseInt(map.get("holidayCount"));
             return counter >= dayCount;
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    public void setHolidayPeriod(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                INSERT INTO abstention (refWorkerID, startDate, endDate, type)
+                VALUES (?, ?, ?, 'Holiday')
+                """)
+                ) {
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
