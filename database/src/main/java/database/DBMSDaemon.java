@@ -1,11 +1,13 @@
 package database;
 
 import commons.Period;
+import entities.Shift;
 import entities.Worker;
 
 import java.sql.Date;
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 
 public class DBMSDaemon {
@@ -776,8 +778,7 @@ public class DBMSDaemon {
             inSt.setDate(2, Date.valueOf(startDate));
             inSt.setDate(3, Date.valueOf(endDate));
 
-            /* Calcola le ore di congedo parentale
-            *  Aggiungendo un giorno a endDate perché between() ha endDate esclusa */
+            /* Calcola le ore di congedo parentale */
             var dayCount = Period.dayCount(startDate, endDate) * 24;
 
             /* Riempi l'update */
@@ -863,9 +864,46 @@ public class DBMSDaemon {
      */
     public void setHolidayPeriod(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
         try (
-                var st = connection.prepareStatement("""
+                var inSt = connection.prepareStatement("""
                 insert into abstention (refWorkerID, startDate, endDate, type)
                 values (?, ?, ?, 'Holiday')
+                """);
+                var upSt = connection.prepareStatement("""
+                update Counters
+                set holidayCount = holidayCount - ?
+                WHERE refWorkerID = ?
+                """)
+        ) {
+            inSt.setString(1, id);
+            inSt.setDate(2, Date.valueOf(startDate));
+            inSt.setDate(3, Date.valueOf(endDate));
+
+            /* Calcola le ore di ferie */
+            var dayCount = Period.dayCount(startDate, endDate) * 24;
+
+            /* Riempi l'update */
+            upSt.setInt(1, dayCount);
+            upSt.setString(2, id);
+
+            inSt.execute();
+            upSt.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
+     * Memorizza nel database un periodo di malattia per il dipendente specificato.
+     * @param id la matricola del dipendente
+     * @param startDate la data di inizio del periodo di ferie
+     * @param endDate la data di fine del periodo di ferie
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void setIllnessPeriod(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                insert into abstention (refWorkerID, startDate, endDate, type)
+                values (?, ?, ?, 'Illness')
                 """)
         ) {
             st.setString(1, id);
@@ -876,6 +914,98 @@ public class DBMSDaemon {
             throw new DBMSException(e);
         }
     }
+
+    // TODO: getData chi cazzu è?
+
+    /**
+     * Inserisce nel database i turni contenuti nella proposta di turnazione specificata.
+     * @param shiftProposal la proposta di turnazione
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void uploadShiftProposal(List<Shift> shiftProposal) throws DBMSException {
+        if (shiftProposal.isEmpty()) throw new AssertionError(); /* Dovrebbe esserci almeno un turno */
+
+        /* Assembla la stringa per la query */
+        var valuesBuilder = new StringBuilder();
+        for (var shift : shiftProposal) {
+            valuesBuilder.append("('");
+            valuesBuilder.append(shift.getOwner().getId()).append("', '");
+            valuesBuilder.append(shift.getRank()).append("', '");
+            valuesBuilder.append(shift.getDate().toString()).append("', '");
+            valuesBuilder.append(shift.getStartTime().toString()).append("', '");
+            valuesBuilder.append(shift.getEndTime().toString()).append("'");
+            valuesBuilder.append(")");
+            valuesBuilder.append(", ");
+        }
+
+        /* Rimuovendo da valuesBuilder l'ultima virgola */
+        var sql = "insert into shift (refWorkerID, workerRank, shiftDate, shiftStart, shiftEnd) " +
+                "values " + valuesBuilder.deleteCharAt(valuesBuilder.lastIndexOf(", "));
+        try (var st = connection.createStatement()) {
+            st.execute(sql);
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    public static void main(String[] args) throws DBMSException {
+        var db = new DBMSDaemon();
+        /*var sh1 = new Shift(new Worker(
+                "098765", "hds", "dd",
+                "", "", ""),
+                'A', LocalDate.now(), LocalTime.NOON, LocalTime.MIDNIGHT);
+        var sh2 = new Shift(new Worker(
+                "0718424", "gab", "lom",
+                "322", "fhdd", "jckcke"),
+                'B', LocalDate.now().plusDays(1), LocalTime.now(), LocalTime.now());
+        db.uploadShiftProposal(List.of(sh1, sh2)); */
+        System.out.println(db.getShiftsList());
+    }
+
+    // TODO: getWorkersDataList?
+
+    /**
+     * Ottiene la lista di tutti i turni memorizzati nel database.
+     * @return una lista di tutti i turni presenti nel database
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public List<Shift> getShiftsList() throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                select W.ID, W.workerName, W.workerSurname, W.telNumber, W.email, W.IBAN,
+                S.workerRank, S.shiftDate, S.shiftStart, S.shiftEnd
+                from Worker W join Shift S on ( W.ID = S.refWorkerID )
+                """)
+        ) {
+            var resultSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+
+            List<Shift> shifts = new ArrayList<>();
+            for (var map : maps) {
+                /* Crea un turno coi dati estratti dal database */
+                shifts.add(new Shift(
+                        new Worker(
+                                map.get("ID"),
+                                map.get("workerName"),
+                                map.get("workerSurname"),
+                                map.get("telNumber"),
+                                map.get("email"),
+                                map.get("IBAN")
+                        ),
+                        map.get("workerRank").charAt(0),
+                        LocalDate.parse(map.get("shiftDate")),
+                        LocalTime.parse(map.get("shiftStart")),
+                        LocalTime.parse(map.get("shiftEnd"))
+                ));
+            }
+
+            return shifts;
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
 
     /**
      * Estrae tutte le righe del resultSet specificato, convertendole in mappe (nome_colonna, valore_colonna).
