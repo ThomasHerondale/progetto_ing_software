@@ -265,7 +265,7 @@ public class DBMSDaemon {
         try (
                 var st = connection.prepareStatement("""
                 select firstAccessFlag, question
-                from security join securityquestion on refQuestionID = IDQuestion
+                from security left outer join securityquestion on refQuestionID = IDQuestion
                 where refWorkerID = ?
                 """)
         ) {
@@ -854,13 +854,24 @@ public class DBMSDaemon {
         }
     }
 
+    /**
+     * Memorizza nel database un periodo di ferie per il dipendente specificato.
+     * @param id la matricola del dipendente
+     * @param startDate la data di inizio del periodo di ferie
+     * @param endDate la data di fine del periodo di ferie
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public void setHolidayPeriod(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
-                INSERT INTO abstention (refWorkerID, startDate, endDate, type)
-                VALUES (?, ?, ?, 'Holiday')
+                insert into abstention (refWorkerID, startDate, endDate, type)
+                values (?, ?, ?, 'Holiday')
                 """)
-                ) {
+        ) {
+            st.setString(1, id);
+            st.setDate(2, Date.valueOf(startDate));
+            st.setDate(3, Date.valueOf(endDate));
+            st.execute();
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
