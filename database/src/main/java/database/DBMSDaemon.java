@@ -964,6 +964,11 @@ public class DBMSDaemon {
 
     // TODO: getWorkersDataList?
 
+    /**
+     * Ottiene la lista di tutti i turni memorizzati nel database.
+     * @return una lista di tutti i turni presenti nel database
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public List<Shift> getShiftsList() throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
@@ -1000,6 +1005,7 @@ public class DBMSDaemon {
             throw new DBMSException(e);
         }
     }
+
 
     /**
      * Estrae tutte le righe del resultSet specificato, convertendole in mappe (nome_colonna, valore_colonna).
