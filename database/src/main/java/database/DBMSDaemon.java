@@ -820,6 +820,15 @@ public class DBMSDaemon {
         }
     }
 
+    /**
+     * Verifica che il contatore dei giorni di ferie disponibili per il dipendente specificato sia sufficiente
+     * a coprire i giorni di ferie richiesti.
+     * @param id la matricola del dipendente
+     * @param startDate la data di inizio del periodo di ferie
+     * @param endDate la data di fine del periodo di ferie
+     * @return true se il contatore è sufficiente, false altrimenti
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public boolean checkHolidayCounter(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
          /*  Ottiene i giorni e moltiplica per 24 per le ore */
         var dayCount = Period.dayCount(startDate, endDate) * 24;
