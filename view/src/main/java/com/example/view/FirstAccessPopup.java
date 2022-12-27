@@ -8,10 +8,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.ListIterator;
 import java.util.Map;
 
 public class FirstAccessPopup {
@@ -30,7 +26,7 @@ public class FirstAccessPopup {
 
     @FXML
     private ComboBox<String> questionBox;
-    private HashMap<String, String> questionsList;  
+    private Map<String, String> questionsList;
 
     private Worker worker;
 
@@ -40,7 +36,7 @@ public class FirstAccessPopup {
     //costruttore
     public FirstAccessPopup(Map<String, String> questionsList, Worker worker, LoginHandler handler) {
         this.worker = worker;
-        this.questionsList = (HashMap<String, String>) questionsList;
+        this.questionsList = questionsList;
         this.loginHandler = handler;
     }
 
