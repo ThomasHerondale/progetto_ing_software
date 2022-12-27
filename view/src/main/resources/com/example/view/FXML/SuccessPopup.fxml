@@ -6,7 +6,6 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
 <AnchorPane prefHeight="248.0" prefWidth="432.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label alignment="CENTER" prefHeight="35.0" prefWidth="432.0" text="Successo!" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="19.0">
@@ -14,7 +13,7 @@
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label alignment="CENTER" prefHeight="17.0" prefWidth="432.0" text="Modifca avvenuta correttamente." AnchorPane.topAnchor="97.0">
+      <Label alignment="CENTER" prefHeight="17.0" prefWidth="432.0" text="Modifica avvenuta correttamente." AnchorPane.topAnchor="97.0">
          <font>
             <Font size="18.0" />
          </font>
