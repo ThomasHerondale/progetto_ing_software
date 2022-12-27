@@ -31,7 +31,7 @@ public class RetrievePasswordHandler {
                         controller -> new ErrorMessage("La matricola inserita non esiste."));
             }
         } catch (DBMSException e) {
-            throw new RuntimeException(e);
+            //TODO:
         }
     }
     public void clickedSend(String answer){

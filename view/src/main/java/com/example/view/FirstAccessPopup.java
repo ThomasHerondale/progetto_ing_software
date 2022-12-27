@@ -19,9 +19,6 @@ public class FirstAccessPopup {
     private Button confirmButton;
 
     @FXML
-    private Label labelDaAzzerare;
-
-    @FXML
     private Text nameLabel;
 
     @FXML

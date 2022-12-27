@@ -3,7 +3,6 @@
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
@@ -54,11 +53,6 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <Label fx:id="labelDaAzzerare" layoutX="296.0" layoutY="111.0" text="Scegli domanda">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Label>
       <ComboBox fx:id="questionBox" layoutX="160.0" layoutY="105.0" prefHeight="40.0" prefWidth="400.0" promptText="Scegli domanda" style="-fx-font-size: 18; -fx-background-color: #d9d9d9; -fx-background-radius: 6;">
          <cursor>
             <Cursor fx:constant="HAND" />

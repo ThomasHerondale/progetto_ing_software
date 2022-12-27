@@ -10,7 +10,6 @@ public class LoginHandler {
     private Worker worker;
 
     public void clickedLogin(String id, String password) {
-        //TODO:
         try {
             /* verifica che le credenziali inserite siano corrette */
             if (DBMSDaemon.getInstance().checkCredentials(id, password)){
@@ -51,7 +50,6 @@ public class LoginHandler {
 
     }
     public void clickedConfirm(String id, String questionID, String answer){
-        //TODO:
         try {
             DBMSDaemon.getInstance().registerSafetyQuestion(id, questionID, answer);
             NavigationManager.getInstance().closePopup("First Access");
