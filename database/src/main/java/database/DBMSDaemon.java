@@ -226,6 +226,33 @@ public class DBMSDaemon {
         }
     }
 
+    /**
+     * Ottiene i dati memorizzati nel database del dipendente specificato.
+     * @param id la matricola del dipendente
+     * @return un oggetto {@link Worker} contenente tutti i dati ottenuti
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public Worker getWorkerData(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                select workerName, workerSurname, telNumber, email, IBAN
+                from worker
+                where ID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+            assert maps.size() == 1; /* A ogni id dovrebbe corrispondere un solo dipendente */
+
+            var map = maps.get(0);
+            return new Worker(id, map.get("workerName"), map.get("workerSurname"), map.get("telNumber"),
+                    map.get("email"), map.get("IBAN"));
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
 
     public Map<String, String> getPasswordRetrievalInfo(String id) {
         // TODO:
@@ -583,11 +610,6 @@ public class DBMSDaemon {
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
-    }
-
-    public static void main(String[] args) throws DBMSException {
-        var db = new DBMSDaemon();
-        db.promoteWorker("0718424");
     }
 
     /**
