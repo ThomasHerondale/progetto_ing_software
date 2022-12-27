@@ -6,10 +6,7 @@ import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 
-public class HomeScreen {
-
-    @FXML
-    private Label initialsLabel;
+public class HomeScreen extends LoggedScreen{
 
     @FXML
     private Group presencesCard;
@@ -29,14 +26,15 @@ public class HomeScreen {
     @FXML
     private Group workersCard;
 
-    private Worker worker;
+    private AccountInfoHandler accountInfoHandler;
 
     public HomeScreen(Worker worker){
-        this.worker = worker;
+        super.setWorker(worker);
     }
-    @FXML
+    @Override
     public void initialize(){
-        //TODO:
+        super.initialize();
+        //continua?
     }
 
     @FXML
@@ -46,7 +44,8 @@ public class HomeScreen {
 
     @FXML
     public void clickProfile(MouseEvent event) {
-        //TODO:
+        accountInfoHandler = new AccountInfoHandler();
+        accountInfoHandler.clickedProfile(super.getWorker());
     }
 
     @FXML
