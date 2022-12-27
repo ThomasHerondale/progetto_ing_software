@@ -43,6 +43,7 @@ public class RetrievePasswordHandler {
                 String fullName = mailData.get("name") + " " + mailData.get("surname");
                 MailManager.getInstance().notifyNewPassword(mailData.get("email"), fullName, newPassword);
                 NavigationManager.getInstance().closePopup("Safety Question");
+                NavigationManager.getInstance().closePopup("Retrieve Password");
             } else {
                 NavigationManager.getInstance().createPopup("Error Message",
                         controller -> new ErrorMessage("La risposta inserita è errata."));
