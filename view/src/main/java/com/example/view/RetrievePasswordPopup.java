@@ -25,9 +25,7 @@ public class RetrievePasswordPopup {
     }
     @FXML
     void clickConfirm(ActionEvent event) {
-        if (!IDField.getText().isEmpty()){
-            retrievePasswordHandler.clickedConfirm(IDField.getText());
-        }
+        retrievePasswordHandler.clickedConfirm(IDField.getText());
     }
 
 }
