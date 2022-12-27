@@ -257,7 +257,8 @@ public class DBMSDaemon {
     /**
      * Ottiene le informazioni relative al recupero della password per il dipendente specificato.
      * @param id la matricola del dipendente
-     * @return una mappa del tipo {("flag", int), ("questionID", string), ("question", string)}
+     * @return una mappa del tipo {("flag", int), ("questionID", string), ("question", string)} se
+     * la matricola specificata ha trovato riscontro nel database, altrimenti una mappa vuota {}
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public Map<String, String> getPasswordRetrievalInfo(String id) throws DBMSException {
@@ -272,8 +273,11 @@ public class DBMSDaemon {
             var resultSet = st.executeQuery();
 
             var maps = extractResults(resultSet);
-            assert maps.size() == 1; /* A ogni id dovrebbe corrispondere una sola domanda */
 
+            if (maps.isEmpty())
+                return Collections.emptyMap();
+
+            assert maps.size() == 1; /* A ogni id dovrebbe corrispondere una sola domanda */
             return maps.get(0);
         } catch (SQLException e) {
             throw new DBMSException(e);
@@ -318,8 +322,7 @@ public class DBMSDaemon {
      * Ottiene le informazioni necessarie alla composizione di notifiche sottoforma di e-mail per il
      * dipendente specificato.
      * @param id la matricola del dipendente
-     * @return una mappa del tipo {("name", string), ("surname", string), ("email", string)} se
-     * l'id ha trovato una corrispondenza nel database, altrimenti una mappa vuota {}
+     * @return una mappa del tipo {("name", string), ("surname", string), ("email", string)}
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public Map<String, String> getMailData(String id) throws DBMSException {
