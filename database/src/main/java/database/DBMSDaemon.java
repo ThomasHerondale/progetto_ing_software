@@ -776,8 +776,7 @@ public class DBMSDaemon {
             inSt.setDate(2, Date.valueOf(startDate));
             inSt.setDate(3, Date.valueOf(endDate));
 
-            /* Calcola le ore di congedo parentale
-            *  Aggiungendo un giorno a endDate perché between() ha endDate esclusa */
+            /* Calcola le ore di congedo parentale */
             var dayCount = Period.dayCount(startDate, endDate) * 24;
 
             /* Riempi l'update */
@@ -863,9 +862,46 @@ public class DBMSDaemon {
      */
     public void setHolidayPeriod(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
         try (
-                var st = connection.prepareStatement("""
+                var inSt = connection.prepareStatement("""
                 insert into abstention (refWorkerID, startDate, endDate, type)
                 values (?, ?, ?, 'Holiday')
+                """);
+                var upSt = connection.prepareStatement("""
+                update Counters
+                set holidayCount = holidayCount - ?
+                WHERE refWorkerID = ?
+                """)
+        ) {
+            inSt.setString(1, id);
+            inSt.setDate(2, Date.valueOf(startDate));
+            inSt.setDate(3, Date.valueOf(endDate));
+
+            /* Calcola le ore di ferie */
+            var dayCount = Period.dayCount(startDate, endDate) * 24;
+
+            /* Riempi l'update */
+            upSt.setInt(1, dayCount);
+            upSt.setString(2, id);
+
+            inSt.execute();
+            upSt.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
+     * Memorizza nel database un periodo di malattia per il dipendente specificato.
+     * @param id la matricola del dipendente
+     * @param startDate la data di inizio del periodo di ferie
+     * @param endDate la data di fine del periodo di ferie
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void setIllnessPeriod(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                insert into abstention (refWorkerID, startDate, endDate, type)
+                values (?, ?, ?, 'Illness')
                 """)
         ) {
             st.setString(1, id);
@@ -876,7 +912,6 @@ public class DBMSDaemon {
             throw new DBMSException(e);
         }
     }
-
     /**
      * Estrae tutte le righe del resultSet specificato, convertendole in mappe (nome_colonna, valore_colonna).
      */
