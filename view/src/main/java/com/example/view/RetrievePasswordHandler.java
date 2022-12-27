@@ -7,11 +7,12 @@ public class RetrievePasswordHandler {
     public void clickedSend(String answer){
         //TODO:
     }
-    public String generatePassword(){
+    private String generatePassword(){
         //TODO:
         return "";
     }
     public void clickedRetrievePassword(){
-        //NavigationManager.getInstance().createPopup("",);
+        NavigationManager.getInstance().createPopup("Retrieve Password",
+                controllerClass -> new RetrievePasswordPopup(this));
     }
 }
