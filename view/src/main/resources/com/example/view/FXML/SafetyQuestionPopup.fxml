@@ -9,7 +9,7 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.text.TextFlow?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="360.0" prefWidth="720.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="360.0" prefWidth="720.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.view.SafetyQuestionPopup">
    <children>
       <TextField fx:id="answerField" layoutX="10.0" layoutY="10.0" prefHeight="50.0" prefWidth="400.0" promptText="Risposta" style="-fx-background-color: rgba(217, 217, 217, 0.6); -fx-background-radius: 6; -fx-prompt-text-fill: derive(-fx-control-inner-background, -30%);" AnchorPane.leftAnchor="160.0" AnchorPane.topAnchor="174.0">
          <font>

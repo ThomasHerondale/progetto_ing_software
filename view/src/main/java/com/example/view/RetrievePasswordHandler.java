@@ -12,12 +12,27 @@ public class RetrievePasswordHandler {
     public void clickedConfirm(String id){
         try {
             Map<String,String> passwordRetrievalInfo = DBMSDaemon.getInstance().getPasswordRetrievalInfo(id);
+            if (!passwordRetrievalInfo.isEmpty()){
+                if (passwordRetrievalInfo.get("firstAccessFlag").equals("1")){
+                    NavigationManager.getInstance().createPopup("Safety Question",
+                            controller -> new SafetyQuestionPopup(passwordRetrievalInfo.get("question"), this));
+                    this.id = id;
+                } else {
+                    NavigationManager.getInstance().createPopup("Error Message",
+                            controller -> new ErrorMessage("Non è possibile recuperare la password se non " +
+                                    "è stato ancora effettuato il primo accesso. " +
+                                    "Controllare la propria casella di posta" +
+                                    " dove è specificata la password per il primo accesso."));
+                }
+
+
+            } else {
+                NavigationManager.getInstance().createPopup("Error Message",
+                        controller -> new ErrorMessage("La matricola inserita non esiste."));
+            }
         } catch (DBMSException e) {
             throw new RuntimeException(e);
         }
-
-        this.id = id;
-        //continua...
     }
     public void clickedSend(String answer){
         try {
