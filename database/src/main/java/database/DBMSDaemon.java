@@ -727,9 +727,8 @@ public class DBMSDaemon {
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public boolean checkParentalLeaveCounter(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
-        /* Aggiungendo un giorno a endDate perché between() ha endDate esclusa
-        *  Ottiene i giorni e moltiplica per 24 per le ore */
-        var dayCount = java.time.Period.between(startDate, endDate.plusDays(1)).getDays() * 24;
+        /*  Ottiene i giorni e moltiplica per 24 per le ore */
+        var dayCount = Period.dayCount(startDate, endDate) * 24;
 
         try (
                 var st = connection.prepareStatement("""
@@ -779,7 +778,7 @@ public class DBMSDaemon {
 
             /* Calcola le ore di congedo parentale
             *  Aggiungendo un giorno a endDate perché between() ha endDate esclusa */
-            var dayCount = java.time.Period.between(startDate, endDate.plusDays(1)).getDays() * 24;
+            var dayCount = Period.dayCount(startDate, endDate) * 24;
 
             /* Riempi l'update */
             upSt.setInt(1, dayCount);
@@ -822,13 +821,12 @@ public class DBMSDaemon {
     }
 
     public boolean checkHolidayCounter(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
-        /* Aggiungendo un giorno a endDate perché between() ha endDate esclusa
-         *  Ottiene i giorni e moltiplica per 24 per le ore */
-        var dayCount = java.time.Period.between(startDate, endDate.plusDays(1)).getDays() * 24;
+         /*  Ottiene i giorni e moltiplica per 24 per le ore */
+        var dayCount = Period.dayCount(startDate, endDate) * 24;
 
         try (
                 var st = connection.prepareStatement("""
-                select parentalLeaveCount
+                select holidayCount
                 from counters
                 where refWorkerID = ?
                 """)
@@ -840,7 +838,7 @@ public class DBMSDaemon {
             assert maps.size() == 1; /* Ci dovrebbe essere un solo conteggio per dipendente */
 
             var map = maps.get(0);
-            var counter = Integer.parseInt(map.get("parentalLeaveCount"));
+            var counter = Integer.parseInt(map.get("holidayCount"));
             return counter >= dayCount;
         } catch (SQLException e) {
             throw new DBMSException(e);
