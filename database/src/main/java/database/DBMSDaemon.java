@@ -792,6 +792,11 @@ public class DBMSDaemon {
         }
     }
 
+    /**
+     * Ottiene tutti i periodi di blocco delle ferie memorizzati nel database.
+     * @return una lista di oggetti {@link Period} rappresentanti ciascuno un periodo di blocco
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public List<Period> getHolidayInterruptions() throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
