@@ -20,8 +20,8 @@ public class RetrievePasswordHandler {
                 } else {
                     NavigationManager.getInstance().createPopup("Error Message",
                             controller -> new ErrorMessage("Non è possibile recuperare la password se non " +
-                                    "è stato ancora effettuato il primo accesso. " +
-                                    "Controllare la propria casella di posta" +
+                                    "è stato ancora effettuato il primo accesso." +
+                                    "\nControllare la propria casella di posta" +
                                     " dove è specificata la password per il primo accesso."));
                 }
 

@@ -7,9 +7,9 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="360.0" prefWidth="720.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.view.ErrorMessage">
    <children>
-      <Label fx:id="messageLabel" alignment="CENTER" layoutX="55.0" layoutY="135.0" prefHeight="17.0" prefWidth="612.0" text="Message Label" wrapText="true" AnchorPane.bottomAnchor="135.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="135.0">
+      <Label fx:id="messageLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="30.0" layoutY="108.0" prefHeight="132.0" prefWidth="660.0" text="Message Label" textAlignment="CENTER" wrapText="true" AnchorPane.bottomAnchor="120.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="108.0">
          <font>
-            <Font size="24.0" />
+            <Font size="20.0" />
          </font>
       </Label>
       <Button fx:id="okayButton" mnemonicParsing="false" onAction="#clickOkay" prefHeight="44.0" prefWidth="120.0" style="-fx-background-color: #d9d9d9; -fx-background-radius: 12;" text="Okay" AnchorPane.leftAnchor="300.0" AnchorPane.topAnchor="253.0">
