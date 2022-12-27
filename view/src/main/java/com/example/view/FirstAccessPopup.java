@@ -30,7 +30,7 @@ public class FirstAccessPopup {
 
     private Worker worker;
 
-    private String questionSelected;
+    private String questionSelectedID;
     private LoginHandler loginHandler;
 
     //costruttore
@@ -47,17 +47,17 @@ public class FirstAccessPopup {
         questionBox.setOnAction(this::onQuestionSelected);
     }
     private void onQuestionSelected(ActionEvent event){
-        //TODO:
         questionsList.forEach((chiave,valore) -> {
             if (questionBox.getValue().equals(valore)){
-                questionSelected = valore;
-                System.out.println(valore);
+                questionSelectedID = chiave;
             }
         });
     }
     @FXML
     public void clickConfirm(ActionEvent event) {
-        loginHandler.clickedConfirm(questionSelected, answerField.getText());
+        if (!questionSelectedID.isEmpty()){
+            loginHandler.clickedConfirm(worker.getId(), questionSelectedID, answerField.getText());
+        }
     }
 }
 
