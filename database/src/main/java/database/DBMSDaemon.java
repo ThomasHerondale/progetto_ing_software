@@ -950,7 +950,7 @@ public class DBMSDaemon {
 
     public static void main(String[] args) throws DBMSException {
         var db = new DBMSDaemon();
-        var sh1 = new Shift(new Worker(
+        /*var sh1 = new Shift(new Worker(
                 "098765", "hds", "dd",
                 "", "", ""),
                 'A', LocalDate.now(), LocalTime.NOON, LocalTime.MIDNIGHT);
@@ -958,7 +958,47 @@ public class DBMSDaemon {
                 "0718424", "gab", "lom",
                 "322", "fhdd", "jckcke"),
                 'B', LocalDate.now().plusDays(1), LocalTime.now(), LocalTime.now());
-        db.uploadShiftProposal(List.of(sh1, sh2));
+        db.uploadShiftProposal(List.of(sh1, sh2)); */
+        System.out.println(db.getShiftsList());
+    }
+
+    // TODO: getWorkersDataList?
+
+    public List<Shift> getShiftsList() throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                select W.ID, W.workerName, W.workerSurname, W.telNumber, W.email, W.IBAN,
+                S.workerRank, S.shiftDate, S.shiftStart, S.shiftEnd
+                from Worker W join Shift S on ( W.ID = S.refWorkerID )
+                """)
+        ) {
+            var resultSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+
+            List<Shift> shifts = new ArrayList<>();
+            for (var map : maps) {
+                /* Crea un turno coi dati estratti dal database */
+                shifts.add(new Shift(
+                        new Worker(
+                                map.get("ID"),
+                                map.get("workerName"),
+                                map.get("workerSurname"),
+                                map.get("telNumber"),
+                                map.get("email"),
+                                map.get("IBAN")
+                        ),
+                        map.get("workerRank").charAt(0),
+                        LocalDate.parse(map.get("shiftDate")),
+                        LocalTime.parse(map.get("shiftStart")),
+                        LocalTime.parse(map.get("shiftEnd"))
+                ));
+            }
+
+            return shifts;
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     /**
