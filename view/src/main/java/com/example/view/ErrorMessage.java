@@ -12,13 +12,14 @@ public class ErrorMessage {
 
     @FXML
     private Button okayButton;
+    private String description;
 
-    public ErrorMessage(){
-        //TODO:
+    public ErrorMessage(String message){
+        this.description = message;
     }
     @FXML
     public void initialize(){
-        //TODO:
+        messageLabel.setText(description);
     }
 
     @FXML

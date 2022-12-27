@@ -7,8 +7,6 @@ import java.util.HashMap;
 
 public class LoginHandler {
 
-    private String id;
-
 
     public void clickedLogin(String id, String password) {
         //TODO:
@@ -29,17 +27,17 @@ public class LoginHandler {
                     /* Il seguente if scopre chi sta effettuando il login,
                     * se è un Amministrativo o un generico Impiegato. */
                     if (DBMSDaemon.getInstance().getWorkerRank(id).equals("?admin?")){
-                        NavigationManager.getInstance().createScreen("Home",
+                        NavigationManager.getInstance().createScreen("Home (Admin)",
                                 controller -> new HomeScreen(worker));
                     } else {
-                        NavigationManager.getInstance().createScreen("Home (Admin)",
+                        NavigationManager.getInstance().createScreen("Home",
                                 controller -> new HomeScreen(worker));
                     }
 
                 }
             } else {
                 NavigationManager.getInstance().createPopup("Error Message",
-                        controller -> new ErrorMessage());
+                        controller -> new ErrorMessage(""));
             }
 
         } catch (DBMSException e) {
