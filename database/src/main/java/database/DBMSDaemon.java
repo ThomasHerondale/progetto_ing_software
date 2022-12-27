@@ -312,7 +312,34 @@ public class DBMSDaemon {
         }
     }
 
-    // TODO: tre metodi getMailData da analizzare?
+    // TODO: tre - ormai due - metodi getMailData da analizzare?
+
+    /**
+     * Ottiene le informazioni necessarie alla composizione di notifiche sottoforma di e-mail per il
+     * dipendente specificato.
+     * @param id la matricola del dipendente
+     * @return una mappa del tipo {("name", string), ("surname", string), ("email", string)}
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public Map<String, String> getMailData(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                select workerName as name, workerSurname as surname, email
+                from worker
+                where ID = ?
+               """)
+        ) {
+            st.setString(1, id);
+            var resulSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resulSet);
+            assert maps.size() == 1; /* Dovrebbe esserci un solo dipendente per matricola */
+
+            return maps.get(0);
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
 
     /**
      * Ottiene la matricola più grande presente nel database.
