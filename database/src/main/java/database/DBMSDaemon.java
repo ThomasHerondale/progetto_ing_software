@@ -265,7 +265,7 @@ public class DBMSDaemon {
         try (
                 var st = connection.prepareStatement("""
                 select firstAccessFlag, question
-                from security join securityquestion on refQuestionID = IDQuestion
+                from security left outer join securityquestion on refQuestionID = IDQuestion
                 where refWorkerID = ?
                 """)
         ) {
