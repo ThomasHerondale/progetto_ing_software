@@ -53,11 +53,11 @@ public class RetrievePasswordHandler {
     }
     private String generatePassword(){
         Random random = new Random();
-        String pass = "";
+        StringBuilder pass = new StringBuilder();
         for (int i = 0; i < 8; i++) {
-            pass += random.nextInt(10);
+            pass.append(random.nextInt(10));
         }
-        return pass;
+        return pass.toString();
     }
     public void clickedRetrievePassword(){
         NavigationManager.getInstance().createPopup("Retrieve Password",
