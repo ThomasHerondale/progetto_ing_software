@@ -5,6 +5,7 @@ import entities.Worker;
 import java.sql.*;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 
 public class DBMSDaemon {
@@ -225,6 +226,33 @@ public class DBMSDaemon {
         }
     }
 
+    /**
+     * Ottiene i dati memorizzati nel database del dipendente specificato.
+     * @param id la matricola del dipendente
+     * @return un oggetto {@link Worker} contenente tutti i dati ottenuti
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public Worker getWorkerData(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                select workerName, workerSurname, telNumber, email, IBAN
+                from worker
+                where ID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+            assert maps.size() == 1; /* A ogni id dovrebbe corrispondere un solo dipendente */
+
+            var map = maps.get(0);
+            return new Worker(id, map.get("workerName"), map.get("workerSurname"), map.get("telNumber"),
+                    map.get("email"), map.get("IBAN"));
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
 
     public Map<String, String> getPasswordRetrievalInfo(String id) {
         // TODO:
@@ -264,7 +292,6 @@ public class DBMSDaemon {
     }
 
     // TODO: tre metodi getMailData da analizzare?
-
 
     /**
      * Ottiene la matricola più grande presente nel database.
@@ -325,16 +352,24 @@ public class DBMSDaemon {
         }
     }
 
-    // TODO: problema perché è update o insert?
+    /**
+     * Memorizza nel database la password specificata per il dipendente specificato, eventualmente
+     * sovrascrivendo quella precedente.
+     * @param id la matricola del dipendente
+     * @param password la nuova password del dipendente
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public void registerPassword(String id, String password) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
                 insert into Security (refWorkerID, workerPassword)
                 values (?, ?)
+                on duplicate key update workerPassword = ?
                 """)
         ) {
             st.setString(1, id);
             st.setString(2, password);
+            st.setString(3, password);
             st.execute();
         } catch (SQLException e) {
             throw new DBMSException(e);
@@ -481,14 +516,52 @@ public class DBMSDaemon {
         }
     }
 
-    // TODO: getWorkerRank da fare
+    /**
+     * Promuove il dipendente specificato al livello successivo, secondo la scala D > C > B > A.
+     * @param id la matricola del dipendente
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     * @apiNote gli impiegati del livello Amministrativo 'H' non possono essere promossi
+     */
+    public void promoteWorker(String id) throws DBMSException {
+        var rankSuccession = List.of('D', 'C', 'B', 'A');
 
-    public void promoteWorker(String id) {
-        // TODO: getWorkerRank da fare
+        /* Calcola il livello dopo la promozione */
+        var currentRank = getWorkerRank(id);
+        assert rankSuccession.contains(currentRank);
+        var newRank = rankSuccession.get(rankSuccession.indexOf(currentRank) + 1);
+
+        try (
+                var st = connection.prepareStatement("""
+                update Worker
+                set workerRank = ?
+                where ID = ?
+                """)
+        ) {
+            st.setString(1, String.valueOf(newRank));
+            st.setString(2, id);
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
-    public void removeWorker(String id) {
-        // TODO:
+    /**
+     * Rimuove dal database il dipendente specificato e tutti i dati ad esso associati.
+     * @param id la matricola del dipendente
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void removeWorker(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                delete from worker
+                where ID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     /**
@@ -516,6 +589,12 @@ public class DBMSDaemon {
 
     // TODO: metodo getAccountData?
 
+    /**
+     * Abilita il dipendente specificato a ricevere il congedo parentale per un totale di ore specificato.
+     * @param id la matricola del dipendente
+     * @param hours il numero di ore di congedo concesse
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public void enableParentalLeave(String id, int hours) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
@@ -533,26 +612,95 @@ public class DBMSDaemon {
         }
     }
 
-    public static void main(String[] args) throws DBMSException {
-        var db = new DBMSDaemon();
-        db.enableParentalLeave("0718424", 100);
+    /**
+     * Ottiene la lista degli scioperi autorizzati presenti nel database per il livello specificato.
+     * @param rank il livello di cui ottenere gli scioperi
+     * @return una lista di mappe, ognuna rappresentante un singolo sciopero. Ogni mappa è formata da coppie
+     * (nome_attributo, valore_attributo)
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public List<HashMap<String, String>> getAuthorizedStrikes(char rank) throws DBMSException {
+        var queryStr = """
+                select strikeName, strikeDate, descriptionStrike
+                from Strike
+                """;
+        queryStr = queryStr + "where Strike." + rank + " = true";
+        try (
+                var st = connection.createStatement()
+        ) {
+            var resultSet = st.executeQuery(queryStr);
+
+            return extractResults(resultSet);
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
-    public void getAuthorizedStrikes(char rank) {
-        // TODO:
-    }
-    public void getWorkerRank(String id) {
-        // TODO:
+    /**
+     * Ottiene il livello del dipendente specificato.
+     * @param id la matricola del dipendente
+     * @return il carattere associato al livello del dipendente ('H' per Amministrativo)
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public Character getWorkerRank(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT workerRank
+                FROM Worker
+                WHERE ID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Dovrebbe esserci un solo dipendente con un id */
+
+            var map = maps.get(0);
+            return map.get("workerRank").charAt(0); /* Converte la stringa in char */
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     // TODO: metodo setStrikeParticipation?
 
+    /* TODO: e chi minchia ava a controllari senza id? */
     public void checkParentalLeaveCounter(LocalDate startDate, LocalDate endDate) {
-        // TODO:
+        /* Aggiungendo un giorno a endDate perché between() ha endDate esclusa
+        * Ottiene i giorni e moltiplica per 24 per le ore */
+        var dayCount = Period.between(startDate, endDate.plusDays(1)).getDays() * 24;
     }
 
-    public void setParentalLeavePeriod(String id, LocalDate startDate, LocalDate endDate) {
-        // TODO:    
+    public void setParentalLeavePeriod(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
+        try (
+                var inSt = connection.prepareStatement("""
+                insert into abstention (refWorkerID, startDate, endDate, type)
+                values (?, ?, ?, 'ParentalLeave')
+                """);
+                var upSt = connection.prepareStatement("""
+                update Counters
+                set parentalLeaveCount = parentalLeaveCount - ?
+                where refWorkerID = ?
+                """)
+        ) {
+            /* Riempi l'insert */
+            inSt.setString(1, id);
+            inSt.setDate(2, Date.valueOf(startDate));
+            inSt.setDate(3, Date.valueOf(endDate));
+
+            /* Calcola le ore di congedo parentale */
+            var dayCount = Period.between(startDate, endDate.plusDays(1)).getDays() * 24;
+
+            /* Riempi l'update */
+            upSt.setInt(1, dayCount);
+            upSt.setString(2, id);
+
+            inSt.execute();
+            upSt.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     /**
