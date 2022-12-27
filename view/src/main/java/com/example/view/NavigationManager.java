@@ -37,14 +37,13 @@ public class NavigationManager {
         //TODO:
         SCREEN_MAP.put("Login", "FXML/LoginScreen.fxml");
         SCREEN_MAP.put("Home (Admin)", "FXML/HomeScreen_Admin.fxml");
-        SCREEN_MAP.put("Primo Accesso", "FXML/FirstAccessPopup.fxml");
+        SCREEN_MAP.put("First Access", "FXML/FirstAccessPopup.fxml");
         SCREEN_MAP.put("Home", "FXML/HomeScreen_Employee.fxml");
-        SCREEN_MAP.put("Recupero Password", "FXML/RetrievePasswordPopup.fxml");
-        SCREEN_MAP.put("Domanda di Sicurezza", "FXML/SafetyQuestionPopup.fxml");
+        SCREEN_MAP.put("Retrieve Password", "FXML/RetrievePasswordPopup.fxml");
+        SCREEN_MAP.put("Safety Question", "FXML/SafetyQuestionPopup.fxml");
         SCREEN_MAP.put("Info Account", "FXML/AccountInfoScreen.fxml");
-        SCREEN_MAP.put("Messaggio di Errore", "FXML/ErrorMessage.fxml");
-        SCREEN_MAP.put("Successo", "FXML/SuccessPopup.fxml");
-        SCREEN_MAP.put("Modifica", "FXML/EditPopup.fxml");
+        SCREEN_MAP.put("Success", "FXML/SuccessPopup.fxml");
+        SCREEN_MAP.put("Edit", "FXML/EditPopup.fxml");
         SCREEN_MAP.put("Error Message","FXML/ErrorMessage.fxml");
         //...
     }

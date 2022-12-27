@@ -19,7 +19,7 @@ public class LoginHandler {
                 * l'abbia già fatto in precedenza o la sua prima volta. */
                 if (DBMSDaemon.getInstance().isFirstAccess(id)){
                     Map<String,String> questions = DBMSDaemon.getInstance().getQuestionsList();
-                    NavigationManager.getInstance().createPopup("Primo Accesso",
+                    NavigationManager.getInstance().createPopup("First Access",
                             controllerClass -> new FirstAccessPopup(questions, worker, this));
                 }
                 /* Se ha già fatto il primo accesso */
@@ -54,7 +54,7 @@ public class LoginHandler {
         //TODO:
         try {
             DBMSDaemon.getInstance().registerSafetyQuestion(id, questionID, answer);
-            NavigationManager.getInstance().closePopup("Primo Accesso");
+            NavigationManager.getInstance().closePopup("First Access");
             /*apre la schermata home o dell'admin o dell'impiegato */
             chooseHomeScreen(id);
 
