@@ -701,6 +701,13 @@ public class DBMSDaemon {
 
     }
 
+    /**
+     * Memorizza nel database il periodo di congedo parentale specificato richiesto dal dipendente specificato.
+     * @param id la matricola del dipendente
+     * @param startDate la data di inizio del periodo di congedo parentale
+     * @param endDate la data di fine del periodo di congedo parentale
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public void setParentalLeavePeriod(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
         try (
                 var inSt = connection.prepareStatement("""
