@@ -1,5 +1,6 @@
 package com.example.view;
 
+import entities.Worker;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -16,6 +17,7 @@ public class NavigationManager {
 
     private static NavigationManager instance;
     private Stage primaryStage;
+    private Stage accountInfoStage = new Stage();
 
     private NavigationManager() {}
 
@@ -45,6 +47,7 @@ public class NavigationManager {
         SCREEN_MAP.put("Success", "FXML/SuccessPopup.fxml");
         SCREEN_MAP.put("Edit", "FXML/EditPopup.fxml");
         SCREEN_MAP.put("Error Message","FXML/ErrorMessage.fxml");
+        SCREEN_MAP.put("Confirm","FXML/ConfirmPopup.fxml");
         //...
     }
     private HashMap<String, Stage> stagesPopup;
@@ -94,6 +97,29 @@ public class NavigationManager {
     public void closePopup(String popupName) {
         stagesPopup.get(popupName).close();
         stagesPopup.remove(popupName);
+    }
+
+    public void openAccountInfoScreen(Worker worker, int workerCounters, AccountInfoHandler accountInfoHandler) {
+        String popupName = "Info Account";
+        String fxmlFile = SCREEN_MAP.get(popupName);
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
+            loader.setControllerFactory(controller ->
+                    new AccountInfoScreen(worker, workerCounters, accountInfoHandler));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            showScene(popupName, scene, true, accountInfoStage);
+
+        } catch (IOException e){
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+        primaryStage.hide();
+    }
+
+    public void closeAccountInfoScreen() {
+        primaryStage.show();
+        accountInfoStage.close();
     }
 }
 

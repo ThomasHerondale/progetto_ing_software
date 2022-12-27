@@ -81,27 +81,27 @@ public class AccountInfoScreen extends LoggedScreen{
 
     @FXML
     void clickBack(ActionEvent event) {
-
+        accountInfoHandler.clickedBack();
     }
 
     @FXML
     void clickEditEmail(ActionEvent event) {
-
+        //TODO:
     }
 
     @FXML
     void clickEditIBAN(ActionEvent event) {
-
+        //TODO:
     }
 
     @FXML
     void clickEditPhone(ActionEvent event) {
-
+        //TODO:
     }
 
     @FXML
     void clickLogout(ActionEvent event) {
-
+        accountInfoHandler.clickedLogout();
     }
 
 }
