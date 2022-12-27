@@ -318,7 +318,8 @@ public class DBMSDaemon {
      * Ottiene le informazioni necessarie alla composizione di notifiche sottoforma di e-mail per il
      * dipendente specificato.
      * @param id la matricola del dipendente
-     * @return una mappa del tipo {("name", string), ("surname", string), ("email", string)}
+     * @return una mappa del tipo {("name", string), ("surname", string), ("email", string)} se
+     * l'id ha trovato una corrispondenza nel database, altrimenti una mappa vuota {}
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public Map<String, String> getMailData(String id) throws DBMSException {
