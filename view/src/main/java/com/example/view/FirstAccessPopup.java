@@ -44,6 +44,7 @@ public class FirstAccessPopup {
     public void initialize() {
         nameLabel.setText(worker.getFullName());
         questionsList.forEach((chiave, valore) -> questionBox.getItems().add(valore));
+        questionSelectedID = "";
         questionBox.setOnAction(this::onQuestionSelected);
     }
     private void onQuestionSelected(ActionEvent event){
