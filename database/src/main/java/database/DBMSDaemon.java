@@ -318,7 +318,8 @@ public class DBMSDaemon {
      * Ottiene le informazioni necessarie alla composizione di notifiche sottoforma di e-mail per il
      * dipendente specificato.
      * @param id la matricola del dipendente
-     * @return una mappa del tipo {("name", string), ("surname", string), ("email", string)}
+     * @return una mappa del tipo {("name", string), ("surname", string), ("email", string)} se
+     * l'id ha trovato una corrispondenza nel database, altrimenti una mappa vuota {}
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public Map<String, String> getMailData(String id) throws DBMSException {
@@ -333,8 +334,11 @@ public class DBMSDaemon {
             var resulSet = st.executeQuery();
 
             List<HashMap<String, String>> maps = extractResults(resulSet);
-            assert maps.size() == 1; /* Dovrebbe esserci un solo dipendente per matricola */
 
+            if (maps.isEmpty())
+                return Collections.emptyMap();
+
+            assert maps.size() == 1; /* Dovrebbe esserci un solo dipendente per id */
             return maps.get(0);
         } catch (SQLException e) {
             throw new DBMSException(e);
