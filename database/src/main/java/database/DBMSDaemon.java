@@ -257,14 +257,14 @@ public class DBMSDaemon {
     /**
      * Ottiene le informazioni relative al recupero della password per il dipendente specificato.
      * @param id la matricola del dipendente
-     * @return una mappa del tipo {("firstAccessFlag", int), ("questionID", string), ("question", string)} se
+     * @return una mappa del tipo {("firstAccessFlag", int), ("question", string)} se
      * la matricola specificata ha trovato riscontro nel database, altrimenti una mappa vuota {}
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public Map<String, String> getPasswordRetrievalInfo(String id) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
-                select firstAccessFlag, refQuestionID as questionID, question
+                select firstAccessFlag, question
                 from security join securityquestion on refQuestionID = IDQuestion
                 where refWorkerID = ?
                 """)
@@ -727,9 +727,8 @@ public class DBMSDaemon {
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public boolean checkParentalLeaveCounter(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
-        /* Aggiungendo un giorno a endDate perché between() ha endDate esclusa
-        *  Ottiene i giorni e moltiplica per 24 per le ore */
-        var dayCount = java.time.Period.between(startDate, endDate.plusDays(1)).getDays() * 24;
+        /*  Ottiene i giorni e moltiplica per 24 per le ore */
+        var dayCount = Period.dayCount(startDate, endDate) * 24;
 
         try (
                 var st = connection.prepareStatement("""
@@ -779,7 +778,7 @@ public class DBMSDaemon {
 
             /* Calcola le ore di congedo parentale
             *  Aggiungendo un giorno a endDate perché between() ha endDate esclusa */
-            var dayCount = java.time.Period.between(startDate, endDate.plusDays(1)).getDays() * 24;
+            var dayCount = Period.dayCount(startDate, endDate) * 24;
 
             /* Riempi l'update */
             upSt.setInt(1, dayCount);
@@ -821,14 +820,22 @@ public class DBMSDaemon {
         }
     }
 
+    /**
+     * Verifica che il contatore dei giorni di ferie disponibili per il dipendente specificato sia sufficiente
+     * a coprire i giorni di ferie richiesti.
+     * @param id la matricola del dipendente
+     * @param startDate la data di inizio del periodo di ferie
+     * @param endDate la data di fine del periodo di ferie
+     * @return true se il contatore è sufficiente, false altrimenti
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public boolean checkHolidayCounter(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
-        /* Aggiungendo un giorno a endDate perché between() ha endDate esclusa
-         *  Ottiene i giorni e moltiplica per 24 per le ore */
-        var dayCount = java.time.Period.between(startDate, endDate.plusDays(1)).getDays() * 24;
+         /*  Ottiene i giorni e moltiplica per 24 per le ore */
+        var dayCount = Period.dayCount(startDate, endDate) * 24;
 
         try (
                 var st = connection.prepareStatement("""
-                select parentalLeaveCount
+                select holidayCount
                 from counters
                 where refWorkerID = ?
                 """)
@@ -840,8 +847,20 @@ public class DBMSDaemon {
             assert maps.size() == 1; /* Ci dovrebbe essere un solo conteggio per dipendente */
 
             var map = maps.get(0);
-            var counter = Integer.parseInt(map.get("parentalLeaveCount"));
+            var counter = Integer.parseInt(map.get("holidayCount"));
             return counter >= dayCount;
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    public void setHolidayPeriod(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                INSERT INTO abstention (refWorkerID, startDate, endDate, type)
+                VALUES (?, ?, ?, 'Holiday')
+                """)
+                ) {
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
