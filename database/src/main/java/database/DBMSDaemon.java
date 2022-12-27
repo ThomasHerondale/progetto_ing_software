@@ -1,11 +1,11 @@
 package database;
 
+import commons.Period;
 import entities.Worker;
 
-import java.sql.*;
 import java.sql.Date;
+import java.sql.*;
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.*;
 
 public class DBMSDaemon {
@@ -254,9 +254,30 @@ public class DBMSDaemon {
         }
     }
 
-    public Map<String, String> getPasswordRetrievalInfo(String id) {
-        // TODO:
-        return null;
+    /**
+     * Ottiene le informazioni relative al recupero della password per il dipendente specificato.
+     * @param id la matricola del dipendente
+     * @return una mappa del tipo {("flag", int), ("questionID", string), ("question", string)}
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public Map<String, String> getPasswordRetrievalInfo(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                select firstAccessFlag as flag, refQuestionID as questionID, question
+                from security join securityquestion on refQuestionID = IDQuestion
+                where refWorkerID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+
+            var maps = extractResults(resultSet);
+            assert maps.size() == 1; /* A ogni id dovrebbe corrispondere una sola domanda */
+
+            return maps.get(0);
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     /**
@@ -677,7 +698,7 @@ public class DBMSDaemon {
     public boolean checkParentalLeaveCounter(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
         /* Aggiungendo un giorno a endDate perché between() ha endDate esclusa
         *  Ottiene i giorni e moltiplica per 24 per le ore */
-        var dayCount = Period.between(startDate, endDate.plusDays(1)).getDays() * 24;
+        var dayCount = java.time.Period.between(startDate, endDate.plusDays(1)).getDays() * 24;
 
         try (
                 var st = connection.prepareStatement("""
@@ -701,6 +722,13 @@ public class DBMSDaemon {
 
     }
 
+    /**
+     * Memorizza nel database il periodo di congedo parentale specificato richiesto dal dipendente specificato.
+     * @param id la matricola del dipendente
+     * @param startDate la data di inizio del periodo di congedo parentale
+     * @param endDate la data di fine del periodo di congedo parentale
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public void setParentalLeavePeriod(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
         try (
                 var inSt = connection.prepareStatement("""
@@ -720,7 +748,7 @@ public class DBMSDaemon {
 
             /* Calcola le ore di congedo parentale
             *  Aggiungendo un giorno a endDate perché between() ha endDate esclusa */
-            var dayCount = Period.between(startDate, endDate.plusDays(1)).getDays() * 24;
+            var dayCount = java.time.Period.between(startDate, endDate.plusDays(1)).getDays() * 24;
 
             /* Riempi l'update */
             upSt.setInt(1, dayCount);
@@ -728,6 +756,30 @@ public class DBMSDaemon {
 
             inSt.execute();
             upSt.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    public List<Period> getHolidayInterruptions() throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                select startDate, endDate
+                from holidayinterruption
+                """)
+        ) {
+            var resultSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+
+            List<Period> holidayInterruptions = new ArrayList<>(maps.size());
+            for (var map : maps) {
+                var startDate = LocalDate.parse(map.get("startDate"));
+                var endDate = LocalDate.parse(map.get("endDate"));
+                holidayInterruptions.add(new Period(startDate, endDate));
+            }
+
+            return holidayInterruptions;
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
