@@ -3,4 +3,5 @@
  */
 module model {
     exports entities;
+    exports commons;
 }
