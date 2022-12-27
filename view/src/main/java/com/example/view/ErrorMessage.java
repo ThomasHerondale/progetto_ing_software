@@ -1,5 +1,6 @@
 package com.example.view;
 
+import database.DBMSDaemon;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -24,7 +25,7 @@ public class ErrorMessage {
 
     @FXML
     void clickOkay(ActionEvent event) {
-        //TODO:
+        NavigationManager.getInstance().closePopup("Error Message");
     }
 
 }
