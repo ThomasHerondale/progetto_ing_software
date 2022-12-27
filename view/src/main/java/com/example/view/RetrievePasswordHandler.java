@@ -12,7 +12,6 @@ public class RetrievePasswordHandler {
     public void clickedConfirm(String id){
         try {
             Map<String,String> passwordRetrievalInfo = DBMSDaemon.getInstance().getPasswordRetrievalInfo(id);
-            System.out.println(passwordRetrievalInfo);
             if (!passwordRetrievalInfo.isEmpty()){
                 if (passwordRetrievalInfo.get("firstAccessFlag").equals("1")){
                     NavigationManager.getInstance().createPopup("Safety Question",
