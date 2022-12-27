@@ -263,7 +263,7 @@ public class DBMSDaemon {
     public Map<String, String> getPasswordRetrievalInfo(String id) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
-                select firstAccessFlag as flag, refQuestionID as questionID, question
+                select firstAccessFlag, refQuestionID as questionID, question
                 from security join securityquestion on refQuestionID = IDQuestion
                 where refWorkerID = ?
                 """)
