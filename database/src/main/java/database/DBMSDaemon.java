@@ -254,9 +254,30 @@ public class DBMSDaemon {
         }
     }
 
-    public Map<String, String> getPasswordRetrievalInfo(String id) {
-        // TODO:
-        return null;
+    /**
+     * Ottiene le informazioni relative al recupero della password per il dipendente specificato.
+     * @param id la matricola del dipendente
+     * @return una mappa del tipo {("flag", int), ("questionID", string), ("question", string)}
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public Map<String, String> getPasswordRetrievalInfo(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                select firstAccessFlag as flag, refQuestionID as questionID, question
+                from security join securityquestion on refQuestionID = IDQuestion
+                where refWorkerID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+
+            var maps = extractResults(resultSet);
+            assert maps.size() == 1; /* A ogni id dovrebbe corrispondere una sola domanda */
+
+            return maps.get(0);
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     /**
