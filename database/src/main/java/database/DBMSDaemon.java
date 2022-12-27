@@ -665,11 +665,40 @@ public class DBMSDaemon {
 
     // TODO: metodo setStrikeParticipation?
 
-    /* TODO: e chi minchia ava a controllari senza id? */
-    public void checkParentalLeaveCounter(LocalDate startDate, LocalDate endDate) {
+    /**
+     * Verifica che il contatore delle ore di congedo parentale disponibili per il dipendente specificato
+     * sia sufficiente a coprire le ore di congedo parentale richieste.
+     * @param id la matricola del dipendente
+     * @param startDate la data di inizio del periodo di congedo parentale
+     * @param endDate la data di fine del periodo di congedo parentale
+     * @return true se il contatore è sufficiente, false altrimenti
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public boolean checkParentalLeaveCounter(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
         /* Aggiungendo un giorno a endDate perché between() ha endDate esclusa
-        * Ottiene i giorni e moltiplica per 24 per le ore */
+        *  Ottiene i giorni e moltiplica per 24 per le ore */
         var dayCount = Period.between(startDate, endDate.plusDays(1)).getDays() * 24;
+
+        try (
+                var st = connection.prepareStatement("""
+                select parentalLeaveCount
+                from counters
+                where refWorkerID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Ci dovrebbe essere un solo conteggio per dipendente */
+
+            var map = maps.get(0);
+            var counter = Integer.parseInt(map.get("parentalLeaveCount"));
+            return counter >= dayCount;
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+
     }
 
     public void setParentalLeavePeriod(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
@@ -689,7 +718,8 @@ public class DBMSDaemon {
             inSt.setDate(2, Date.valueOf(startDate));
             inSt.setDate(3, Date.valueOf(endDate));
 
-            /* Calcola le ore di congedo parentale */
+            /* Calcola le ore di congedo parentale
+            *  Aggiungendo un giorno a endDate perché between() ha endDate esclusa */
             var dayCount = Period.between(startDate, endDate.plusDays(1)).getDays() * 24;
 
             /* Riempi l'update */
