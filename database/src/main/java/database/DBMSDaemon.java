@@ -263,7 +263,7 @@ public class DBMSDaemon {
      * @return una mappa del tipo {("firstAccessFlag", int), ("question", string)} se
      * la matricola specificata ha trovato riscontro nel database, altrimenti una mappa vuota {}
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
-     * @apiNote essendo la mappa <String, String> gli <i>int</i> ai valori della mappa corrispondono a stringhe
+     * @apiNote essendo la mappa {@code <String, String>} gli <i>int</i> ai valori della mappa corrispondono a stringhe
      * contenenti interi, da castare con {@link Integer#parseInt(String)}
      */
     public Map<String, String> getPasswordRetrievalInfo(String id) throws DBMSException {
@@ -682,7 +682,7 @@ public class DBMSDaemon {
      * ("telNumber", string), ("email", string), ("IBAN", string), ("delayCount", int), ("autoExitCount", int),
      * ("holidayCount", int), ("parentalLeaveCount", int)}
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
-     * @apiNote essendo la mappa <String, String> gli <i>int</i> ai valori della mappa corrispondono a stringhe
+     * @apiNote essendo la mappa {@code <String, String>} gli <i>int</i> ai valori della mappa corrispondono a stringhe
      * contenenti interi, da castare con {@link Integer#parseInt(String)}
      */
     public Map<String, String> getAccountData(String id) throws DBMSException {
