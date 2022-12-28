@@ -26,7 +26,8 @@ public class HomeScreen extends LoggedScreen{
     @FXML
     private Group workersCard;
 
-    private AccountInfoHandler accountInfoHandler = new AccountInfoHandler();
+    private AccountInfoHandler accountInfoHandler = new AccountInfoHandler(super.getWorker());
+    private ViewSalaryHandler viewSalaryHandler = new ViewSalaryHandler(super.getWorker());
 
     public HomeScreen(Worker worker){
         super.setWorker(worker);
@@ -43,7 +44,7 @@ public class HomeScreen extends LoggedScreen{
 
     @FXML
     public void clickProfile(MouseEvent event) {
-        accountInfoHandler.clickedProfile(super.getWorker());
+        accountInfoHandler.clickedProfile();
     }
 
     @FXML
@@ -58,7 +59,7 @@ public class HomeScreen extends LoggedScreen{
 
     @FXML
     public void clickViewSalary(MouseEvent event) {
-        //TODO:
+        viewSalaryHandler.clickedViewSalary();
     }
 
     @FXML

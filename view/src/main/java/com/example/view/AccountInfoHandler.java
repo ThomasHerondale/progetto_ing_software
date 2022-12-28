@@ -7,8 +7,11 @@ import entities.Worker;
 public class AccountInfoHandler {
 
     private Worker worker;
-    public void clickedProfile(Worker worker) {
+
+    public AccountInfoHandler(Worker worker){
         this.worker = worker;
+    }
+    public void clickedProfile() {
         //Counters workerCounters = DBMSDaemon.getInstance().getWorkerCounters(worker.getId());
         int workerCounters = 1;
         NavigationManager.getInstance().openAccountInfoScreen(worker, workerCounters, this);
