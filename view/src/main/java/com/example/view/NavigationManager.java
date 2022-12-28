@@ -1,5 +1,6 @@
 package com.example.view;
 
+import commons.Counters;
 import entities.Worker;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -89,18 +90,22 @@ public class NavigationManager {
             Scene scene = new Scene(root);
             showScene(popupName, scene, false, newStage);
             stagesPopup.put(popupName, newStage);
+
+            /* per chiudere con la X */
+            newStage.setOnCloseRequest(event -> closePopup(popupName));
+
         } catch (IOException e){
             System.out.println(e.getMessage());
             e.printStackTrace();
         }
     }
 
-    public void closePopup(String popupName) {
-        stagesPopup.get(popupName).close();
-        stagesPopup.remove(popupName);
+    public void closePopup(String currentPopupName) {
+        stagesPopup.get(currentPopupName).close();
+        stagesPopup.remove(currentPopupName);
     }
 
-    public void openAccountInfoScreen(Worker worker, int workerCounters, AccountInfoHandler accountInfoHandler) {
+    public void openAccountInfoScreen(Worker worker, Counters workerCounters, AccountInfoHandler accountInfoHandler) {
         String popupName = "Info Account";
         String fxmlFile = SCREEN_MAP.get(popupName);
         try {

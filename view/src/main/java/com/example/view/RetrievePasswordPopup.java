@@ -13,7 +13,7 @@ public class RetrievePasswordPopup {
     @FXML
     private Button confirmButton;
 
-    private RetrievePasswordHandler retrievePasswordHandler;
+    private final RetrievePasswordHandler retrievePasswordHandler;
 
     public RetrievePasswordPopup(RetrievePasswordHandler handler){
         this.retrievePasswordHandler = handler;

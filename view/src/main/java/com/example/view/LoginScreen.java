@@ -28,8 +28,8 @@ public class LoginScreen {
     @FXML
     private ImageView logo;
 
-    private LoginHandler loginHandler;
-    private RetrievePasswordHandler retrievePasswordHandler;
+    private final LoginHandler loginHandler;
+    private final RetrievePasswordHandler retrievePasswordHandler;
     public LoginScreen(){
         loginHandler = new LoginHandler();
         retrievePasswordHandler = new RetrievePasswordHandler();

@@ -1,5 +1,6 @@
 package com.example.view;
 
+import commons.Counters;
 import entities.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -55,12 +56,12 @@ public class AccountInfoScreen extends LoggedScreen{
     private Group profileIcon;
 
     private final AccountInfoHandler accountInfoHandler;
-    //private Counters workerCounters;
+    private Counters workerCounters;
 
-    public AccountInfoScreen(Worker worker, int workerCounters, AccountInfoHandler accountInfoHandler) {
+    public AccountInfoScreen(Worker worker, Counters workerCounters, AccountInfoHandler accountInfoHandler) {
         super(worker);
         this.accountInfoHandler = accountInfoHandler;
-        //this.workerCounters = workerCounters;
+        this.workerCounters = workerCounters;
 
     }
     @Override
@@ -71,12 +72,10 @@ public class AccountInfoScreen extends LoggedScreen{
         phoneLabel.setText(super.getWorker().getPhone());
         emailLabel.setText(super.getWorker().getEmail());
         IBANLabel.setText(super.getWorker().getIban());
-        /*
-        autoExitCountLabel.setText(workerCounters.getAutoExitCount());
-        delayCountLabel.setText(workerCounters.getDelayCount());
-        holidayCountLabel.setText(workerCounters.getHolidayCount());
-        parentalLeaveLabel.setText(workerCounters.getParentalLeave());
-        */
+        autoExitCountLabel.setText(String.valueOf(workerCounters.autoExit()));
+        delayCountLabel.setText(String.valueOf(workerCounters.delay()));
+        holidayCountLabel.setText(String.valueOf(workerCounters.holiday()));
+        parentalLeaveLabel.setText(String.valueOf(workerCounters.parentalLeave()));
 
     }
 

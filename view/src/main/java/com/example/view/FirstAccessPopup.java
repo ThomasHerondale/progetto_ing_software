@@ -23,12 +23,12 @@ public class FirstAccessPopup {
 
     @FXML
     private ComboBox<String> questionBox;
-    private Map<String, String> questionsList;
+    private final Map<String, String> questionsList;
 
-    private Worker worker;
+    private final Worker worker;
 
     private String questionSelectedID;
-    private LoginHandler loginHandler;
+    private final LoginHandler loginHandler;
 
     //costruttore
     public FirstAccessPopup(Map<String, String> questionsList, Worker worker, LoginHandler handler) {

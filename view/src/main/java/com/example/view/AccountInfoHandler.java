@@ -1,8 +1,11 @@
 package com.example.view;
 
+import commons.Counters;
 import database.DBMSDaemon;
 import database.DBMSException;
 import entities.Worker;
+
+import java.util.Map;
 
 public class AccountInfoHandler {
 
@@ -12,9 +15,18 @@ public class AccountInfoHandler {
         this.worker = worker;
     }
     public void clickedProfile() {
-        //Counters workerCounters = DBMSDaemon.getInstance().getWorkerCounters(worker.getId());
-        int workerCounters = 1;
-        NavigationManager.getInstance().openAccountInfoScreen(worker, workerCounters, this);
+        try {
+            Map<String, String> counters = DBMSDaemon.getInstance().getAccountData(worker.getId());
+            int autoExit = Integer.parseInt(counters.get("autoExitCount"));
+            int delay = Integer.parseInt(counters.get("delayCount"));
+            int holiday = Integer.parseInt(counters.get("holidayCount"));
+            int parentalLeave = Integer.parseInt(counters.get("parentalLeaveCount"));
+            Counters workerCounters = new Counters(autoExit, delay, holiday, parentalLeave);
+            NavigationManager.getInstance().openAccountInfoScreen(worker, workerCounters, this);
+        } catch (DBMSException e) {
+            //TODO:
+        }
+
 
     }
 

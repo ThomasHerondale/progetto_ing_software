@@ -10,6 +10,7 @@ public class ViewSalaryHandler {
 
     public void clickedViewSalary() {
         //getWorkerInfo(worker.getID())
+        //mancano le informazioni necessarie per tutti i valori del salario
         NavigationManager.getInstance().createScreen("Salary",
                 controller -> new SalaryScreen(worker, this));
     }

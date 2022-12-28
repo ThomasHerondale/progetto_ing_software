@@ -17,10 +17,14 @@ public class SalaryScreen extends LoggedScreen {
     private Group profileIcon;
 
     private final ViewSalaryHandler viewSalaryHandler;
+    private final AccountInfoHandler accountInfoHandler;
 
     public SalaryScreen(Worker worker, ViewSalaryHandler handler){
+        //mancano ancora delle cose
+        //TODO:
         super(worker);
         this.viewSalaryHandler = handler;
+        accountInfoHandler = new AccountInfoHandler(worker);
     }
     @Override
     public void initialize(){
@@ -34,7 +38,7 @@ public class SalaryScreen extends LoggedScreen {
 
     @FXML
     void clickProfile(MouseEvent event) {
-
+        accountInfoHandler.clickedProfile();
     }
 
 }

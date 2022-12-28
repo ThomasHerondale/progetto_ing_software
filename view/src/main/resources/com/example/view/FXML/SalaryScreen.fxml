@@ -12,14 +12,6 @@
 
 <AnchorPane prefHeight="800.0" prefWidth="1440.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.view.SalaryScreen">
    <children>
-      <Button fx:id="backButton" mnemonicParsing="false" onAction="#clickBack" prefHeight="46.0" prefWidth="128.0" style="-fx-background-color: #d9d9d9; -fx-background-radius: 6;" text="Indietro" AnchorPane.leftAnchor="21.0" AnchorPane.topAnchor="21.0">
-         <font>
-            <Font size="15.0" />
-         </font>
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor>
-      </Button>
       <Label alignment="CENTER" prefHeight="35.0" prefWidth="1440.0" text="Riepilogo Salario" AnchorPane.topAnchor="30.0">
          <font>
             <Font name="System Bold" size="24.0" />
@@ -44,5 +36,13 @@
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
+      <Button fx:id="backButton" mnemonicParsing="false" onAction="#clickBack" prefHeight="46.0" prefWidth="128.0" style="-fx-background-color: #d9d9d9; -fx-background-radius: 6;" text="Indietro" AnchorPane.leftAnchor="21.0" AnchorPane.topAnchor="21.0">
+         <font>
+            <Font size="15.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
    </children>
 </AnchorPane>
