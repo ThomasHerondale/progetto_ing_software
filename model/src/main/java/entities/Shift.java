@@ -2,6 +2,7 @@ package entities;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Objects;
 
 public class Shift {
     private final Worker owner;
@@ -58,5 +59,32 @@ public class Shift {
 
     public boolean isSubstitution() {
         return isSubstitution;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Shift shift = (Shift) o;
+        return rank == shift.rank && Objects.equals(owner, shift.owner)
+                && Objects.equals(date, shift.date) && Objects.equals(startTime, shift.startTime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(owner, rank, date, startTime);
+    }
+
+    @Override
+    public String toString() {
+        return "Shift{" +
+                "owner=" + owner +
+                ", rank=" + rank +
+                ", date=" + date +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", isOvertime=" + isOvertime +
+                ", isSubstitution=" + isSubstitution +
+                '}';
     }
 }
