@@ -48,6 +48,7 @@ public class NavigationManager {
         SCREEN_MAP.put("Edit", "FXML/EditPopup.fxml");
         SCREEN_MAP.put("Error Message","FXML/ErrorMessage.fxml");
         SCREEN_MAP.put("Confirm","FXML/ConfirmPopup.fxml");
+        SCREEN_MAP.put("Salary","FXML/SalaryScreen.fxml");
         //...
     }
     private HashMap<String, Stage> stagesPopup;
