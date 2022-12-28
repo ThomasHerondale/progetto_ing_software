@@ -2,6 +2,7 @@ package com.example.view;
 
 import commons.Counters;
 import entities.Worker;
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
@@ -67,6 +68,7 @@ public class AccountInfoScreen extends LoggedScreen{
     @Override
     public void initialize(){
         super.initialize();
+        //phoneLabel.textProperty().bind(Bindings.format("%d", getWorker().getPhone()));
         IDLabel.setText(super.getWorker().getId());
         fullNameLabel.setText(super.getWorker().getFullName().toUpperCase());
         phoneLabel.setText(super.getWorker().getPhone());

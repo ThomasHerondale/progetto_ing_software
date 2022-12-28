@@ -65,6 +65,9 @@ public class AccountInfoHandler {
                 case EMAIL -> DBMSDaemon.getInstance().changeEmail(worker.getId(), input);
                 case IBAN -> DBMSDaemon.getInstance().changeIban(worker.getId(), input);
             }
+            //come faccio ad aggiornare la entity worker in ogni posto dove esiste?
+
+            NavigationManager.getInstance().closePopup("Edit");
         } catch (DBMSException e){
             //TODO:
         }
