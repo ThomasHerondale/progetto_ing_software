@@ -970,27 +970,13 @@ public class DBMSDaemon {
         }
 
         /* Rimuovendo da valuesBuilder l'ultima virgola */
-        var sql = "insert into shift (refWorkerID, workerRank, shiftDate, shiftStart, shiftEnd) " +
+        var sql = "insert into shift (refWorkerID, shiftRank, shiftDate, shiftStart, shiftEnd) " +
                 "values " + valuesBuilder.deleteCharAt(valuesBuilder.lastIndexOf(", "));
         try (var st = connection.createStatement()) {
             st.execute(sql);
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
-    }
-
-    public static void main(String[] args) throws DBMSException {
-        var db = new DBMSDaemon();
-        /*var sh1 = new Shift(new Worker(
-                "098765", "hds", "dd",
-                "", "", ""),
-                'A', LocalDate.now(), LocalTime.NOON, LocalTime.MIDNIGHT);
-        var sh2 = new Shift(new Worker(
-                "0718424", "gab", "lom",
-                "322", "fhdd", "jckcke"),
-                'B', LocalDate.now().plusDays(1), LocalTime.now(), LocalTime.now());
-        db.uploadShiftProposal(List.of(sh1, sh2)); */
-        System.out.println(db.getShiftsList());
     }
 
     // TODO: getWorkersDataList?
@@ -1004,7 +990,7 @@ public class DBMSDaemon {
         try (
                 var st = connection.prepareStatement("""
                 select W.ID, W.workerName, W.workerSurname, W.telNumber, W.email, W.IBAN,
-                S.workerRank, S.shiftDate, S.shiftStart, S.shiftEnd
+                S.shiftRank, S.shiftDate, S.shiftStart, S.shiftEnd
                 from Worker W join Shift S on ( W.ID = S.refWorkerID )
                 """)
         ) {
@@ -1024,7 +1010,7 @@ public class DBMSDaemon {
                                 map.get("email"),
                                 map.get("IBAN")
                         ),
-                        map.get("workerRank").charAt(0),
+                        map.get("shiftRank").charAt(0),
                         LocalDate.parse(map.get("shiftDate")),
                         LocalTime.parse(map.get("shiftStart")),
                         LocalTime.parse(map.get("shiftEnd"))
