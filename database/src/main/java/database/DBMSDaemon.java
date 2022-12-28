@@ -1,6 +1,7 @@
 package database;
 
 import commons.Counters;
+import commons.HoursRecap;
 import commons.Period;
 import entities.Shift;
 import entities.Worker;
@@ -1077,6 +1078,15 @@ public class DBMSDaemon {
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
+    }
+
+    public Map<Worker, HoursRecap> getWorkersData() throws DBMSException {
+        var workers = getWorkersList(); /* Ottieni la lista di tutti i dipendenti */
+
+        for (var worker : workers) {
+            // TODO: tutte le query del cazzo
+        }
+        return null;
     }
 
 
