@@ -110,6 +110,9 @@ public class NavigationManager {
             Scene scene = new Scene(root);
             showScene(popupName, scene, true, accountInfoStage);
 
+            /* per chiudere con la X */
+            accountInfoStage.setOnCloseRequest(event -> closeAccountInfoScreen());
+
         } catch (IOException e){
             System.out.println(e.getMessage());
             e.printStackTrace();

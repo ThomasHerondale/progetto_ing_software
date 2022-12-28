@@ -77,6 +77,7 @@ public class AccountInfoScreen extends LoggedScreen{
         holidayCountLabel.setText(workerCounters.getHolidayCount());
         parentalLeaveLabel.setText(workerCounters.getParentalLeave());
         */
+
     }
 
     @FXML
