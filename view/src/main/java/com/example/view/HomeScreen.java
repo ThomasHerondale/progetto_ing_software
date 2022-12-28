@@ -26,11 +26,11 @@ public class HomeScreen extends LoggedScreen{
     @FXML
     private Group workersCard;
 
-    private AccountInfoHandler accountInfoHandler = new AccountInfoHandler(super.getWorker());
-    private ViewSalaryHandler viewSalaryHandler = new ViewSalaryHandler(super.getWorker());
+    private final AccountInfoHandler accountInfoHandler = new AccountInfoHandler(super.getWorker());
+    private final ViewSalaryHandler viewSalaryHandler = new ViewSalaryHandler(super.getWorker());
 
     public HomeScreen(Worker worker){
-        super.setWorker(worker);
+        super(worker);
     }
     @Override
     public void initialize(){

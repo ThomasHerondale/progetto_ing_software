@@ -5,18 +5,19 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
 public class LoggedScreen {
-    private Worker worker;
+    private final Worker worker;
     @FXML
     private Label initialsLabel;
+
+    protected LoggedScreen(Worker worker) {
+        this.worker = worker;
+    }
+
     @FXML
     public void initialize(){
         String nameInit = String.valueOf(worker.getName().charAt(0));
         String surnameInit = String.valueOf(worker.getSurname().charAt(0));
         initialsLabel.setText(nameInit + " " + surnameInit);
-    }
-
-    public void setWorker(Worker worker) {
-        this.worker = worker;
     }
 
     public Worker getWorker() {

@@ -16,10 +16,10 @@ public class SalaryScreen extends LoggedScreen {
     @FXML
     private Group profileIcon;
 
-    private ViewSalaryHandler viewSalaryHandler;
+    private final ViewSalaryHandler viewSalaryHandler;
 
     public SalaryScreen(Worker worker, ViewSalaryHandler handler){
-        super.setWorker(worker);
+        super(worker);
         this.viewSalaryHandler = handler;
     }
     @Override

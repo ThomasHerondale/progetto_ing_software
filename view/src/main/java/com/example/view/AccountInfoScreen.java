@@ -54,11 +54,11 @@ public class AccountInfoScreen extends LoggedScreen{
     @FXML
     private Group profileIcon;
 
-    private AccountInfoHandler accountInfoHandler;
+    private final AccountInfoHandler accountInfoHandler;
     //private Counters workerCounters;
 
     public AccountInfoScreen(Worker worker, int workerCounters, AccountInfoHandler accountInfoHandler) {
-        super.setWorker(worker);
+        super(worker);
         this.accountInfoHandler = accountInfoHandler;
         //this.workerCounters = workerCounters;
 
