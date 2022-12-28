@@ -1,5 +1,6 @@
 package database;
 
+import commons.Counters;
 import commons.Period;
 import entities.Shift;
 import entities.Worker;
@@ -638,9 +639,40 @@ public class DBMSDaemon {
         }
     }
 
-    // TODO: analizzare
-    public void getWorkersList() {
-        // TODO:
+    /**
+     * Ottiene la lista di tutti i dipendenti memorizzati nel database.
+     * @return una lista di tutti i dipendenti presenti nel database
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public List<Worker> getWorkersList() throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                select W.ID, W.workerName, W.workerSurname, W.workerRank, W.telNumber, W.email, W.IBAN
+                from Worker W
+                """)
+        ) {
+            var resultSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+
+            List<Worker> workers = new ArrayList<>(maps.size());
+            for (var map : maps) {
+                /* Crea un dipendente coi dati estratti dal database */
+                workers.add(new Worker(
+                        map.get("ID"),
+                        map.get("workerName"),
+                        map.get("workerSurname"),
+                        map.get("workerRank").charAt(0),
+                        map.get("telNumber"),
+                        map.get("email"),
+                        map.get("IBAN")
+                ));
+            }
+
+            return workers;
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     /**
@@ -1021,7 +1053,7 @@ public class DBMSDaemon {
 
             List<HashMap<String, String>> maps = extractResults(resultSet);
 
-            List<Shift> shifts = new ArrayList<>();
+            List<Shift> shifts = new ArrayList<>(maps.size());
             for (var map : maps) {
                 /* Crea un turno coi dati estratti dal database */
                 shifts.add(new Shift(
