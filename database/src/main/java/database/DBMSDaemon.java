@@ -237,7 +237,7 @@ public class DBMSDaemon {
     public Worker getWorkerData(String id) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
-                select workerName, workerSurname, telNumber, email, IBAN
+                select workerName, workerSurname, workerRank, telNumber, email, IBAN
                 from worker
                 where ID = ?
                 """)
@@ -249,8 +249,8 @@ public class DBMSDaemon {
             assert maps.size() == 1; /* A ogni id dovrebbe corrispondere un solo dipendente */
 
             var map = maps.get(0);
-            return new Worker(id, map.get("workerName"), map.get("workerSurname"), map.get("telNumber"),
-                    map.get("email"), map.get("IBAN"));
+            return new Worker(id, map.get("workerName"), map.get("workerSurname"), map.get("workerRank").charAt(0),
+                    map.get("telNumber"), map.get("email"), map.get("IBAN"));
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
@@ -262,6 +262,8 @@ public class DBMSDaemon {
      * @return una mappa del tipo {("firstAccessFlag", int), ("question", string)} se
      * la matricola specificata ha trovato riscontro nel database, altrimenti una mappa vuota {}
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     * @apiNote essendo la mappa <String, String> gli <i>int</i> ai valori della mappa corrispondono a stringhe
+     * contenenti interi, da castare con {@link Integer#parseInt(String)}
      */
     public Map<String, String> getPasswordRetrievalInfo(String id) throws DBMSException {
         try (
@@ -641,7 +643,36 @@ public class DBMSDaemon {
         // TODO:
     }
 
-    // TODO: metodo getAccountData?
+    /**
+     * Ottiene i dati dell'account memorizzati nel database del dipendente specificato.
+     * @param id la matricola del dipendente
+     * @return una mappa del tipo {("ID", string), ("workerName", string), ("workerSurname", string),
+     * ("telNumber", string), ("email", string), ("IBAN", string), ("delayCount", int), ("autoExitCount", int),
+     * ("holidayCount", int), ("parentalLeaveCount", int)}
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     * @apiNote essendo la mappa <String, String> gli <i>int</i> ai valori della mappa corrispondono a stringhe
+     * contenenti interi, da castare con {@link Integer#parseInt(String)}
+     */
+    public Map<String, String> getAccountData(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                select W.ID, W.workerName, W.workerSurname, W.telNumber, W.email, W.IBAN,
+                C.delayCount, C.autoExitCount, C.holidayCount, C.parentalLeaveCount
+                from Worker W join Counters C on (W.ID = C.refWorkerID)
+                where W.ID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Dovrebbe esserci un solo dipendente per matricola */
+
+            return maps.get(0);
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
 
     /**
      * Abilita il dipendente specificato a ricevere il congedo parentale per un totale di ore specificato.
@@ -717,7 +748,28 @@ public class DBMSDaemon {
         }
     }
 
-    // TODO: metodo setStrikeParticipation?
+    /**
+     * Memorizza nel database la partecipazione del dipendente specificato allo sciopero specificato.
+     * @param id la matricola del dipendente
+     * @param strikeName il nome dello sciopero
+     * @param strikeDate la data di svolgimento dello sciopero
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void setStrikeParticipation(String id, String strikeName, LocalDate strikeDate) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                insert into strikeparticipation(refStrikeName, refStrikeDate, refWorkerID)
+                values (?, ?, ?)
+                """)
+                ) {
+            st.setString(1, strikeName);
+            st.setDate(2, Date.valueOf(strikeDate));
+            st.setString(3, id);
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
 
     /**
      * Verifica che il contatore delle ore di congedo parentale disponibili per il dipendente specificato
@@ -939,27 +991,13 @@ public class DBMSDaemon {
         }
 
         /* Rimuovendo da valuesBuilder l'ultima virgola */
-        var sql = "insert into shift (refWorkerID, workerRank, shiftDate, shiftStart, shiftEnd) " +
+        var sql = "insert into shift (refWorkerID, shiftRank, shiftDate, shiftStart, shiftEnd) " +
                 "values " + valuesBuilder.deleteCharAt(valuesBuilder.lastIndexOf(", "));
         try (var st = connection.createStatement()) {
             st.execute(sql);
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
-    }
-
-    public static void main(String[] args) throws DBMSException {
-        var db = new DBMSDaemon();
-        /*var sh1 = new Shift(new Worker(
-                "098765", "hds", "dd",
-                "", "", ""),
-                'A', LocalDate.now(), LocalTime.NOON, LocalTime.MIDNIGHT);
-        var sh2 = new Shift(new Worker(
-                "0718424", "gab", "lom",
-                "322", "fhdd", "jckcke"),
-                'B', LocalDate.now().plusDays(1), LocalTime.now(), LocalTime.now());
-        db.uploadShiftProposal(List.of(sh1, sh2)); */
-        System.out.println(db.getShiftsList());
     }
 
     // TODO: getWorkersDataList?
@@ -972,8 +1010,8 @@ public class DBMSDaemon {
     public List<Shift> getShiftsList() throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
-                select W.ID, W.workerName, W.workerSurname, W.telNumber, W.email, W.IBAN,
-                S.workerRank, S.shiftDate, S.shiftStart, S.shiftEnd
+                select W.ID, W.workerName, W.workerSurname, W.workerRank, W.telNumber, W.email, W.IBAN,
+                S.shiftRank, S.shiftDate, S.shiftStart, S.shiftEnd
                 from Worker W join Shift S on ( W.ID = S.refWorkerID )
                 """)
         ) {
@@ -989,11 +1027,12 @@ public class DBMSDaemon {
                                 map.get("ID"),
                                 map.get("workerName"),
                                 map.get("workerSurname"),
+                                map.get("workerRank").charAt(0),
                                 map.get("telNumber"),
                                 map.get("email"),
                                 map.get("IBAN")
                         ),
-                        map.get("workerRank").charAt(0),
+                        map.get("shiftRank").charAt(0),
                         LocalDate.parse(map.get("shiftDate")),
                         LocalTime.parse(map.get("shiftStart")),
                         LocalTime.parse(map.get("shiftEnd"))
