@@ -15,7 +15,7 @@ public class ViewSalaryHandler {
     }
 
     public void clickedBack() {
-        if (worker.getRank().equals("H")){
+        if (worker.getRank() == 'H'){
             NavigationManager.getInstance().createScreen("Home (Admin)",
                     controller -> new HomeScreen(worker));
         } else {

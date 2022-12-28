@@ -24,7 +24,7 @@ public class LoginHandler {
                 /* Se ha già fatto il primo accesso */
                 else {
                     /*apre la schermata home o dell'admin o dell'impiegato */
-                    chooseHomeScreen(id);
+                    chooseHomeScreen();
                 }
             } else {
                 NavigationManager.getInstance().createPopup("Error Message",
@@ -34,19 +34,16 @@ public class LoginHandler {
             //TODO:
         }
     }
-    private void chooseHomeScreen (String id){
+    private void chooseHomeScreen(){
         String screenName;
-        try {
-            if (DBMSDaemon.getInstance().getWorkerRank(id).equals('H')){
-                screenName = "Home (Admin)";
-            } else {
-                screenName = "Home";
-            }
-            NavigationManager.getInstance().createScreen(screenName,
-                    controller -> new HomeScreen(worker));
-        } catch (DBMSException e) {
-            //TODO:
+        if (worker.getRank() == 'H' ){
+            screenName = "Home (Admin)";
+        } else {
+            screenName = "Home";
         }
+        NavigationManager.getInstance().createScreen(screenName,
+                controller -> new HomeScreen(worker));
+
 
     }
     public void clickedConfirm(String id, String questionID, String answer){
@@ -54,7 +51,7 @@ public class LoginHandler {
             DBMSDaemon.getInstance().registerSafetyQuestion(id, questionID, answer);
             NavigationManager.getInstance().closePopup("First Access");
             /*apre la schermata home o dell'admin o dell'impiegato */
-            chooseHomeScreen(id);
+            chooseHomeScreen();
 
         } catch (DBMSException e) {
             //TODO:
