@@ -237,7 +237,7 @@ public class DBMSDaemon {
     public Worker getWorkerData(String id) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
-                select workerName, workerSurname, telNumber, email, IBAN
+                select workerName, workerSurname, workerRank, telNumber, email, IBAN
                 from worker
                 where ID = ?
                 """)
@@ -249,8 +249,8 @@ public class DBMSDaemon {
             assert maps.size() == 1; /* A ogni id dovrebbe corrispondere un solo dipendente */
 
             var map = maps.get(0);
-            return new Worker(id, map.get("workerName"), map.get("workerSurname"), map.get("telNumber"),
-                    map.get("email"), map.get("IBAN"));
+            return new Worker(id, map.get("workerName"), map.get("workerSurname"), map.get("workerRank").charAt(0),
+                    map.get("telNumber"), map.get("email"), map.get("IBAN"));
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
@@ -1010,7 +1010,7 @@ public class DBMSDaemon {
     public List<Shift> getShiftsList() throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
-                select W.ID, W.workerName, W.workerSurname, W.telNumber, W.email, W.IBAN,
+                select W.ID, W.workerName, W.workerSurname, W.workerRank, W.telNumber, W.email, W.IBAN,
                 S.shiftRank, S.shiftDate, S.shiftStart, S.shiftEnd
                 from Worker W join Shift S on ( W.ID = S.refWorkerID )
                 """)
@@ -1027,6 +1027,7 @@ public class DBMSDaemon {
                                 map.get("ID"),
                                 map.get("workerName"),
                                 map.get("workerSurname"),
+                                map.get("workerRank").charAt(0),
                                 map.get("telNumber"),
                                 map.get("email"),
                                 map.get("IBAN")
