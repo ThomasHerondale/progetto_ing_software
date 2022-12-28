@@ -748,7 +748,28 @@ public class DBMSDaemon {
         }
     }
 
-    // TODO: metodo setStrikeParticipation?
+    /**
+     * Memorizza nel database la partecipazione del dipendente specificato allo sciopero specificato.
+     * @param id la matricola del dipendente
+     * @param strikeName il nome dello sciopero
+     * @param strikeDate la data di svolgimento dello sciopero
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void setStrikeParticipation(String id, String strikeName, LocalDate strikeDate) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                insert into strikeparticipation(refStrikeName, refStrikeDate, refWorkerID)
+                values (?, ?, ?)
+                """)
+                ) {
+            st.setString(1, strikeName);
+            st.setDate(2, Date.valueOf(strikeDate));
+            st.setString(3, id);
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
 
     /**
      * Verifica che il contatore delle ore di congedo parentale disponibili per il dipendente specificato
