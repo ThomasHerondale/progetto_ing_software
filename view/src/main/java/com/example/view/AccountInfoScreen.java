@@ -56,7 +56,7 @@ public class AccountInfoScreen extends LoggedScreen{
     private Group profileIcon;
 
     private final AccountInfoHandler accountInfoHandler;
-    private Counters workerCounters;
+    private final Counters workerCounters;
 
     public AccountInfoScreen(Worker worker, Counters workerCounters, AccountInfoHandler accountInfoHandler) {
         super(worker);
@@ -86,7 +86,7 @@ public class AccountInfoScreen extends LoggedScreen{
 
     @FXML
     void clickEditEmail(ActionEvent event) {
-        //TODO:
+        accountInfoHandler.clickedEditEmail();
     }
 
     @FXML

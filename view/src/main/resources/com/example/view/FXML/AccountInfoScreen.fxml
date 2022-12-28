@@ -31,7 +31,7 @@
             <Font size="24.0" />
          </font>
       </Label>
-      <Label text="congedo parentale (h)" AnchorPane.leftAnchor="913.0" AnchorPane.topAnchor="450.0">
+      <Label text="Congedo parentale (h)" AnchorPane.leftAnchor="913.0" AnchorPane.topAnchor="450.0">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
@@ -101,9 +101,9 @@
             <Font size="24.0" />
          </font>
       </Label>
-      <Label text="+39" AnchorPane.leftAnchor="370.0" AnchorPane.topAnchor="334.0">
+      <Label layoutX="372.0" layoutY="334.0" text="+39" AnchorPane.leftAnchor="372.0" AnchorPane.topAnchor="334.0">
          <font>
-            <Font size="24.0" />
+            <Font name="System Bold" size="24.0" />
          </font>
       </Label>
       <Label text="E-mail" AnchorPane.leftAnchor="65.0" AnchorPane.topAnchor="402.0">

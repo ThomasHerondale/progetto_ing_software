@@ -1,6 +1,7 @@
 package com.example.view;
 
 import commons.Counters;
+import commons.EditableProperty;
 import database.DBMSDaemon;
 import database.DBMSException;
 import entities.Worker;
@@ -44,5 +45,10 @@ public class AccountInfoHandler {
         NavigationManager.getInstance().closeAccountInfoScreen();
         NavigationManager.getInstance().createScreen("Login",
                 controller -> new LoginScreen());
+    }
+
+    public void clickedEditEmail() {
+        NavigationManager.getInstance().createPopup("Edit",
+                controller -> new EditPopup(EditableProperty.EMAIL));
     }
 }
