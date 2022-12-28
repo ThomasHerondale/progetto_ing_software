@@ -262,6 +262,8 @@ public class DBMSDaemon {
      * @return una mappa del tipo {("firstAccessFlag", int), ("question", string)} se
      * la matricola specificata ha trovato riscontro nel database, altrimenti una mappa vuota {}
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     * @apiNote essendo la mappa <String, String> gli <i>int</i> ai valori della mappa corrispondono a stringhe
+     * contenenti interi, da castare con {@link Integer#parseInt(String)}
      */
     public Map<String, String> getPasswordRetrievalInfo(String id) throws DBMSException {
         try (
@@ -641,7 +643,36 @@ public class DBMSDaemon {
         // TODO:
     }
 
-    // TODO: metodo getAccountData?
+    /**
+     * Ottiene i dati dell'account memorizzati nel database del dipendente specificato.
+     * @param id la matricola del dipendente
+     * @return una mappa del tipo {("ID", string), ("workerName", string), ("workerSurname", string),
+     * ("telNumber", string), ("email", string), ("IBAN", string), ("delayCount", int), ("autoExitCount", int),
+     * ("holidayCount", int), ("parentalLeaveCount", int)}
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     * @apiNote essendo la mappa <String, String> gli <i>int</i> ai valori della mappa corrispondono a stringhe
+     * contenenti interi, da castare con {@link Integer#parseInt(String)}
+     */
+    public Map<String, String> getAccountData(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                select W.ID, W.workerName, W.workerSurname, W.telNumber, W.email, W.IBAN,
+                C.delayCount, C.autoExitCount, C.holidayCount, C.parentalLeaveCount
+                from Worker W join Counters C on (W.ID = C.refWorkerID)
+                where W.ID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Dovrebbe esserci un solo dipendente per matricola */
+
+            return maps.get(0);
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
 
     /**
      * Abilita il dipendente specificato a ricevere il congedo parentale per un totale di ore specificato.
