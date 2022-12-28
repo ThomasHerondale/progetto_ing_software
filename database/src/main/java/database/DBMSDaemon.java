@@ -813,6 +813,7 @@ public class DBMSDaemon {
      * @param endDate la data di fine del periodo di congedo parentale
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
+    @SuppressWarnings("DuplicatedCode")
     public void setParentalLeavePeriod(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
         try (
                 var inSt = connection.prepareStatement("""
@@ -914,6 +915,7 @@ public class DBMSDaemon {
      * @param endDate la data di fine del periodo di ferie
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
+    @SuppressWarnings("DuplicatedCode")
     public void setHolidayPeriod(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
         try (
                 var inSt = connection.prepareStatement("""
