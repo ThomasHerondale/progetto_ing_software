@@ -18,7 +18,7 @@ public class ConfirmPopup {
 
     private AccountInfoHandler accountInfoHandler;
     public ConfirmPopup(AccountInfoHandler accountInfoHandler){
-        //serve la WorkerAction enum...
+        //serve la ConfirmAction enum...
         this.accountInfoHandler = accountInfoHandler;
     }
     @FXML
@@ -27,7 +27,7 @@ public class ConfirmPopup {
     }
     @FXML
     void clickConfirm(ActionEvent event) {
-        accountInfoHandler.clickedConfirm();
+        accountInfoHandler.clickedConfirmLogout();
     }
 
 }

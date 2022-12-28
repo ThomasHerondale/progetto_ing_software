@@ -22,9 +22,12 @@ public class EditPopup {
     private Label titleLabel;
 
     private EditableProperty property;
+    private AccountInfoHandler accountInfoHandler;
 
-    public EditPopup(EditableProperty propertyToEdit){
+    public EditPopup(EditableProperty propertyToEdit, AccountInfoHandler handler){
+
         this.property = propertyToEdit;
+        this.accountInfoHandler = handler;
     }
     @FXML
     public void initialize(){
@@ -55,7 +58,7 @@ public class EditPopup {
 
     @FXML
     void clickConfirm(ActionEvent event) {
-
+        accountInfoHandler.clickedConfirmEdit(inputField.getText(), property);
     }
 
 }

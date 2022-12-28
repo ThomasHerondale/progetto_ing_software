@@ -9,12 +9,11 @@ import entities.Worker;
 import java.util.Map;
 
 public class AccountInfoHandler {
-
     private Worker worker;
-
     public AccountInfoHandler(Worker worker){
         this.worker = worker;
     }
+
     public void clickedProfile() {
         try {
             Map<String, String> counters = DBMSDaemon.getInstance().getAccountData(worker.getId());
@@ -27,8 +26,6 @@ public class AccountInfoHandler {
         } catch (DBMSException e) {
             //TODO:
         }
-
-
     }
 
     public void clickedBack() {
@@ -40,7 +37,7 @@ public class AccountInfoHandler {
                 controller -> new ConfirmPopup(this));
     }
 
-    public void clickedConfirm() {
+    public void clickedConfirmLogout() {
         NavigationManager.getInstance().closePopup("Confirm");
         NavigationManager.getInstance().closeAccountInfoScreen();
         NavigationManager.getInstance().createScreen("Login",
@@ -49,6 +46,28 @@ public class AccountInfoHandler {
 
     public void clickedEditEmail() {
         NavigationManager.getInstance().createPopup("Edit",
-                controller -> new EditPopup(EditableProperty.EMAIL));
+                controller -> new EditPopup(EditableProperty.EMAIL, this));
+    }
+
+    public void clickedEditIBAN() {
+        NavigationManager.getInstance().createPopup("Edit",
+                controller -> new EditPopup(EditableProperty.IBAN, this));
+    }
+
+    public void clickedEditPhone() {
+        NavigationManager.getInstance().createPopup("Edit",
+                controller -> new EditPopup(EditableProperty.PHONE, this));
+    }
+    public void clickedConfirmEdit(String input, EditableProperty property){
+        try {
+            switch (property){
+                case PHONE -> DBMSDaemon.getInstance().changePhone(worker.getId(), input);
+                case EMAIL -> DBMSDaemon.getInstance().changeEmail(worker.getId(), input);
+                case IBAN -> DBMSDaemon.getInstance().changeIban(worker.getId(), input);
+            }
+        } catch (DBMSException e){
+            //TODO:
+        }
+
     }
 }

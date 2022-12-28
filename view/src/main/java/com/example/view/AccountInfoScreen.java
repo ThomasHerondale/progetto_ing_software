@@ -91,12 +91,12 @@ public class AccountInfoScreen extends LoggedScreen{
 
     @FXML
     void clickEditIBAN(ActionEvent event) {
-        //TODO:
+        accountInfoHandler.clickedEditIBAN();
     }
 
     @FXML
     void clickEditPhone(ActionEvent event) {
-        //TODO:
+        accountInfoHandler.clickedEditPhone();
     }
 
     @FXML
