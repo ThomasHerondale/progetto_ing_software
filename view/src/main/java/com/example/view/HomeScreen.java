@@ -1,9 +1,7 @@
 package com.example.view;
 
-import entities.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
-import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 
 public class HomeScreen extends LoggedScreen{
@@ -29,10 +27,9 @@ public class HomeScreen extends LoggedScreen{
     private final AccountInfoHandler accountInfoHandler;
     private final ViewSalaryHandler viewSalaryHandler;
 
-    public HomeScreen(Worker worker){
-        super(worker);
-        accountInfoHandler = new AccountInfoHandler(super.getWorker());
-        viewSalaryHandler = new ViewSalaryHandler(super.getWorker());
+    public HomeScreen(){
+        accountInfoHandler = new AccountInfoHandler();
+        viewSalaryHandler = new ViewSalaryHandler();
     }
     @Override
     public void initialize(){

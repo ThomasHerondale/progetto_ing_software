@@ -105,13 +105,13 @@ public class NavigationManager {
         stagesPopup.remove(currentPopupName);
     }
 
-    public void openAccountInfoScreen(Worker worker, Counters workerCounters, AccountInfoHandler accountInfoHandler) {
+    public void openAccountInfoScreen(Counters workerCounters, AccountInfoHandler accountInfoHandler) {
         String popupName = "Info Account";
         String fxmlFile = SCREEN_MAP.get(popupName);
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
             loader.setControllerFactory(controller ->
-                    new AccountInfoScreen(worker, workerCounters, accountInfoHandler));
+                    new AccountInfoScreen(workerCounters, accountInfoHandler));
             Parent root = loader.load();
             Scene scene = new Scene(root);
             showScene(popupName, scene, true, accountInfoStage);

@@ -1,6 +1,5 @@
 package com.example.view;
 
-import database.DBMSDaemon;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

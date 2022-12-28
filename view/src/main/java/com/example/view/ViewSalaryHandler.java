@@ -1,27 +1,22 @@
 package com.example.view;
 
-import entities.Worker;
+import commons.Session;
 
 public class ViewSalaryHandler {
-    private Worker worker;
-    public ViewSalaryHandler(Worker worker) {
-        this.worker = worker;
-    }
-
     public void clickedViewSalary() {
         //getWorkerInfo(worker.getID())
         //mancano le informazioni necessarie per tutti i valori del salario
         NavigationManager.getInstance().createScreen("Salary",
-                controller -> new SalaryScreen(worker, this));
+                controller -> new SalaryScreen(this));
     }
 
     public void clickedBack() {
-        if (worker.getRank() == 'H'){
+        if (Session.getInstance().getWorker().getRank() == 'H'){
             NavigationManager.getInstance().createScreen("Home (Admin)",
-                    controller -> new HomeScreen(worker));
+                    controller -> new HomeScreen());
         } else {
             NavigationManager.getInstance().createScreen("Home",
-                    controller -> new HomeScreen(worker));
+                    controller -> new HomeScreen());
         }
 
     }

@@ -1,8 +1,7 @@
 package com.example.view;
 
 import commons.Counters;
-import entities.Worker;
-import javafx.beans.binding.Bindings;
+import commons.Session;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
@@ -59,8 +58,7 @@ public class AccountInfoScreen extends LoggedScreen{
     private final AccountInfoHandler accountInfoHandler;
     private final Counters workerCounters;
 
-    public AccountInfoScreen(Worker worker, Counters workerCounters, AccountInfoHandler accountInfoHandler) {
-        super(worker);
+    public AccountInfoScreen(Counters workerCounters, AccountInfoHandler accountInfoHandler) {
         this.accountInfoHandler = accountInfoHandler;
         this.workerCounters = workerCounters;
 
@@ -68,12 +66,11 @@ public class AccountInfoScreen extends LoggedScreen{
     @Override
     public void initialize(){
         super.initialize();
-        //phoneLabel.textProperty().bind(Bindings.format("%d", getWorker().getPhone()));
-        IDLabel.setText(super.getWorker().getId());
-        fullNameLabel.setText(super.getWorker().getFullName().toUpperCase());
-        phoneLabel.setText(super.getWorker().getPhone());
-        emailLabel.setText(super.getWorker().getEmail());
-        IBANLabel.setText(super.getWorker().getIban());
+        IDLabel.setText(Session.getInstance().getWorker().getId());
+        fullNameLabel.setText(Session.getInstance().getWorker().getFullName().toUpperCase());
+        phoneLabel.setText(Session.getInstance().getWorker().getPhone());
+        emailLabel.setText(Session.getInstance().getWorker().getEmail());
+        IBANLabel.setText(Session.getInstance().getWorker().getIban());
         autoExitCountLabel.setText(String.valueOf(workerCounters.autoExit()));
         delayCountLabel.setText(String.valueOf(workerCounters.delay()));
         holidayCountLabel.setText(String.valueOf(workerCounters.holiday()));
