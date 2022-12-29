@@ -1163,18 +1163,38 @@ public class DBMSDaemon {
         }
     }
 
+    private LocalDate getLastSalaryDate(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT MAX(s.salaryDate) AS salary_date
+                FROM salary s
+                WHERE s.refWorkerID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+
+            var maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Dovrebbe esserci un solo dipendente per matricola */
+            System.out.println(LocalDate.parse(maps.get(0).get("salary_date")));
+            return LocalDate.parse(maps.get(0).get("salary_date"));
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    public static void main(String[] args) throws DBMSException {
+        var db = new DBMSDaemon();
+        System.out.println(db.getWorkerSalaryData("0266723"));
+    }
     public Map<HoursRecap, Double> getWorkerSalaryData(String id) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
-                SELECT *
+                SELECT amount, ordinary_hours, overtime_hours, parentalLeave_hours
                 FROM
                     (SELECT refWorkerID, amount
                      FROM salary s
-                     WHERE refWorkerID = ? AND salaryDate = (
-                                                             SELECT MAX(s2.salaryDate)
-                                                             FROM salary s2
-                                                             WHERE s2.refWorkerID = s.refWorkerID
-                                                             )
+                     WHERE refWorkerID = ? AND salaryDate = ?
                     ) AS amount_table
                     JOIN
                     (SELECT ordinary_hours_table.ID, ordinary_hours,
@@ -1207,13 +1227,31 @@ public class DBMSDaemon {
                 ON counters_table.ID = amount_table.refWorkerID
                 """)
         ) {
+            /* Ottieni la data dell'ultimo stipendio e calcola il suo periodo di riferimento.
+            Questo periodo andrà da un mese prima alla data ottenuta alla data ottenuta stessa. */
+            var endDate = getLastSalaryDate(id); // TODo: forse un giorno indietro...
+            var startDate = endDate.minusMonths(1);
+
             st.setString(1, id);
+            st.setDate(2, Date.valueOf(endDate));
+            st.setDate(3, Date.valueOf(startDate));
+            st.setDate(4, Date.valueOf(endDate));
+            st.setDate(5, Date.valueOf(startDate));
+            st.setDate(6, Date.valueOf(endDate));
 
             var resultSet = st.executeQuery();
 
             List<HashMap<String, String>> maps = extractResults(resultSet);
             assert maps.size() == 1; /* Dovrebbe esserci un solo dipendente per matricola */
 
+            /* Assembla i risultati */
+            var map = maps.get(0);
+            var ordinaryHours = Double.parseDouble(map.get("ordinary_hours"));
+            var overtimeHours = Double.parseDouble(map.get("overtime_hours"));
+            var parentalLeaveHours = Double.parseDouble(map.get("parentalLeave_hours"));
+            HoursRecap recap = new HoursRecap(ordinaryHours, overtimeHours, parentalLeaveHours);
+
+            return Map.of(recap, Double.parseDouble(map.get("amount")));
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
