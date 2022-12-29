@@ -1,5 +1,7 @@
 package com.example.control;
 
+import commons.HoursRecap;
+
 import java.util.Map;
 
 public class SalaryHandler {
@@ -32,17 +34,15 @@ public class SalaryHandler {
      */
     private static final Double baseSalary = 150.0;
 
-    static double computeSalary(char rank, double ordinaryHours, double overtimeHours, double parentLeaveHours) {
+    private double computeSalary(char rank, HoursRecap hours) {
         /* Calcola le tariffe orarie per gli straordinari e i congedi parentali */
         var overtimeWage = hourWage * overtimeFactor;
         var parentalLeaveWage = hourWage * parentalLeaveFactor;
 
         return baseSalary +
                 rankSalaries.get(rank) +
-                ordinaryHours * hourWage +
-                overtimeHours * overtimeWage +
-                parentLeaveHours * parentalLeaveWage;
+                hours.ordinaryHours() * hourWage +
+                hours.overtimeHours() * overtimeWage +
+                hours.parentalLeaveHours() * parentalLeaveWage;
     }
-
-
 }
