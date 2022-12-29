@@ -1087,16 +1087,25 @@ public class DBMSDaemon {
         }
     }
 
-    /* Dati del calcolo dello stipendio di un mese */
+    /**
+     * Ottiene dal database i dati necessari al calcolo dello stipendio di tutti i dipendenti con riferimento
+     * al periodo (mese) specificato.
+     * @param referencePeriod il periodo corrente su cui calcolare lo stipendio
+     * @return una mappa di coppie ({@link Worker}, {@link HoursRecap})
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public Map<Worker, HoursRecap> getWorkersData(Period referencePeriod) throws DBMSException {
         var workers = getWorkersList(); /* Ottieni la lista di tutti i dipendenti */
 
-        /* Ottieni le ore ordinarie e straordinarie */
+        /* Ottieni le ore divise per categoria*/
         Map<String, Integer> ordinaryHours = new HashMap<>();
         Map<String, Integer> overtimeHours = new HashMap<>();
+        Map<String, Integer> parentalLeaveHours = new HashMap<>();
         try (
                 var st = connection.prepareStatement("""
-                SELECT ordinary_hours_table.ID, ordinary_hours, COALESCE(overtime_hours, 0) AS overtime_hours
+                SELECT ordinary_hours_table.ID, ordinary_hours,
+                COALESCE(overtime_hours, 0) AS overtime_hours,
+                requestParentalLeave AS parentalLeave_hours
                 FROM
                     (SELECT ID,
                             SUM(TIMESTAMPDIFF(HOUR, entryTime, exitTime)) AS ordinary_hours
@@ -1118,6 +1127,9 @@ public class DBMSDaemon {
                         shiftDate BETWEEN '2022-12-27' AND '2023-01-26'
                     GROUP BY ID) AS overtime_hours_table
                 ON ordinary_hours_table.ID = overtime_hours_table.ID
+                JOIN
+                counters
+                ON refWorkerID = ordinary_hours_table.ID;
                 """)
         ) {
             st.setDate(1, Date.valueOf(referencePeriod.start()));
@@ -1125,48 +1137,51 @@ public class DBMSDaemon {
             var resultSet = st.executeQuery();
             var maps = extractResults(resultSet);
 
-            /* Riduci la lista di mappe a una mappa di coppie (ID, tot_ore_ordinarie) */
+            /* Riduci la lista di mappe a mappe di coppie (ID, tot_ore) */
             for (var map : maps) {
                 ordinaryHours.put(map.get("ID"), Integer.parseInt(map.get("ordinary_hours")));
                 overtimeHours.put(map.get("ID"), Integer.parseInt(map.get("overtime_hours")));
+                parentalLeaveHours.put(map.get("ID"), Integer.parseInt(map.get("parentalLeave_hours")));
             }
-        } catch (SQLException e) {
-            throw new DBMSException(e);
-        }
 
-        /* Ottieni le ore di congedo parentale */
-        /* Ottieni la lista dei periodi di congedo parentale richiesti in questo mese da ogni dipendente
-        *  e inseriscili in una mappa (ID, [periodo1, periodo2, periodo3]) */
-        Map<String, List<Period>> pLeavePeriods = new HashMap<>();
-        try (
-                var st = connection.prepareStatement("""
-                    select ID, startDate, endDate
-                    from abstention join worker w on w.ID = abstention.refWorkerID
-                    where startDate between ? and ?
-                    """)
-        ) {
-            st.setDate(1, Date.valueOf(referencePeriod.start()));
-            st.setDate(2, Date.valueOf(referencePeriod.end()));
-            var resultSet = st.executeQuery();
-            var maps = extractResults(resultSet);
-
-            for (var map : maps) {
-                /* Ottieni la lista dei periodi del dipendente specificato e aggiungici quest'altro
-                *  che hai trovato associato al suo id */
-                pLeavePeriods.get(map.get("ID")).add(new Period(
-                        LocalDate.parse(map.get("startDate")), LocalDate.parse(map.get("endDate"))
+            /* Assembla gli oggetti di tipo HoursRecap */
+            Map<Worker, HoursRecap> data = new HashMap<>();
+            for (var worker : workers) {
+                var id = worker.getId();
+                data.put(worker, new HoursRecap(
+                        ordinaryHours.get(id),
+                        overtimeHours.get(id),
+                        parentalLeaveHours.get(id)
                 ));
             }
+
+            return data;
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
-
-        return null;
     }
 
-    public static void main(String[] args) throws DBMSException {
-        var db = new DBMSDaemon();
-        db.getWorkersData(new Period(LocalDate.parse("2022-12-27"), LocalDate.parse("2023-01-26")));
+    /**
+     * Memorizza lo stipendio relativo al mese specificato per il dipendente specificato.
+     * @param id la matricola del dipendente
+     * @param date la data di caricamento dello stipendio
+     * @param salary l'importo dello stipendio
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void setSalary(String id, LocalDate date, Double salary) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                INSERT INTO Salary(refWorkerID, salaryDate, amount)
+                VALUES (?, ?, ?)
+                """)
+        ) {
+            st.setString(1, id);
+            st.setDate(2, Date.valueOf(date));
+            st.setDouble(3, salary);
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     /**
