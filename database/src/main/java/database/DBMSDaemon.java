@@ -1162,6 +1162,29 @@ public class DBMSDaemon {
     }
 
     /**
+     * Memorizza lo stipendio relativo al mese specificato per il dipendente specificato.
+     * @param id la matricola del dipendente
+     * @param date la data di caricamento dello stipendio
+     * @param salary l'importo dello stipendio
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void setSalary(String id, LocalDate date, Double salary) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                INSERT INTO Salary(refWorkerID, salaryDate, amount)
+                VALUES (?, ?, ?)
+                """)
+        ) {
+            st.setString(1, id);
+            st.setDate(2, Date.valueOf(date));
+            st.setDouble(3, salary);
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
      * Estrae tutte le righe del resultSet specificato, convertendole in mappe (nome_colonna, valore_colonna).
      */
     private List<HashMap<String, String>> extractResults(ResultSet resultSet) throws SQLException {
