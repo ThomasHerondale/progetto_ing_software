@@ -15,11 +15,12 @@ public class AccountInfoHandler {
             int autoExit = Integer.parseInt(counters.get("autoExitCount"));
             int delay = Integer.parseInt(counters.get("delayCount"));
             int holiday = Integer.parseInt(counters.get("holidayCount"));
-            int parentalLeave = Integer.parseInt(counters.get("parentalLeaveCount"));
+            int parentalLeave = Integer.parseInt(counters.get("availabilityParentalLeave"));
             Counters workerCounters = new Counters(autoExit, delay, holiday, parentalLeave);
             NavigationManager.getInstance().openAccountInfoScreen(workerCounters, this);
         } catch (DBMSException e) {
             //TODO:
+            e.printStackTrace();
         }
     }
 
@@ -63,12 +64,17 @@ public class AccountInfoHandler {
             }
             //aggiorna la entity worker
             Session.getInstance().update(DBMSDaemon.getInstance().getWorkerData(Session.getInstance().getWorker().getId()));
-            NavigationManager.getInstance().closePopup("Edit");
-            NavigationManager.getInstance().closeAccountInfoScreen();
-            clickedProfile();
+            NavigationManager.getInstance().createPopup("Success",
+                    controller -> new SuccessPopup(this));
         } catch (DBMSException e){
             //TODO:
         }
 
+    }
+    public void clickedOkay(){
+        NavigationManager.getInstance().closePopup("Success");
+        NavigationManager.getInstance().closePopup("Edit");
+        NavigationManager.getInstance().closeAccountInfoScreen();
+        clickedProfile();
     }
 }
