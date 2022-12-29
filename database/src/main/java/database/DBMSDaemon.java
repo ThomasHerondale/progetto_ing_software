@@ -1163,6 +1163,9 @@ public class DBMSDaemon {
         }
     }
 
+    /**
+     * Ottiene la data di caricamento dell'ultimo stipendio.
+     */
     private LocalDate getLastSalaryDate(String id) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
@@ -1183,10 +1186,13 @@ public class DBMSDaemon {
         }
     }
 
-    public static void main(String[] args) throws DBMSException {
-        var db = new DBMSDaemon();
-        System.out.println(db.getWorkerSalaryData("0266723"));
-    }
+    /**
+     * Ottiene dal database i dati utilizzati dal sistema per il calcolo dell'ultimo stipendio
+     * del dipendente specificato.
+     * @param id la matricola del dipendente
+     * @return una mappa con una coppia ({@link HoursRecap}, stipendio)
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public Map<HoursRecap, Double> getWorkerSalaryData(String id) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
