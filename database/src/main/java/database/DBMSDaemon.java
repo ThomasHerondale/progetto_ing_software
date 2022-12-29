@@ -1,6 +1,5 @@
 package database;
 
-import commons.Counters;
 import commons.HoursRecap;
 import commons.Period;
 import entities.Shift;
@@ -631,7 +630,7 @@ public class DBMSDaemon {
         try (
                 var st = connection.prepareStatement("""
                 update Counters
-                set delayCount = 0 , autoExitCount = 0, holidayCount = 0
+                set delayCount = 0 , autoExitCount = 0, holidayCount = 0, requestParentalLeave = 0
                 """)
         ) {
             st.execute();
@@ -681,7 +680,7 @@ public class DBMSDaemon {
      * @param id la matricola del dipendente
      * @return una mappa del tipo {("ID", string), ("workerName", string), ("workerSurname", string),
      * ("telNumber", string), ("email", string), ("IBAN", string), ("delayCount", int), ("autoExitCount", int),
-     * ("holidayCount", int), ("parentalLeaveCount", int)}
+     * ("holidayCount", int), ("availabilityParentalLeave", int)}
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      * @apiNote essendo la mappa {@code <String, String>} gli <i>int</i> ai valori della mappa corrispondono a stringhe
      * contenenti interi, da castare con {@link Integer#parseInt(String)}
@@ -690,7 +689,7 @@ public class DBMSDaemon {
         try (
                 var st = connection.prepareStatement("""
                 select W.ID, W.workerName, W.workerSurname, W.telNumber, W.email, W.IBAN,
-                C.delayCount, C.autoExitCount, C.holidayCount, C.parentalLeaveCount
+                C.delayCount, C.autoExitCount, C.holidayCount, C.availabilityParentalLeave
                 from Worker W join Counters C on (W.ID = C.refWorkerID)
                 where W.ID = ?
                 """)
@@ -716,9 +715,9 @@ public class DBMSDaemon {
     public void enableParentalLeave(String id, int hours) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
-                insert into counters(refWorkerID, parentalLeaveCount)
+                insert into counters(refWorkerID, availabilityParentalLeave)
                 values(?, ?)
-                on duplicate key update parentalLeaveCount = ?
+                on duplicate key update availabilityParentalLeave = ?
                 """)
         ) {
             st.setString(1, id);
@@ -819,7 +818,7 @@ public class DBMSDaemon {
 
         try (
                 var st = connection.prepareStatement("""
-                select parentalLeaveCount
+                select availabilityParentalLeave
                 from counters
                 where refWorkerID = ?
                 """)
@@ -831,7 +830,7 @@ public class DBMSDaemon {
             assert maps.size() == 1; /* Ci dovrebbe essere un solo conteggio per dipendente */
 
             var map = maps.get(0);
-            var counter = Integer.parseInt(map.get("parentalLeaveCount"));
+            var counter = Integer.parseInt(map.get("availabilityParentalLeave"));
             return counter >= dayCount;
         } catch (SQLException e) {
             throw new DBMSException(e);
@@ -853,9 +852,14 @@ public class DBMSDaemon {
                 insert into abstention (refWorkerID, startDate, endDate, type)
                 values (?, ?, ?, 'ParentalLeave')
                 """);
-                var upSt = connection.prepareStatement("""
+                var upSt1 = connection.prepareStatement("""
                 update Counters
-                set parentalLeaveCount = parentalLeaveCount - ?
+                set availabilityParentalLeave = availabilityParentalLeave - ?
+                where refWorkerID = ?
+                """);
+                var upSt2 = connection.prepareStatement("""
+                update Counters
+                set requestParentalLeave = requestParentalLeave + ?
                 where refWorkerID = ?
                 """)
         ) {
@@ -865,14 +869,17 @@ public class DBMSDaemon {
             inSt.setDate(3, Date.valueOf(endDate));
 
             /* Calcola le ore di congedo parentale */
-            var dayCount = Period.dayCount(startDate, endDate) * 24;
+            var hourCount = Period.dayCount(startDate, endDate) * 24;
 
-            /* Riempi l'update */
-            upSt.setInt(1, dayCount);
-            upSt.setString(2, id);
+            /* Riempi gli update */
+            upSt1.setInt(1, hourCount);
+            upSt1.setString(2, id);
+            upSt2.setInt(1, hourCount);
+            upSt2.setString(2, id);
 
             inSt.execute();
-            upSt.execute();
+            upSt1.execute();
+            upSt2.execute();
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
@@ -1080,15 +1087,87 @@ public class DBMSDaemon {
         }
     }
 
-    public Map<Worker, HoursRecap> getWorkersData() throws DBMSException {
+    /* Dati del calcolo dello stipendio di un mese */
+    public Map<Worker, HoursRecap> getWorkersData(Period referencePeriod) throws DBMSException {
         var workers = getWorkersList(); /* Ottieni la lista di tutti i dipendenti */
 
-        for (var worker : workers) {
-            // TODO: tutte le query del cazzo
+        /* Ottieni le ore ordinarie e straordinarie */
+        Map<String, Integer> ordinaryHours = new HashMap<>();
+        Map<String, Integer> overtimeHours = new HashMap<>();
+        try (
+                var st = connection.prepareStatement("""
+                SELECT ordinary_hours_table.ID, ordinary_hours, COALESCE(overtime_hours, 0) AS overtime_hours
+                FROM
+                    (SELECT ID,
+                            SUM(TIMESTAMPDIFF(HOUR, entryTime, exitTime)) AS ordinary_hours
+                     FROM presence JOIN shift s ON s.refWorkerID = presence.refShiftID AND
+                                                   s.shiftDate = presence.refshiftDate AND
+                                                   s.shiftStart = presence.refshiftStart
+                                   JOIN worker w ON w.ID = s.refWorkerID
+                     WHERE overTimeFlag = FALSE AND
+                         shiftDate BETWEEN '2022-12-27' AND '2023-01-26'
+                     GROUP BY ID) AS ordinary_hours_table
+                LEFT OUTER JOIN
+                    (SELECT ID,
+                            SUM(TIMESTAMPDIFF(HOUR, entryTime, exitTime)) AS overtime_hours
+                    FROM presence JOIN shift s ON s.refWorkerID = presence.refShiftID AND
+                                                   s.shiftDate = presence.refshiftDate AND
+                                                   s.shiftStart = presence.refshiftStart
+                        JOIN worker w ON w.ID = s.refWorkerID
+                    WHERE overTimeFlag = TRUE AND
+                        shiftDate BETWEEN '2022-12-27' AND '2023-01-26'
+                    GROUP BY ID) AS overtime_hours_table
+                ON ordinary_hours_table.ID = overtime_hours_table.ID
+                """)
+        ) {
+            st.setDate(1, Date.valueOf(referencePeriod.start()));
+            st.setDate(2, Date.valueOf(referencePeriod.end()));
+            var resultSet = st.executeQuery();
+            var maps = extractResults(resultSet);
+
+            /* Riduci la lista di mappe a una mappa di coppie (ID, tot_ore_ordinarie) */
+            for (var map : maps) {
+                ordinaryHours.put(map.get("ID"), Integer.parseInt(map.get("ordinary_hours")));
+                overtimeHours.put(map.get("ID"), Integer.parseInt(map.get("overtime_hours")));
+            }
+        } catch (SQLException e) {
+            throw new DBMSException(e);
         }
+
+        /* Ottieni le ore di congedo parentale */
+        /* Ottieni la lista dei periodi di congedo parentale richiesti in questo mese da ogni dipendente
+        *  e inseriscili in una mappa (ID, [periodo1, periodo2, periodo3]) */
+        Map<String, List<Period>> pLeavePeriods = new HashMap<>();
+        try (
+                var st = connection.prepareStatement("""
+                    select ID, startDate, endDate
+                    from abstention join worker w on w.ID = abstention.refWorkerID
+                    where startDate between ? and ?
+                    """)
+        ) {
+            st.setDate(1, Date.valueOf(referencePeriod.start()));
+            st.setDate(2, Date.valueOf(referencePeriod.end()));
+            var resultSet = st.executeQuery();
+            var maps = extractResults(resultSet);
+
+            for (var map : maps) {
+                /* Ottieni la lista dei periodi del dipendente specificato e aggiungici quest'altro
+                *  che hai trovato associato al suo id */
+                pLeavePeriods.get(map.get("ID")).add(new Period(
+                        LocalDate.parse(map.get("startDate")), LocalDate.parse(map.get("endDate"))
+                ));
+            }
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+
         return null;
     }
 
+    public static void main(String[] args) throws DBMSException {
+        var db = new DBMSDaemon();
+        db.getWorkersData(new Period(LocalDate.parse("2022-12-27"), LocalDate.parse("2023-01-26")));
+    }
 
     /**
      * Estrae tutte le righe del resultSet specificato, convertendole in mappe (nome_colonna, valore_colonna).
