@@ -3,6 +3,7 @@ package com.example.view;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.stage.Stage;
 
 public class SuccessPopup {
 
@@ -13,6 +14,10 @@ public class SuccessPopup {
 
     public SuccessPopup(AccountInfoHandler accountInfoHandler) {
         this.accountInfoHandler = accountInfoHandler;
+    }
+
+    public void setClose(Stage stage) {
+        stage.setOnCloseRequest(event -> accountInfoHandler.clickedOkay());
     }
 
     @FXML

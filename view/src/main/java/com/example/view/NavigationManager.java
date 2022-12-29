@@ -2,6 +2,7 @@ package com.example.view;
 
 import commons.Counters;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
@@ -83,14 +84,30 @@ public class NavigationManager {
         try {
             Stage newStage = new Stage();
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
-            loader.setControllerFactory(controllerFactory);
+
+            /* Questo if è un pezzo di codice che ho usato per fare in modo che quando chiudo
+            * un SuccessPopup succede la stessa che cosa che succede se clicco sul tasto Okay */
+            if (popupName.equals("Success")){
+                Callback<Class<?>, Object> factory = controllerClass -> {
+                    Object controller = controllerFactory.call(controllerClass);
+                    ((SuccessPopup) controller).setClose(newStage);
+                    return controller;
+                };
+                loader.setControllerFactory(factory);
+            }
+            else {
+                loader.setControllerFactory(controllerFactory);
+            }
+
             Parent root = loader.load();
             Scene scene = new Scene(root);
             showScene(popupName, scene, false, newStage);
             stagesPopup.put(popupName, newStage);
 
-            /* per chiudere con la X */
-            newStage.setOnCloseRequest(event -> closePopup(popupName));
+            if (!popupName.equals("Success")){
+                /* per chiudere con la X */
+                newStage.setOnCloseRequest(event -> closePopup(popupName));
+            }
 
         } catch (IOException e){
             System.out.println(e.getMessage());
