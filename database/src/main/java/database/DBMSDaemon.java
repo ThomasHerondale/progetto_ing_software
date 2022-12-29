@@ -1,6 +1,5 @@
 package database;
 
-import commons.Counters;
 import commons.HoursRecap;
 import commons.Period;
 import entities.Shift;
@@ -1080,15 +1079,89 @@ public class DBMSDaemon {
         }
     }
 
-    public Map<Worker, HoursRecap> getWorkersData() throws DBMSException {
+    /* Dati del calcolo dello stipendio di un mese */
+    public Map<Worker, HoursRecap> getWorkersData(Period referencePeriod) throws DBMSException {
         var workers = getWorkersList(); /* Ottieni la lista di tutti i dipendenti */
 
-        for (var worker : workers) {
-            // TODO: tutte le query del cazzo
+        /* Ottieni le ore ordinarie e straordinarie */
+        Map<String, Integer> ordinaryHours = new HashMap<>();
+        Map<String, Integer> overtimeHours = new HashMap<>();
+        try (
+                var st = connection.prepareStatement("""
+                SELECT ordinary_hours_table.ID, ordinary_hours, COALESCE(overtime_hours, 0) AS overtime_hours
+                FROM
+                    (SELECT ID,
+                            SUM(TIMESTAMPDIFF(HOUR, entryTime, exitTime)) AS ordinary_hours
+                     FROM presence JOIN shift s ON s.refWorkerID = presence.refShiftID AND
+                                                   s.shiftRank = presence.refShiftRank AND
+                                                   s.shiftDate = presence.refshiftDate AND
+                                                   s.shiftStart = presence.refshiftStart
+                                   JOIN worker w ON w.ID = s.refWorkerID
+                     WHERE overTimeFlag = FALSE AND
+                         shiftDate BETWEEN '2022-12-27' AND '2023-01-26'
+                     GROUP BY ID) AS ordinary_hours_table
+                LEFT OUTER JOIN
+                    (SELECT ID,
+                            SUM(TIMESTAMPDIFF(HOUR, entryTime, exitTime)) AS overtime_hours
+                    FROM presence JOIN shift s ON s.refWorkerID = presence.refShiftID AND
+                                                   s.shiftRank = presence.refShiftRank AND
+                                                   s.shiftDate = presence.refshiftDate AND
+                                                   s.shiftStart = presence.refshiftStart
+                        JOIN worker w ON w.ID = s.refWorkerID
+                    WHERE overTimeFlag = TRUE AND
+                        shiftDate BETWEEN '2022-12-27' AND '2023-01-26'
+                    GROUP BY ID) AS overtime_hours_table
+                ON ordinary_hours_table.ID = overtime_hours_table.ID
+                """)
+        ) {
+            st.setDate(1, Date.valueOf(referencePeriod.start()));
+            st.setDate(2, Date.valueOf(referencePeriod.end()));
+            var resultSet = st.executeQuery();
+            var maps = extractResults(resultSet);
+
+            /* Riduci la lista di mappe a una mappa di coppie (ID, tot_ore_ordinarie) */
+            for (var map : maps) {
+                ordinaryHours.put(map.get("ID"), Integer.parseInt(map.get("ordinary_hours")));
+                overtimeHours.put(map.get("ID"), Integer.parseInt(map.get("overtime_hours")));
+            }
+        } catch (SQLException e) {
+            throw new DBMSException(e);
         }
+
+        /* Ottieni le ore di congedo parentale */
+        /* Ottieni la lista dei periodi di congedo parentale richiesti in questo mese da ogni dipendente
+        *  e inseriscili in una mappa (ID, [periodo1, periodo2, periodo3]) */
+        Map<String, List<Period>> pLeavePeriods = new HashMap<>();
+        try (
+                var st = connection.prepareStatement("""
+                    select ID, startDate, endDate
+                    from abstention join worker w on w.ID = abstention.refWorkerID
+                    where startDate between ? and ?
+                    """)
+        ) {
+            st.setDate(1, Date.valueOf(referencePeriod.start()));
+            st.setDate(2, Date.valueOf(referencePeriod.end()));
+            var resultSet = st.executeQuery();
+            var maps = extractResults(resultSet);
+
+            for (var map : maps) {
+                /* Ottieni la lista dei periodi del dipendente specificato e aggiungici quest'altro
+                *  che hai trovato associato al suo id */
+                pLeavePeriods.get(map.get("ID")).add(new Period(
+                        LocalDate.parse(map.get("startDate")), LocalDate.parse(map.get("endDate"))
+                ));
+            }
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+
         return null;
     }
 
+    public static void main(String[] args) throws DBMSException {
+        var db = new DBMSDaemon();
+        db.getWorkersData(new Period(LocalDate.parse("2022-12-27"), LocalDate.parse("2023-01-26")));
+    }
 
     /**
      * Estrae tutte le righe del resultSet specificato, convertendole in mappe (nome_colonna, valore_colonna).
