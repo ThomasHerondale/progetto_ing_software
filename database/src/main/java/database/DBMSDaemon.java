@@ -1,5 +1,7 @@
 package database;
 
+import commons.Counters;
+import commons.HoursRecap;
 import commons.Period;
 import entities.Shift;
 import entities.Worker;
@@ -262,7 +264,7 @@ public class DBMSDaemon {
      * @return una mappa del tipo {("firstAccessFlag", int), ("question", string)} se
      * la matricola specificata ha trovato riscontro nel database, altrimenti una mappa vuota {}
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
-     * @apiNote essendo la mappa <String, String> gli <i>int</i> ai valori della mappa corrispondono a stringhe
+     * @apiNote essendo la mappa {@code <String, String>} gli <i>int</i> ai valori della mappa corrispondono a stringhe
      * contenenti interi, da castare con {@link Integer#parseInt(String)}
      */
     public Map<String, String> getPasswordRetrievalInfo(String id) throws DBMSException {
@@ -638,9 +640,40 @@ public class DBMSDaemon {
         }
     }
 
-    // TODO: analizzare
-    public void getWorkersList() {
-        // TODO:
+    /**
+     * Ottiene la lista di tutti i dipendenti memorizzati nel database.
+     * @return una lista di tutti i dipendenti presenti nel database
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public List<Worker> getWorkersList() throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                select W.ID, W.workerName, W.workerSurname, W.workerRank, W.telNumber, W.email, W.IBAN
+                from Worker W
+                """)
+        ) {
+            var resultSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+
+            List<Worker> workers = new ArrayList<>(maps.size());
+            for (var map : maps) {
+                /* Crea un dipendente coi dati estratti dal database */
+                workers.add(new Worker(
+                        map.get("ID"),
+                        map.get("workerName"),
+                        map.get("workerSurname"),
+                        map.get("workerRank").charAt(0),
+                        map.get("telNumber"),
+                        map.get("email"),
+                        map.get("IBAN")
+                ));
+            }
+
+            return workers;
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     /**
@@ -650,7 +683,7 @@ public class DBMSDaemon {
      * ("telNumber", string), ("email", string), ("IBAN", string), ("delayCount", int), ("autoExitCount", int),
      * ("holidayCount", int), ("parentalLeaveCount", int)}
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
-     * @apiNote essendo la mappa <String, String> gli <i>int</i> ai valori della mappa corrispondono a stringhe
+     * @apiNote essendo la mappa {@code <String, String>} gli <i>int</i> ai valori della mappa corrispondono a stringhe
      * contenenti interi, da castare con {@link Integer#parseInt(String)}
      */
     public Map<String, String> getAccountData(String id) throws DBMSException {
@@ -813,6 +846,7 @@ public class DBMSDaemon {
      * @param endDate la data di fine del periodo di congedo parentale
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
+    @SuppressWarnings("DuplicatedCode")
     public void setParentalLeavePeriod(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
         try (
                 var inSt = connection.prepareStatement("""
@@ -914,6 +948,7 @@ public class DBMSDaemon {
      * @param endDate la data di fine del periodo di ferie
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
+    @SuppressWarnings("DuplicatedCode")
     public void setHolidayPeriod(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
         try (
                 var inSt = connection.prepareStatement("""
@@ -1019,7 +1054,7 @@ public class DBMSDaemon {
 
             List<HashMap<String, String>> maps = extractResults(resultSet);
 
-            List<Shift> shifts = new ArrayList<>();
+            List<Shift> shifts = new ArrayList<>(maps.size());
             for (var map : maps) {
                 /* Crea un turno coi dati estratti dal database */
                 shifts.add(new Shift(
@@ -1043,6 +1078,15 @@ public class DBMSDaemon {
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
+    }
+
+    public Map<Worker, HoursRecap> getWorkersData() throws DBMSException {
+        var workers = getWorkersList(); /* Ottieni la lista di tutti i dipendenti */
+
+        for (var worker : workers) {
+            // TODO: tutte le query del cazzo
+        }
+        return null;
     }
 
 

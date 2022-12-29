@@ -18,12 +18,11 @@ public class SalaryScreen extends LoggedScreen {
     private final ViewSalaryHandler viewSalaryHandler;
     private final AccountInfoHandler accountInfoHandler;
 
-    public SalaryScreen(Worker worker, ViewSalaryHandler handler){
+    public SalaryScreen(ViewSalaryHandler handler){
         //mancano ancora delle cose
         //TODO:
-        super(worker);
         this.viewSalaryHandler = handler;
-        accountInfoHandler = new AccountInfoHandler(worker);
+        accountInfoHandler = new AccountInfoHandler();
     }
     @Override
     public void initialize(){

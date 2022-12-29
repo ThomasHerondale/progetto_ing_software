@@ -1,25 +1,23 @@
 package com.example.view;
 
+import commons.Session;
 import database.DBMSDaemon;
 import database.DBMSException;
 import entities.Worker;
 import java.util.Map;
 
 public class LoginHandler {
-
-    private Worker worker;
-
     public void clickedLogin(String id, String password) {
         try {
             /* verifica che le credenziali inserite siano corrette */
             if (DBMSDaemon.getInstance().checkCredentials(id, password)){
-                worker = DBMSDaemon.getInstance().getWorkerData(id);
+                Session.getInstance().update(DBMSDaemon.getInstance().getWorkerData(id));
                 /* verifica che chi sta effettuando l'accesso
                 * l'abbia già fatto in precedenza o la sua prima volta. */
                 if (DBMSDaemon.getInstance().isFirstAccess(id)){
                     Map<String,String> questions = DBMSDaemon.getInstance().getQuestionsList();
                     NavigationManager.getInstance().createPopup("First Access",
-                            controllerClass -> new FirstAccessPopup(questions, worker, this));
+                            controllerClass -> new FirstAccessPopup(questions,this));
                 }
                 /* Se ha già fatto il primo accesso */
                 else {
@@ -36,13 +34,13 @@ public class LoginHandler {
     }
     private void chooseHomeScreen(){
         String screenName;
-        if (worker.getRank() == 'H' ){
+        if (Session.getInstance().getWorker().getRank() == 'H' ){
             screenName = "Home (Admin)";
         } else {
             screenName = "Home";
         }
         NavigationManager.getInstance().createScreen(screenName,
-                controller -> new HomeScreen(worker));
+                controller -> new HomeScreen());
 
 
     }
