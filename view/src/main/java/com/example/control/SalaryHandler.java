@@ -1,6 +1,10 @@
 package com.example.control;
 
 import commons.HoursRecap;
+import commons.Period;
+import database.DBMSDaemon;
+import database.DBMSException;
+import entities.Worker;
 
 import java.util.Map;
 
@@ -34,6 +38,12 @@ public class SalaryHandler {
      */
     private static final Double baseSalary = 150.0;
 
+    /**
+     * Calcola lo stipendio di un dipendente del livello specificato in base alle ore di lavoro svolto.
+     * @param rank il livello del dipendente
+     * @param hours il riepilogo delle ore di lavoro svolte dal dipendente
+     * @return lo stipendio calcolato
+     */
     private double computeSalary(char rank, HoursRecap hours) {
         /* Calcola le tariffe orarie per gli straordinari e i congedi parentali */
         var overtimeWage = hourWage * overtimeFactor;
@@ -44,5 +54,23 @@ public class SalaryHandler {
                 hours.ordinaryHours() * hourWage +
                 hours.overtimeHours() * overtimeWage +
                 hours.parentalLeaveHours() * parentalLeaveWage;
+    }
+
+    /**
+     * Calcola lo stipendio di tutti i dipendenti, con riferimento al periodo specificato.
+     * @param referencePeriod il periodo di riferimento
+     */
+    public void computeSalaries(Period referencePeriod) {
+        try {
+            var dbms = DBMSDaemon.getInstance();
+            Map<Worker, HoursRecap> salaryData = dbms.getWorkersData(referencePeriod);
+            for (var workerInfo : salaryData.entrySet()) {
+                var salary = computeSalary(workerInfo.getKey().getRank(), workerInfo.getValue());
+                dbms.setSalary(workerInfo.getKey().getId(), referencePeriod.end(), salary);
+            }
+        } catch (DBMSException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 }
