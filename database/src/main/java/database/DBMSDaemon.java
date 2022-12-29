@@ -630,7 +630,7 @@ public class DBMSDaemon {
         try (
                 var st = connection.prepareStatement("""
                 update Counters
-                set delayCount = 0 , autoExitCount = 0, holidayCount = 0
+                set delayCount = 0 , autoExitCount = 0, holidayCount = 0, requestParentalLeave = 0
                 """)
         ) {
             st.execute();
@@ -680,7 +680,7 @@ public class DBMSDaemon {
      * @param id la matricola del dipendente
      * @return una mappa del tipo {("ID", string), ("workerName", string), ("workerSurname", string),
      * ("telNumber", string), ("email", string), ("IBAN", string), ("delayCount", int), ("autoExitCount", int),
-     * ("holidayCount", int), ("parentalLeaveCount", int)}
+     * ("holidayCount", int), ("availabilityParentalLeave", int)}
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      * @apiNote essendo la mappa {@code <String, String>} gli <i>int</i> ai valori della mappa corrispondono a stringhe
      * contenenti interi, da castare con {@link Integer#parseInt(String)}
@@ -689,7 +689,7 @@ public class DBMSDaemon {
         try (
                 var st = connection.prepareStatement("""
                 select W.ID, W.workerName, W.workerSurname, W.telNumber, W.email, W.IBAN,
-                C.delayCount, C.autoExitCount, C.holidayCount, C.parentalLeaveCount
+                C.delayCount, C.autoExitCount, C.holidayCount, C.availabilityParentalLeave
                 from Worker W join Counters C on (W.ID = C.refWorkerID)
                 where W.ID = ?
                 """)
@@ -715,9 +715,9 @@ public class DBMSDaemon {
     public void enableParentalLeave(String id, int hours) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
-                insert into counters(refWorkerID, parentalLeaveCount)
+                insert into counters(refWorkerID, availabilityParentalLeave)
                 values(?, ?)
-                on duplicate key update parentalLeaveCount = ?
+                on duplicate key update availabilityParentalLeave = ?
                 """)
         ) {
             st.setString(1, id);
@@ -818,7 +818,7 @@ public class DBMSDaemon {
 
         try (
                 var st = connection.prepareStatement("""
-                select parentalLeaveCount
+                select availabilityParentalLeave
                 from counters
                 where refWorkerID = ?
                 """)
@@ -830,7 +830,7 @@ public class DBMSDaemon {
             assert maps.size() == 1; /* Ci dovrebbe essere un solo conteggio per dipendente */
 
             var map = maps.get(0);
-            var counter = Integer.parseInt(map.get("parentalLeaveCount"));
+            var counter = Integer.parseInt(map.get("availabilityParentalLeave"));
             return counter >= dayCount;
         } catch (SQLException e) {
             throw new DBMSException(e);
@@ -852,9 +852,14 @@ public class DBMSDaemon {
                 insert into abstention (refWorkerID, startDate, endDate, type)
                 values (?, ?, ?, 'ParentalLeave')
                 """);
-                var upSt = connection.prepareStatement("""
+                var upSt1 = connection.prepareStatement("""
                 update Counters
-                set parentalLeaveCount = parentalLeaveCount - ?
+                set availabilityParentalLeave = availabilityParentalLeave - ?
+                where refWorkerID = ?
+                """);
+                var upSt2 = connection.prepareStatement("""
+                update Counters
+                set requestParentalLeave = requestParentalLeave + ?
                 where refWorkerID = ?
                 """)
         ) {
@@ -864,14 +869,17 @@ public class DBMSDaemon {
             inSt.setDate(3, Date.valueOf(endDate));
 
             /* Calcola le ore di congedo parentale */
-            var dayCount = Period.dayCount(startDate, endDate) * 24;
+            var hourCount = Period.dayCount(startDate, endDate) * 24;
 
-            /* Riempi l'update */
-            upSt.setInt(1, dayCount);
-            upSt.setString(2, id);
+            /* Riempi gli update */
+            upSt1.setInt(1, hourCount);
+            upSt1.setString(2, id);
+            upSt2.setInt(1, hourCount);
+            upSt2.setString(2, id);
 
             inSt.execute();
-            upSt.execute();
+            upSt1.execute();
+            upSt2.execute();
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
@@ -1093,7 +1101,6 @@ public class DBMSDaemon {
                     (SELECT ID,
                             SUM(TIMESTAMPDIFF(HOUR, entryTime, exitTime)) AS ordinary_hours
                      FROM presence JOIN shift s ON s.refWorkerID = presence.refShiftID AND
-                                                   s.shiftRank = presence.refShiftRank AND
                                                    s.shiftDate = presence.refshiftDate AND
                                                    s.shiftStart = presence.refshiftStart
                                    JOIN worker w ON w.ID = s.refWorkerID
@@ -1104,7 +1111,6 @@ public class DBMSDaemon {
                     (SELECT ID,
                             SUM(TIMESTAMPDIFF(HOUR, entryTime, exitTime)) AS overtime_hours
                     FROM presence JOIN shift s ON s.refWorkerID = presence.refShiftID AND
-                                                   s.shiftRank = presence.refShiftRank AND
                                                    s.shiftDate = presence.refshiftDate AND
                                                    s.shiftStart = presence.refshiftStart
                         JOIN worker w ON w.ID = s.refWorkerID
