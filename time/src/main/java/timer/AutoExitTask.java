@@ -16,7 +16,7 @@ class AutoExitTask extends TimerTask {
     private final String actionLogString;
 
     public AutoExitTask(boolean debugMode) {
-        this.actionLogString = debugMode ? "[DEBUG - AUTO_EXIT - ACTION]" : "";
+        this.actionLogString = debugMode ? ": [DEBUG - AUTO_EXIT - ACTION]" : "";
     }
 
     @Override
@@ -25,9 +25,9 @@ class AutoExitTask extends TimerTask {
             List<Shift> expiredShifts =
                     DBMSDaemon.getInstance().getExitMissingShifts(LocalDate.now(), LocalTime.now());
             DBMSDaemon.getInstance().recordAutoExit(expiredShifts);
-            System.err.println(actionLogString);
+            System.err.println(LocalTime.now() + actionLogString);
         } catch (DBMSException e) {
-            System.err.println("[DEBUG - AUTO_EXIT - DBMS ERROR]");
+            System.err.println(LocalTime.now() + ": [DEBUG - AUTO_EXIT - DBMS ERROR]");
         }
     }
 }

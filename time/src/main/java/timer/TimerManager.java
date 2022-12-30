@@ -1,5 +1,8 @@
 package timer;
 
+import database.DBMSDaemon;
+import database.DBMSException;
+
 import java.time.Instant;
 import java.util.Date;
 import java.util.Timer;
@@ -10,6 +13,10 @@ public class TimerManager {
      * Il timer che si occupa delle uscite automatiche.
      */
     private final Timer autoExitTimer;
+    /**
+     * Il timer che si occupa del reset dei contatori dei dipendenti.
+     */
+    private MonthlyTimer resetCountersTimer;
     /**
      * L'intervallo tra una registrazione di uscite automatiche e un'altra.
      */
@@ -51,6 +58,15 @@ public class TimerManager {
     public void initialize() {
         var rate = debugMode ? 10_000 : AUTO_EXIT_RATE;
         autoExitTimer.scheduleAtFixedRate(new AutoExitTask(debugMode), Date.from(Instant.now()), rate);
+        this.resetCountersTimer = MonthlyTimer.schedule(
+                () -> {
+                    try {
+                        DBMSDaemon.getInstance().resetCounters();
+                    } catch (DBMSException e) {
+                        if (debugMode)
+                            System.err.println("[DEBUG - RESET_COUNTERS - DBMS ERROR]");
+                    }
+                }, 27, 23);
 
         /* Task di debug */
         if (debugMode) {
