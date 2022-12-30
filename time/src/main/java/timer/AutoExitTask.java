@@ -11,15 +11,21 @@ import java.util.TimerTask;
 
 public class AutoExitTask extends TimerTask {
 
+    private final String logString;
+
+    public AutoExitTask(boolean debugMode) {
+        this.logString = debugMode ? "[DEBUG - AUTO_EXIT - NOTICE]" : "";
+    }
+
     @Override
     public void run() {
         try {
             List<Shift> expiredShifts =
                     DBMSDaemon.getInstance().getExitMissingShifts(LocalDate.now(), LocalTime.now());
-            for (var shift : expiredShifts) {
-            }
+            DBMSDaemon.getInstance().recordAutoExit(expiredShifts);
+            System.out.println(logString);
         } catch (DBMSException e) {
-            throw new RuntimeException(e);
+            System.err.println();
         }
     }
 }
