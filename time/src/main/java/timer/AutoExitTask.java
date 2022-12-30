@@ -9,12 +9,14 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.TimerTask;
 
-public class AutoExitTask extends TimerTask {
-
-    private final String logString;
+/**
+ * La {@link TimerTask} che si occupa di registrare in automatico le uscite dei turni ogni mezz'ora.
+ */
+class AutoExitTask extends TimerTask {
+    private final String actionLogString;
 
     public AutoExitTask(boolean debugMode) {
-        this.logString = debugMode ? "[DEBUG - AUTO_EXIT - NOTICE]" : "";
+        this.actionLogString = debugMode ? "[DEBUG - AUTO_EXIT - ACTION]" : "";
     }
 
     @Override
@@ -23,9 +25,9 @@ public class AutoExitTask extends TimerTask {
             List<Shift> expiredShifts =
                     DBMSDaemon.getInstance().getExitMissingShifts(LocalDate.now(), LocalTime.now());
             DBMSDaemon.getInstance().recordAutoExit(expiredShifts);
-            System.out.println(logString);
+            System.err.println(actionLogString);
         } catch (DBMSException e) {
-            System.err.println();
+            System.err.println("[DEBUG - AUTO_EXIT - DBMS ERROR]");
         }
     }
 }
