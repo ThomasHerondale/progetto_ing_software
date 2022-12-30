@@ -3,6 +3,9 @@ package entities;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalField;
 import java.util.Objects;
 
 /**
@@ -93,6 +96,14 @@ public class Shift {
      */
     public DayOfWeek dayOfWeek() {
         return date.getDayOfWeek();
+    }
+
+    /**
+     * Ritorna la durata in ore di questo turno.
+     * @return la durata in ore di questo turno
+     */
+    public int getHours() {
+        return endTime.minusHours(startTime.get(ChronoField.HOUR_OF_DAY)).get(ChronoField.HOUR_OF_DAY);
     }
 
     @Override
