@@ -1087,6 +1087,12 @@ public class DBMSDaemon {
         }
     }
 
+    /**
+     * Ottiene la lista dei turni assegnati al dipendente specificato.
+     * @param id la matricola del dipendente
+     * @return la lista dei turni relativi al dipendente
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
     public List<Shift> getShiftsList(String id) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
