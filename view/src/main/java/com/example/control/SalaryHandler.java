@@ -41,6 +41,9 @@ public class SalaryHandler {
      */
     private static final Double baseSalary = 150.0;
 
+    /* Costruttore privato per impedire l'istanziazione di questa classe */
+    private SalaryHandler() {}
+
     /**
      * Calcola lo stipendio di un dipendente del livello specificato in base alle ore di lavoro svolto.
      * @param rank il livello del dipendente
