@@ -1087,6 +1087,46 @@ public class DBMSDaemon {
         }
     }
 
+    public List<Shift> getShiftsList(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                select W.ID, W.workerName, W.workerSurname, W.workerRank, W.telNumber, W.email, W.IBAN,
+                S.shiftRank, S.shiftDate, S.shiftStart, S.shiftEnd
+                from Worker W join Shift S on ( W.ID = S.refWorkerID )
+                where ID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+
+            // TODO: duplicato!
+            List<Shift> shifts = new ArrayList<>(maps.size());
+            for (var map : maps) {
+                /* Crea un turno coi dati estratti dal database */
+                shifts.add(new Shift(
+                        new Worker(
+                                map.get("ID"),
+                                map.get("workerName"),
+                                map.get("workerSurname"),
+                                map.get("workerRank").charAt(0),
+                                map.get("telNumber"),
+                                map.get("email"),
+                                map.get("IBAN")
+                        ),
+                        map.get("shiftRank").charAt(0),
+                        LocalDate.parse(map.get("shiftDate")),
+                        LocalTime.parse(map.get("shiftStart")),
+                        LocalTime.parse(map.get("shiftEnd"))
+                ));
+            }
+            return shifts;
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
     /**
      * Ottiene dal database i dati necessari al calcolo dello stipendio di tutti i dipendenti con riferimento
      * al periodo (mese) specificato.
