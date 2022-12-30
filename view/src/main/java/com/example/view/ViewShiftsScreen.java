@@ -50,11 +50,10 @@ public class ViewShiftsScreen extends LoggedScreen {
     @FXML
     private MenuButton abstentionsMenu;
 
-    private ShiftHandler shiftHandler;
-    private AccountInfoHandler accountInfoHandler;
+    private final ShiftHandler shiftHandler;
+    private final AccountInfoHandler accountInfoHandler;
     private List<Shift> weekShiftsList;
     private List<Shift> shiftsList;
-    private int shiftIndex = 0;
     private Period showedWeek;
 
     public ViewShiftsScreen(ShiftHandler handler){
@@ -71,10 +70,10 @@ public class ViewShiftsScreen extends LoggedScreen {
                     Session.getInstance().getWorker().getRank(), LocalDate.parse("2023-01-02"),
                     LocalTime.parse("09:00:00"),LocalTime.parse("10:00:00") ));
             shiftsList.add(new Shift(Session.getInstance().getWorker(),
-                    Session.getInstance().getWorker().getRank(), LocalDate.parse("2023-01-02"),
+                    Session.getInstance().getWorker().getRank(), LocalDate.parse("2022-12-26"),
                     LocalTime.parse("12:00:00"),LocalTime.parse("21:00:00") ));
             shiftsList.add(new Shift(Session.getInstance().getWorker(),
-                    Session.getInstance().getWorker().getRank(), LocalDate.parse("2023-01-02"),
+                    Session.getInstance().getWorker().getRank(), LocalDate.parse("2022-12-26"),
                     LocalTime.parse("21:00:00"),LocalTime.parse("22:00:00") ));
             shiftsList.add(new Shift(Session.getInstance().getWorker(),
                     Session.getInstance().getWorker().getRank(), LocalDate.parse("2022-12-27"),
@@ -95,7 +94,7 @@ public class ViewShiftsScreen extends LoggedScreen {
         weekShiftsList = shiftsOfShowedWeek(showedWeek);
         abstentionsMenu.getStylesheets().add(String.valueOf(getClass().getResource("css/AbstentionsMenuStyle.css")));
         abstentionsMenu.getStyleClass().add("abstentionsMenu");
-        insertAllShiftsCard(shiftsList);
+        insertAllShiftsCard(weekShiftsList);
     }
 
     /**
@@ -141,6 +140,7 @@ public class ViewShiftsScreen extends LoggedScreen {
 
     /**
      * Per ogni turno in shiftsList crea una ShiftCard e la inserisce nello shiftsPane.
+     * Inoltre qui dentro viene impostato il metodo setOnMouseClicked di ogni ShiftCard.
      * @param shiftsList lista dei turni.
      */
     private void insertAllShiftsCard(List<Shift> shiftsList){
@@ -154,11 +154,8 @@ public class ViewShiftsScreen extends LoggedScreen {
             shiftsPane.getChildren().add(i, shiftCard);
             shiftsPane.getChildren().get(i).setLayoutY(cardLayoutY);
             shiftsPane.getChildren().get(i).setLayoutX(cardLayoutX);
-
-
-            shiftCard.setOnMouseClicked(mouseEvent ->
-                    NavigationManager.getInstance().createPopup("Error Message",
-                            controller-> new ErrorMessage("Prova")));
+            Shift finalShift = shift;
+            shiftCard.setOnMouseClicked(mouseEvent -> new ViewShiftsInfoHandler().clickedShift(finalShift));
         }
     }
 
@@ -206,7 +203,6 @@ public class ViewShiftsScreen extends LoggedScreen {
         shiftCard.getStylesheets().add(String.valueOf(getClass().getResource("css/styleShiftCard.css")));
         shiftCard.getStyleClass().add("shiftCard");
         shiftCard.setCursor(Cursor.HAND);
-        //set onMouseClicked va qua?
         return shiftCard;
     }
 
