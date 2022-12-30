@@ -60,7 +60,6 @@ public class ViewShiftsScreen extends LoggedScreen {
         this.shiftHandler = handler;
         accountInfoHandler = new AccountInfoHandler();
         try {
-        /* questo è giusto ma per ora faccio prove */
             shiftsList = DBMSDaemon.getInstance().getShiftsList(Session.getInstance().getWorker().getId());
 
         /*    DBMSDaemon.getInstance().getShiftsList(Session.getInstance().getWorker().getId());
@@ -95,7 +94,7 @@ public class ViewShiftsScreen extends LoggedScreen {
         weekShiftsList = shiftsOfShowedWeek(showedWeek);
         abstentionsMenu.getStylesheets().add(String.valueOf(getClass().getResource("css/AbstentionsMenuStyle.css")));
         abstentionsMenu.getStyleClass().add("abstentionsMenu");
-        insertAllShiftsCard(shiftsList);
+        insertAllShiftsCard(weekShiftsList);
     }
 
     /**
