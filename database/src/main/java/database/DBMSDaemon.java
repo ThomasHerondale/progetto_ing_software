@@ -9,6 +9,8 @@ import java.sql.Date;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAmount;
 import java.util.*;
 
 public class DBMSDaemon {
@@ -1341,6 +1343,66 @@ public class DBMSDaemon {
 
             inSt.execute();
             upSt.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
+     * Ottiene la lista dei turni del giorno specificato che risultano terminati da più di mezz'ora rispetto
+     * all'ora specificata, ma per cui non risulta un'uscita registrata.
+     * @param date la data di riferimento dei turni
+     * @param time l'ora rispetto a cui sarà eseguito il controllo
+     * @return la lista dei turni terminati da più di mezz'ora che non hanno un'uscita registrata
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public List<Shift> getExitMissingShifts(LocalDate date, LocalTime time) throws DBMSException {
+        /* Otterremo i turni finiti da più di mezz'ora senza uscita */
+        time = time.minus(30, ChronoUnit.MINUTES);
+
+        try (
+                var st = connection.prepareStatement("""
+                SELECT W.ID, W.workerName, W.workerSurname, W.workerRank, W.telNumber, W.email, W.IBAN,
+                S.shiftRank, S.shiftDate, S.shiftStart, S.shiftEnd
+                FROM Shift S join Presence P
+                    on (S.refWorkerID = P.refShiftID and S.shiftDate = P.refShiftDate
+                    and S.shiftStart = P.refShiftStart)
+                    JOIN worker w ON w.ID = S.refWorkerID
+                WHERE P.refShiftDate = ? and P.exitTime IS NULL and S.shiftEnd <= ?;
+                """)
+        ) {
+            st.setDate(1, Date.valueOf(date));
+            st.setTime(2, Time.valueOf(time));
+            var resultSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+
+            if (maps.isEmpty()) {
+                return Collections.emptyList();
+            } else {
+                List<Shift> shifts = new ArrayList<>();
+
+                for (var map : maps) {
+                    var shiftOwner = new Worker(
+                            map.get("ID"),
+                            map.get("workerName"),
+                            map.get("workerSurname"),
+                            map.get("workerRank").charAt(0),
+                            map.get("telNumber"),
+                            map.get("email"),
+                            map.get("IBAN")
+                    );
+                    shifts.add(new Shift(
+                            shiftOwner,
+                            map.get("shiftRank").charAt(0),
+                            LocalDate.parse(map.get("shiftDate")),
+                            LocalTime.parse(map.get("shiftStart")),
+                            LocalTime.parse(map.get("shiftEnd"))
+                    ));
+                }
+
+                return shifts;
+            }
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
