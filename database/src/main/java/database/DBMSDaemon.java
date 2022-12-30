@@ -10,7 +10,6 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
 import java.util.*;
 
 public class DBMSDaemon {
@@ -1405,6 +1404,25 @@ public class DBMSDaemon {
             }
         } catch (SQLException e) {
             throw new DBMSException(e);
+        }
+    }
+
+    public List<Shift> recordAutoExit(List<Shift> shifts) throws DBMSException {
+        for (var shift : shifts) {
+            try (
+                    var st = connection.prepareStatement("""
+                    UPDATE Presence
+                    SET exitTime = ?
+                    WHERE refShiftID = ? AND refShiftDate = ? and refShiftStart = ?
+                    """)
+            ) {
+                st.setTime(1, shift.getEndTime());
+                st.setString(2, shift.getOwner().getId());
+                st.setDate(3, Date.valueOf(shift.getDate()));
+                st.setTime(4, shift.getStartTime());
+            } catch (SQLException e) {
+                throw new DBMSException(e);
+            }
         }
     }
 
