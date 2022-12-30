@@ -278,9 +278,9 @@
             </AnchorPane>
         </content>
       </ScrollPane>
-      <ScrollPane fx:id="verticalAndHorizonatalPane" hbarPolicy="NEVER" layoutX="27.0" layoutY="54.0" prefHeight="617.0" prefWidth="1319.0" style="-fx-background-color: transparent;" vbarPolicy="NEVER" AnchorPane.bottomAnchor="28.0" AnchorPane.leftAnchor="91.0">
+      <ScrollPane fx:id="verticalAndHorizonatalPane" hbarPolicy="NEVER" layoutX="27.0" layoutY="54.0" prefHeight="617.0" prefWidth="1319.0" style="-fx-background-color: transparent;" vbarPolicy="NEVER" AnchorPane.bottomAnchor="28.0" AnchorPane.leftAnchor="91.0" AnchorPane.topAnchor="155.0">
         <content>
-          <AnchorPane fx:id="shiftsPane" minHeight="0.0" minWidth="0.0" prefHeight="998.0" prefWidth="1800.0" />
+          <AnchorPane fx:id="shiftsPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1485.0" prefWidth="1800.0" />
         </content>
       </ScrollPane>
       <Group fx:id="profileIcon" layoutX="182.0" layoutY="151.0" onMouseClicked="#clickProfile" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0">
