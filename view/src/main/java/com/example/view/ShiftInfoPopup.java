@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import java.time.format.DateTimeFormatter;
 
 public class ShiftInfoPopup {
     @FXML
@@ -42,8 +43,9 @@ public class ShiftInfoPopup {
         idLabel.setText(shift.getOwner().getId());
         fullNameLabel.setText(shift.getOwner().getFullName());
         rankLabel.setText("Livello " + shift.getRank());
-        hoursLabel.setText(String.valueOf(shift.getStartTime()) + " - " + shift.getEndTime() + "(" + shift.getHours() + "h)");
-        dateLabel.setText(String.valueOf(shift.getDate()));
+        hoursLabel.setText(String.valueOf(shift.getStartTime()) + " - " + shift.getEndTime() + " (" + shift.getHours() + "h)");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        dateLabel.setText(String.valueOf(shift.getDate().format(formatter)));
         if (shift.isOvertime()){
             overtimeLabel.setOpacity(1.0);
         }
