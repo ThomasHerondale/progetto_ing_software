@@ -120,6 +120,16 @@ public class Shift {
         return Objects.hash(owner, rank, date, startTime);
     }
 
+    /**
+     * Imposta i flag che contrassegnano il turno come sostituzione o straordinario.
+     * @param overtimeFlag il nuovo valore del flag di straordinario
+     * @param substitutionFlag il nuovo valore del flag di sostituzione
+     */
+    public void setFlags(boolean overtimeFlag, boolean substitutionFlag) {
+        this.isOvertime = overtimeFlag;
+        this.isSubstitution = substitutionFlag;
+    }
+
     @Override
     public String toString() {
         return "Shift{" +
