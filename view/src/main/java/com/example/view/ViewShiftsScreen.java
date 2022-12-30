@@ -44,7 +44,7 @@ public class ViewShiftsScreen extends LoggedScreen {
         this.shiftHandler = handler;
         accountInfoHandler = new AccountInfoHandler();
         try {
-            DBMSDaemon.getInstance().getShiftsList(Session.getInstance().getWorker().getId());
+            shiftsList = DBMSDaemon.getInstance().getShiftsList(Session.getInstance().getWorker().getId());
         } catch (DBMSException e) {
             //TODO:
         }
@@ -56,8 +56,8 @@ public class ViewShiftsScreen extends LoggedScreen {
         abstentionsMenu.getStylesheets().add(String.valueOf(getClass().getResource("css/AbstentionsMenuStyle.css")));
         abstentionsMenu.getStyleClass().add("abstentionsMenu");
         synchroBar();
-        //insertAllShiftsCard(Session.getInstance().getWorker().getId(),
-        //        Session.getInstance().getWorker().getFullName(), shiftsList);
+        insertAllShiftsCard(Session.getInstance().getWorker().getId(),
+                Session.getInstance().getWorker().getFullName(), shiftsList);
     }
 
     private void synchroBar() {
