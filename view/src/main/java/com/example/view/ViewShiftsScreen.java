@@ -1,10 +1,10 @@
 package com.example.view;
 
+import commons.Period;
 import commons.Session;
 import database.DBMSDaemon;
 import database.DBMSException;
 import entities.Shift;
-import entities.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
@@ -15,10 +15,7 @@ import javafx.scene.layout.AnchorPane;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ViewShiftsScreen extends LoggedScreen {
 
@@ -89,11 +86,27 @@ public class ViewShiftsScreen extends LoggedScreen {
     public void initialize(){
         super.initialize();
         //inizializza pure weekLabel
+        weekShiftsList = shiftsOfCurrentWeek();
         abstentionsMenu.getStylesheets().add(String.valueOf(getClass().getResource("css/AbstentionsMenuStyle.css")));
         abstentionsMenu.getStyleClass().add("abstentionsMenu");
         synchroBar();
         insertAllShiftsCard(Session.getInstance().getWorker().getId(),
                 Session.getInstance().getWorker().getFullName(), shiftsList);
+    }
+
+    private List<Shift> shiftsOfCurrentWeek() {
+        List<Shift> week = new ArrayList<>();
+        LocalDate currentDate = LocalDate.now();
+        LocalDate startWeekDate = currentDate.with(DayOfWeek.MONDAY);
+        LocalDate endWeekDate = currentDate.with(DayOfWeek.SUNDAY);
+        Period currentWeek = new Period(startWeekDate, endWeekDate);
+
+        for (var shift : shiftsList) {
+            if (currentWeek.comprehends(shift.getDate())) {
+                week.add(shift);
+            }
+        }
+        return week;
     }
 
     private void synchroBar() {
