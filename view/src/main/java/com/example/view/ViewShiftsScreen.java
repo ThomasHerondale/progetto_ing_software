@@ -6,6 +6,8 @@ import database.DBMSException;
 import entities.Shift;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane;
@@ -38,6 +40,7 @@ public class ViewShiftsScreen extends LoggedScreen {
 
     private ShiftHandler shiftHandler;
     private AccountInfoHandler accountInfoHandler;
+    private List<Shift> weekShiftsList;
     private List<Shift> shiftsList;
 
     public ViewShiftsScreen(ShiftHandler handler){
@@ -69,18 +72,37 @@ public class ViewShiftsScreen extends LoggedScreen {
     private void insertAllShiftsCard(String idWorker, String fullNameWorker, List<Shift> shiftsList){
         Shift shift;
         AnchorPane shiftCard;
+        int indexChild = 0;
         for (int i=0; i<shiftsList.size(); i++){
             shift = shiftsList.get(i);
-            shiftCard = createShiftCard(idWorker,fullNameWorker, shift);
+            createShiftCard(idWorker,fullNameWorker, shift, indexChild);
+            //ogni shiftCard ha due children
+            indexChild = indexChild + 2;
+            shiftCard.getStylesheets().add(String.valueOf(getClass().getResource("css/styleShiftCard.css")));
+            shiftCard.getStyleClass().add("shiftCard");
         }
     }
-    private AnchorPane createShiftCard(String id, String fullName, Shift shift){
+    private void createShiftCard(String id, String fullName, Shift shift, int indexChild){
         AnchorPane shiftCard = new AnchorPane();
         shiftCard.setPrefHeight(87);
         shiftCard.setPrefWidth(227);
+        Label idLabel = new Label(id);
+        shiftCard.getChildren().add(indexChild, idLabel);
+        shiftCard.getChildren().get(indexChild).setLayoutY(20);
+        shiftCard.getChildren().get(indexChild).setLayoutX(20);
+        Label fullNameLabel = new Label(fullName);
+        indexChild++;
+        shiftCard.getChildren().add(indexChild, fullNameLabel);
+        shiftCard.getChildren().get(indexChild).setLayoutY(40);
+        shiftCard.getChildren().get(indexChild).setLayoutX(20);
 
+        shiftCard.setCursor(Cursor.HAND);
+        //set onMouseClicked va qua?
+        computeCardSize(shift);
+    }
 
-        return shiftCard;
+    private void computeCardSize(Shift shift) {
+
     }
 
     @FXML
