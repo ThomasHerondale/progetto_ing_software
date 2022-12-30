@@ -54,6 +54,7 @@ public class ViewShiftsScreen extends LoggedScreen {
     private List<Shift> weekShiftsList;
     private List<Shift> shiftsList;
     private int shiftIndex = 0;
+    private Period showedWeek;
 
     public ViewShiftsScreen(ShiftHandler handler){
         this.shiftHandler = handler;
@@ -86,7 +87,10 @@ public class ViewShiftsScreen extends LoggedScreen {
     public void initialize(){
         super.initialize();
         //inizializza pure weekLabel
-        weekShiftsList = shiftsOfCurrentWeek();
+        weekLabel.setText(getWeekString());
+
+        showedWeek = computeWeek(LocalDate.now());
+        weekShiftsList = shiftsOfShowedWeek(showedWeek);
         abstentionsMenu.getStylesheets().add(String.valueOf(getClass().getResource("css/AbstentionsMenuStyle.css")));
         abstentionsMenu.getStyleClass().add("abstentionsMenu");
         synchroBar();
@@ -94,21 +98,35 @@ public class ViewShiftsScreen extends LoggedScreen {
                 Session.getInstance().getWorker().getFullName(), weekShiftsList);
     }
 
-    private List<Shift> shiftsOfCurrentWeek() {
-        List<Shift> week = new ArrayList<>();
-        LocalDate currentDate = LocalDate.now();
-        LocalDate startWeekDate = currentDate.with(DayOfWeek.MONDAY);
-        LocalDate endWeekDate = currentDate.with(DayOfWeek.SUNDAY);
-        Period currentWeek = new Period(startWeekDate, endWeekDate);
+    /**
+     * calcola la settimana relativa al parametro LocalDate passato.
+     * Ritorna una variabile Period.
+     * @param localDate
+     * @return variabile Period di una settimana che contiene il parametro passato
+     */
+    private Period computeWeek(LocalDate localDate) {
+        LocalDate startWeekDate = localDate.with(DayOfWeek.MONDAY);
+        LocalDate endWeekDate = localDate.with(DayOfWeek.SUNDAY);
+        return new Period(startWeekDate, endWeekDate);
+    }
 
+    private String getWeekString() {
+        return "";
+    }
+
+    private List<Shift> shiftsOfShowedWeek(Period showedWeek) {
+        List<Shift> week = new ArrayList<>();
         for (var shift : shiftsList) {
-            if (currentWeek.comprehends(shift.getDate())) {
+            if (showedWeek.comprehends(shift.getDate())) {
                 week.add(shift);
             }
         }
         return week;
     }
 
+    /**
+     * Sincronizza le barre di scorrimento per gli orari e per i giorni.
+     */
     private void synchroBar() {
         verticalBar.valueProperty().bindBidirectional(verticalAndHorizonatalPane.vvalueProperty());
         verticalBar.valueProperty().bindBidirectional(verticalPane.vvalueProperty());
@@ -118,56 +136,83 @@ public class ViewShiftsScreen extends LoggedScreen {
     private void insertAllShiftsCard(String idWorker, String fullNameWorker, List<Shift> shiftsList){
         Shift shift;
         for (int i=0; i<shiftsList.size(); i++){
-            int indexChild = 0;
             shift = shiftsList.get(i);
-            createShiftCard(idWorker,fullNameWorker, shift, indexChild);
+            AnchorPane shiftCard = createShiftCard(idWorker,fullNameWorker);
+            setShiftCardSize(shiftCard, shift);
+            int cardLayoutY = computeLayoutY(shift);
+            int cardLayoutX = computeLayoutX(shift);
+            shiftsPane.getChildren().add(i, shiftCard);
+            shiftsPane.getChildren().get(i).setLayoutY(cardLayoutY);
+            shiftsPane.getChildren().get(i).setLayoutX(cardLayoutX);
         }
     }
-    private void createShiftCard(String id, String fullName, Shift shift, int indexChild){
+
+    /**
+     * Ritorna la posizione X da settare per una shiftCard dato lo shift corrispondente.
+     * @param shift shift corrispondente a una shiftCard.
+     * @return il valore intero della posizione X.
+     */
+    private int computeLayoutX(Shift shift) {
+        int day = shift.dayOfWeek().getValue();
+        return 38 + (227 + 27) * (day - 1);
+    }
+
+    /**
+     * Ritorna la posizione Y da settare per una shiftCard dato lo shift corrispondente.
+     * @param shift shift corrispondente a una shiftCard.
+     * @return il valore intero della posizione Y.
+     */
+    private int computeLayoutY(Shift shift) {
+        Map<LocalTime, Integer> position = positionY();
+        return 5 + (87+12) * position.get(shift.getStartTime());
+    }
+
+    /**
+     * Crea una nuova ShiftCard che contiene e mostra matricola, nome e cognome del dipendente relativo al turno.
+     * @param id matricola del dipendente.
+     * @param fullName nome e cognome del dipendente.
+     * @return un AnchorPane che è una ShiftCard.
+     */
+    private AnchorPane createShiftCard(String id, String fullName){
+        int indexChildCard = 0;
         AnchorPane shiftCard = new AnchorPane();
         shiftCard.setPrefWidth(227);
         shiftCard.setMaxWidth(227);
         shiftCard.setMinWidth(227);
         Label idLabel = new Label(id);
-        shiftCard.getChildren().add(indexChild, idLabel);
-        shiftCard.getChildren().get(indexChild).setLayoutY(20);
-        shiftCard.getChildren().get(indexChild).setLayoutX(20);
+        shiftCard.getChildren().add(indexChildCard, idLabel);
+        shiftCard.getChildren().get(indexChildCard).setLayoutY(20);
+        shiftCard.getChildren().get(indexChildCard).setLayoutX(20);
         Label fullNameLabel = new Label(fullName);
-        indexChild++;
-        shiftCard.getChildren().add(indexChild, fullNameLabel);
-        shiftCard.getChildren().get(indexChild).setLayoutY(40);
-        shiftCard.getChildren().get(indexChild).setLayoutX(20);
-
+        indexChildCard++;
+        shiftCard.getChildren().add(indexChildCard, fullNameLabel);
+        shiftCard.getChildren().get(indexChildCard).setLayoutY(40);
+        shiftCard.getChildren().get(indexChildCard).setLayoutX(20);
         shiftCard.getStylesheets().add(String.valueOf(getClass().getResource("css/styleShiftCard.css")));
         shiftCard.getStyleClass().add("shiftCard");
-
         shiftCard.setCursor(Cursor.HAND);
         //set onMouseClicked va qua?
-        computeCardSize(shiftCard, shift);
+        return shiftCard;
     }
 
-    private void computeCardSize(AnchorPane shiftCard,Shift shift) {
+    /**
+     * Imposta l'altezza di uno shiftCard in relazione all'ammontare di ore del suo turno.
+     * @param shiftCard shiftCard su cui calcola e imposta l'altezza.
+     * @param shift turno che contiene il numero di ore.
+     */
+    private void setShiftCardSize(AnchorPane shiftCard, Shift shift) {
         int numberOfHours = shift.getHours();
         int height = (87 * numberOfHours) + (12 * (numberOfHours-1));
         shiftCard.setPrefHeight(height);
         shiftCard.setMinHeight(height);
         shiftCard.setMaxHeight(height);
-        Map<LocalTime, Integer> posizioneLayoutY = posizioneY();
-        int layoutY = 5 + (87+12) * posizioneLayoutY.get(shift.getStartTime());
-        int day = shift.dayOfWeek().getValue();
-        int layoutX = 38 + (227 + 27) * (day - 1);
-
-        //Inserisco la shiftCard
-
-        shiftsPane.getChildren().add(shiftIndex, shiftCard);
-        shiftsPane.getChildren().get(shiftIndex).setLayoutY(layoutY);
-        shiftsPane.getChildren().get(shiftIndex).setLayoutX(layoutX);
-        shiftIndex++;
-
-
     }
-    private Map<LocalTime, Integer> posizioneY(){
-        Map<LocalTime, Integer> posizioneLayoutY = new HashMap<>(Map.of(
+    /**
+     * Ritorna una mappa con valore gli interi da utilizzare per il calcolo della posizione Y.
+     * @return una mappa chiave LocalTime e valore Integer per calcolare la posizione Y di una shiftCard.
+     */
+    private Map<LocalTime, Integer> positionY(){
+        Map<LocalTime, Integer> positionLayoutY = new HashMap<>(Map.of(
                 LocalTime.parse("08:00:00"), 0,
                 LocalTime.parse("09:00:00"), 1,
                 LocalTime.parse("10:00:00"), 2,
@@ -184,8 +229,8 @@ public class ViewShiftsScreen extends LoggedScreen {
                 LocalTime.parse("20:00:00"), 12,
                 LocalTime.parse("21:00:00"), 13,
                 LocalTime.parse("22:00:00"), 14);
-        posizioneLayoutY.putAll(map);
-        return posizioneLayoutY;
+        positionLayoutY.putAll(map);
+        return positionLayoutY;
     }
 
     @FXML
