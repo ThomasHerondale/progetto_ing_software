@@ -8,10 +8,7 @@ import entities.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.ScrollBar;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
@@ -25,6 +22,16 @@ import java.util.Map;
 
 public class ViewShiftsScreen extends LoggedScreen {
 
+    @FXML
+    private Button nextWeekButton;
+    @FXML
+    private Button nextMonthButton;
+    @FXML
+    private Button previousWeekButton;
+    @FXML
+    private Button previousMonthButton;
+    @FXML
+    private Label weekLabel;
     @FXML
     private ScrollBar horizontalBar;
 
@@ -81,6 +88,7 @@ public class ViewShiftsScreen extends LoggedScreen {
     @FXML
     public void initialize(){
         super.initialize();
+        //inizializza pure weekLabel
         abstentionsMenu.getStylesheets().add(String.valueOf(getClass().getResource("css/AbstentionsMenuStyle.css")));
         abstentionsMenu.getStyleClass().add("abstentionsMenu");
         synchroBar();
@@ -174,6 +182,26 @@ public class ViewShiftsScreen extends LoggedScreen {
     @FXML
     public void clickBack(ActionEvent event){
         shiftHandler.clickedBack();
+    }
+
+    @FXML
+    public void clickNextMonth(ActionEvent event) {
+
+    }
+
+    @FXML
+    public void clickNextWeek(ActionEvent event) {
+
+    }
+
+    @FXML
+    public void clickPreviousMonth(ActionEvent event) {
+
+    }
+
+    @FXML
+    public void clickPreviousWeek(ActionEvent event) {
+
     }
 
 }

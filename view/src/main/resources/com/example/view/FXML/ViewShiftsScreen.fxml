@@ -15,6 +15,27 @@
 
 <AnchorPane prefHeight="800.0" prefWidth="1440.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.view.ViewShiftsScreen">
    <children>
+      <Label fx:id="weekLabel" alignment="CENTER" layoutY="42.0" prefHeight="0.0" prefWidth="1440.0" text="IV Sett. Maggio 2022" AnchorPane.topAnchor="42.0">
+         <font>
+            <Font name="System Bold" size="32.0" />
+         </font>
+      </Label>
+      <Button fx:id="previousMonthButton" alignment="CENTER" contentDisplay="CENTER" layoutX="439.0" layoutY="47.0" mnemonicParsing="false" onAction="#clickPreviousMonth" prefHeight="40.0" prefWidth="40.0" style="-fx-background-radius: 100; -fx-background-color: #D9D9D9;" text="&lt;&lt;" wrapText="true" AnchorPane.leftAnchor="439.0" AnchorPane.topAnchor="47.0">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="previousWeekButton" alignment="CENTER" contentDisplay="CENTER" layoutX="499.0" layoutY="47.0" mnemonicParsing="false" onAction="#clickPreviousWeek" prefHeight="40.0" prefWidth="40.0" style="-fx-background-radius: 100; -fx-background-color: #D9D9D9;" text="&lt;" wrapText="true" AnchorPane.leftAnchor="499.0" AnchorPane.topAnchor="47.0">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
       <ScrollBar fx:id="verticalBar" layoutX="1417.0" layoutY="154.0" max="1.0" orientation="VERTICAL" prefHeight="617.0" prefWidth="18.0" style="-fx-background-color: #ABABAB; -fx-background-radius: 12;" unitIncrement="0.1" visibleAmount="0.5" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="155.0" />
       <ScrollBar fx:id="horizontalBar" layoutX="22.0" layoutY="25.0" max="1.0" prefHeight="18.0" prefWidth="1319.0" style="-fx-background-color: grey; -fx-background-radius: 12;" unitIncrement="0.1" visibleAmount="0.5" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="28.0" />
       <ScrollPane fx:id="verticalPane" hbarPolicy="NEVER" prefHeight="617.0" prefWidth="92.0" style="-fx-background-color: transparent;" vbarPolicy="NEVER" AnchorPane.topAnchor="155.0">
@@ -319,5 +340,21 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </MenuButton>
+      <Button fx:id="nextWeekButton" alignment="CENTER" contentDisplay="CENTER" layoutX="900.0" layoutY="47.0" mnemonicParsing="false" onAction="#clickNextWeek" prefHeight="40.0" prefWidth="40.0" style="-fx-background-radius: 100; -fx-background-color: #D9D9D9;" text="&gt;" wrapText="true" AnchorPane.rightAnchor="500.0" AnchorPane.topAnchor="47.0">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="nextMonthButton" alignment="CENTER" contentDisplay="CENTER" layoutX="960.0" layoutY="47.0" mnemonicParsing="false" onAction="#clickNextMonth" prefHeight="40.0" prefWidth="40.0" style="-fx-background-radius: 100; -fx-background-color: #D9D9D9;" text="&gt;&gt;" wrapText="true" AnchorPane.topAnchor="47.0">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
    </children>
 </AnchorPane>
