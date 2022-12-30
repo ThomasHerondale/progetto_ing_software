@@ -1,5 +1,6 @@
 package entities;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Objects;
@@ -59,6 +60,10 @@ public class Shift {
 
     public boolean isSubstitution() {
         return isSubstitution;
+    }
+
+    public DayOfWeek dayOfWeek() {
+        return date.getDayOfWeek();
     }
 
     @Override
