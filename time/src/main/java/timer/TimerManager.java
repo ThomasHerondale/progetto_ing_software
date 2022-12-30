@@ -79,4 +79,21 @@ public class TimerManager {
         }
     }
 
+    /**
+     * Elimina la programmazione di tutte le task del manager e ne invalida l'istanza.
+     */
+    public void cancel() {
+        autoExitTimer.cancel();
+        autoExitTimer.purge();
+        resetCountersTimer.cancelCurrent();
+        invalidate();
+    }
+
+    /**
+     * Invalida l'istanza del TimerManager
+     */
+    private static void invalidate() {
+        instance = null;
+    }
+
 }
