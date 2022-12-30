@@ -6,6 +6,7 @@ import database.DBMSDaemon;
 import database.DBMSException;
 import entities.Shift;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
@@ -86,6 +87,7 @@ public class ViewShiftsScreen extends LoggedScreen {
     @FXML
     public void initialize(){
         super.initialize();
+        synchroBar();
         //inizializza pure weekLabel
         weekLabel.setText(getWeekString());
 
@@ -93,9 +95,7 @@ public class ViewShiftsScreen extends LoggedScreen {
         weekShiftsList = shiftsOfShowedWeek(showedWeek);
         abstentionsMenu.getStylesheets().add(String.valueOf(getClass().getResource("css/AbstentionsMenuStyle.css")));
         abstentionsMenu.getStyleClass().add("abstentionsMenu");
-        synchroBar();
-        insertAllShiftsCard(Session.getInstance().getWorker().getId(),
-                Session.getInstance().getWorker().getFullName(), weekShiftsList);
+        insertAllShiftsCard(shiftsList);
     }
 
     /**
@@ -114,6 +114,11 @@ public class ViewShiftsScreen extends LoggedScreen {
         return "";
     }
 
+    /**
+     * Ritorna la lista dei turni contenuti all'interno del Period passato per parametro.
+     * @param showedWeek Period, ovvero la settiman che si intende mostrare.
+     * @return lista di turni facenti parte del Period.
+     */
     private List<Shift> shiftsOfShowedWeek(Period showedWeek) {
         List<Shift> week = new ArrayList<>();
         for (var shift : shiftsList) {
@@ -133,17 +138,27 @@ public class ViewShiftsScreen extends LoggedScreen {
         horizontalBar.valueProperty().bindBidirectional(verticalAndHorizonatalPane.hvalueProperty());
         horizontalBar.valueProperty().bindBidirectional(horizontalPane.hvalueProperty());
     }
-    private void insertAllShiftsCard(String idWorker, String fullNameWorker, List<Shift> shiftsList){
+
+    /**
+     * Per ogni turno in shiftsList crea una ShiftCard e la inserisce nello shiftsPane.
+     * @param shiftsList lista dei turni.
+     */
+    private void insertAllShiftsCard(List<Shift> shiftsList){
         Shift shift;
         for (int i=0; i<shiftsList.size(); i++){
             shift = shiftsList.get(i);
-            AnchorPane shiftCard = createShiftCard(idWorker,fullNameWorker);
+            AnchorPane shiftCard = createShiftCard(shift.getOwner().getId(),shift.getOwner().getFullName());
             setShiftCardSize(shiftCard, shift);
             int cardLayoutY = computeLayoutY(shift);
             int cardLayoutX = computeLayoutX(shift);
             shiftsPane.getChildren().add(i, shiftCard);
             shiftsPane.getChildren().get(i).setLayoutY(cardLayoutY);
             shiftsPane.getChildren().get(i).setLayoutX(cardLayoutX);
+
+
+            shiftCard.setOnMouseClicked(mouseEvent ->
+                    NavigationManager.getInstance().createPopup("Error Message",
+                            controller-> new ErrorMessage("Prova")));
         }
     }
 

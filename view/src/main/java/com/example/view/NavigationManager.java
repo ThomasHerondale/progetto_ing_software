@@ -87,21 +87,6 @@ public class NavigationManager {
         try {
             Stage newStage = new Stage();
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
-
-            /* Questo if è un pezzo di codice che ho usato per fare in modo che quando chiudo
-            * un SuccessPopup succede la stessa che cosa che succede se clicco sul tasto Okay */
-            /*
-            if (popupName.equals("Success")){
-                Callback<Class<?>, Object> factory = controllerClass -> {
-                    Object controller = controllerFactory.call(controllerClass);
-                    ((SuccessPopup) controller).setClose(newStage);
-                    return controller;
-                };
-                loader.setControllerFactory(factory);
-            }
-            else {
-
-            }*/
             loader.setControllerFactory(controllerFactory);
 
             Parent root = loader.load();
