@@ -100,7 +100,7 @@ public class ViewShiftsScreen extends LoggedScreen {
     /**
      * calcola la settimana relativa al parametro LocalDate passato.
      * Ritorna una variabile Period.
-     * @param localDate
+     * @param localDate data su cui calcolare il Period
      * @return variabile Period di una settimana che contiene il parametro passato
      */
     private Period computeWeek(LocalDate localDate) {
