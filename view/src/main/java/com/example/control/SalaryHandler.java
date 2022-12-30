@@ -8,6 +8,9 @@ import entities.Worker;
 
 import java.util.Map;
 
+/**
+ * Questa classe di metodi statici si occupa di calcolare gli stipendi degli impiegati.
+ */
 public class SalaryHandler {
     /**
      * La tariffa oraria dei dipendenti.
@@ -44,7 +47,7 @@ public class SalaryHandler {
      * @param hours il riepilogo delle ore di lavoro svolte dal dipendente
      * @return lo stipendio calcolato
      */
-    private double computeSalary(char rank, HoursRecap hours) {
+    private static double computeSalary(char rank, HoursRecap hours) {
         /* Calcola le tariffe orarie per gli straordinari e i congedi parentali */
         var overtimeWage = hourWage * overtimeFactor;
         var parentalLeaveWage = hourWage * parentalLeaveFactor;
@@ -60,7 +63,7 @@ public class SalaryHandler {
      * Calcola lo stipendio di tutti i dipendenti, con riferimento al periodo specificato.
      * @param referencePeriod il periodo di riferimento
      */
-    public void computeSalaries(Period referencePeriod) {
+    public static void computeSalaries(Period referencePeriod) {
         try {
             var dbms = DBMSDaemon.getInstance();
             Map<Worker, HoursRecap> salaryData = dbms.getWorkersData(referencePeriod);
