@@ -3,11 +3,14 @@ package com.example.view;
 import commons.Session;
 import entities.Worker;
 import javafx.fxml.FXML;
+import javafx.scene.Group;
 import javafx.scene.control.Label;
 
 public class LoggedScreen {
     @FXML
     private Label initialsLabel;
+    @FXML
+    private Group profileIcon;
     @FXML
     public void initialize(){
         String nameInit = String.valueOf(Session.getInstance().getWorker().getName().charAt(0));

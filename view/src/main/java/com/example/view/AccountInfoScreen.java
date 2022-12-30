@@ -52,9 +52,6 @@ public class AccountInfoScreen extends LoggedScreen{
     @FXML
     private Label phoneLabel;
 
-    @FXML
-    private Group profileIcon;
-
     private final AccountInfoHandler accountInfoHandler;
     private final Counters workerCounters;
 

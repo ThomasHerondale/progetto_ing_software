@@ -10,9 +10,6 @@ public class HomeScreen extends LoggedScreen{
     private Group presencesCard;
 
     @FXML
-    private Group profileIcon;
-
-    @FXML
     private Group salaryCard;
 
     @FXML

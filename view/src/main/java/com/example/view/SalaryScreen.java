@@ -1,5 +1,6 @@
 package com.example.view;
 
+import database.DBMSDaemon;
 import entities.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -11,9 +12,6 @@ public class SalaryScreen extends LoggedScreen {
 
     @FXML
     private Button backButton;
-
-    @FXML
-    private Group profileIcon;
 
     private final ViewSalaryHandler viewSalaryHandler;
     private final AccountInfoHandler accountInfoHandler;
