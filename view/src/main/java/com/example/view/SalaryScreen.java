@@ -28,12 +28,12 @@ public class SalaryScreen extends LoggedScreen {
         //TODO:
     }
     @FXML
-    void clickBack(ActionEvent event) {
+    public void clickBack(ActionEvent event) {
         viewSalaryHandler.clickedBack();
     }
 
     @FXML
-    void clickProfile(MouseEvent event) {
+    public void clickProfile(MouseEvent event) {
         accountInfoHandler.clickedProfile();
     }
 

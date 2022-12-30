@@ -1,5 +1,6 @@
 package com.example.view;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane;
@@ -26,6 +27,14 @@ public class ViewShiftsScreen extends LoggedScreen {
     @FXML
     private ScrollPane verticalPane;
 
+    private ShiftHandler shiftHandler;
+    private AccountInfoHandler accountInfoHandler;
+
+    public ViewShiftsScreen(ShiftHandler handler){
+        this.shiftHandler = handler;
+        accountInfoHandler = new AccountInfoHandler();
+    }
+
     @FXML
     public void initialize(){
         super.initialize();
@@ -40,8 +49,12 @@ public class ViewShiftsScreen extends LoggedScreen {
     }
 
     @FXML
-    void clickProfile(MouseEvent event) {
-
+    public void clickProfile(MouseEvent event) {
+        accountInfoHandler.clickedProfile();
+    }
+    @FXML
+    public void clickBack(ActionEvent event){
+        shiftHandler.clickedBack();
     }
 
 }
