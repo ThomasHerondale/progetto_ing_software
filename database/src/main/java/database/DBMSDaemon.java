@@ -630,7 +630,7 @@ public class DBMSDaemon {
         try (
                 var st = connection.prepareStatement("""
                 update Counters
-                set delayCount = 0 , autoExitCount = 0, holidayCount = 0, requestParentalLeave = 0
+                set delayCount = 0 , autoExitCount = 0, holidayCount = 0, consumedParentalLeave = 0
                 """)
         ) {
             st.execute();
@@ -859,7 +859,7 @@ public class DBMSDaemon {
                 """);
                 var upSt2 = connection.prepareStatement("""
                 update Counters
-                set requestParentalLeave = requestParentalLeave + ?
+                set consumedParentalLeave = counters.consumedParentalLeave + ?
                 where refWorkerID = ?
                 """)
         ) {
@@ -1087,6 +1087,46 @@ public class DBMSDaemon {
         }
     }
 
+    public List<Shift> getShiftsList(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                select W.ID, W.workerName, W.workerSurname, W.workerRank, W.telNumber, W.email, W.IBAN,
+                S.shiftRank, S.shiftDate, S.shiftStart, S.shiftEnd
+                from Worker W join Shift S on ( W.ID = S.refWorkerID )
+                where ID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+
+            // TODO: duplicato!
+            List<Shift> shifts = new ArrayList<>(maps.size());
+            for (var map : maps) {
+                /* Crea un turno coi dati estratti dal database */
+                shifts.add(new Shift(
+                        new Worker(
+                                map.get("ID"),
+                                map.get("workerName"),
+                                map.get("workerSurname"),
+                                map.get("workerRank").charAt(0),
+                                map.get("telNumber"),
+                                map.get("email"),
+                                map.get("IBAN")
+                        ),
+                        map.get("shiftRank").charAt(0),
+                        LocalDate.parse(map.get("shiftDate")),
+                        LocalTime.parse(map.get("shiftStart")),
+                        LocalTime.parse(map.get("shiftEnd"))
+                ));
+            }
+            return shifts;
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
     /**
      * Ottiene dal database i dati necessari al calcolo dello stipendio di tutti i dipendenti con riferimento
      * al periodo (mese) specificato.
@@ -1105,7 +1145,7 @@ public class DBMSDaemon {
                 var st = connection.prepareStatement("""
                 SELECT ordinary_hours_table.ID, ordinary_hours,
                 COALESCE(overtime_hours, 0) AS overtime_hours,
-                requestParentalLeave AS parentalLeave_hours
+                consumedParentalLeave AS parentalLeave_hours
                 FROM
                     (SELECT ID,
                             SUM(TIMESTAMPDIFF(HOUR, entryTime, exitTime)) AS ordinary_hours
@@ -1114,7 +1154,7 @@ public class DBMSDaemon {
                                                    s.shiftStart = presence.refshiftStart
                                    JOIN worker w ON w.ID = s.refWorkerID
                      WHERE overTimeFlag = FALSE AND
-                         shiftDate BETWEEN '2022-12-27' AND '2023-01-26'
+                         shiftDate BETWEEN ? AND ?
                      GROUP BY ID) AS ordinary_hours_table
                 LEFT OUTER JOIN
                     (SELECT ID,
@@ -1124,7 +1164,7 @@ public class DBMSDaemon {
                                                    s.shiftStart = presence.refshiftStart
                         JOIN worker w ON w.ID = s.refWorkerID
                     WHERE overTimeFlag = TRUE AND
-                        shiftDate BETWEEN '2022-12-27' AND '2023-01-26'
+                        shiftDate BETWEEN ? AND ?
                     GROUP BY ID) AS overtime_hours_table
                 ON ordinary_hours_table.ID = overtime_hours_table.ID
                 JOIN
@@ -1134,6 +1174,8 @@ public class DBMSDaemon {
         ) {
             st.setDate(1, Date.valueOf(referencePeriod.start()));
             st.setDate(2, Date.valueOf(referencePeriod.end()));
+            st.setDate(3, Date.valueOf(referencePeriod.start()));
+            st.setDate(4, Date.valueOf(referencePeriod.end()));
             var resultSet = st.executeQuery();
             var maps = extractResults(resultSet);
 
@@ -1162,6 +1204,106 @@ public class DBMSDaemon {
     }
 
     /**
+     * Ottiene la data di caricamento dell'ultimo stipendio.
+     */
+    private LocalDate getLastSalaryDate(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT MAX(s.salaryDate) AS salary_date
+                FROM salary s
+                WHERE s.refWorkerID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+
+            var maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Dovrebbe esserci un solo dipendente per matricola */
+            System.out.println(LocalDate.parse(maps.get(0).get("salary_date")));
+            return LocalDate.parse(maps.get(0).get("salary_date"));
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
+     * Ottiene dal database i dati utilizzati dal sistema per il calcolo dell'ultimo stipendio
+     * del dipendente specificato.
+     * @param id la matricola del dipendente
+     * @return una mappa con una coppia ({@link HoursRecap}, stipendio)
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public Map<HoursRecap, Double> getWorkerSalaryData(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT amount, ordinary_hours, overtime_hours, parentalLeave_hours
+                FROM
+                    (SELECT refWorkerID, amount
+                     FROM salary s
+                     WHERE refWorkerID = ? AND salaryDate = ?
+                    ) AS amount_table
+                    JOIN
+                    (SELECT ordinary_hours_table.ID, ordinary_hours,
+                COALESCE(overtime_hours, 0) AS overtime_hours,
+                consumedParentalLeave AS parentalLeave_hours
+                FROM
+                    (SELECT ID,
+                            SUM(TIMESTAMPDIFF(HOUR, entryTime, exitTime)) AS ordinary_hours
+                     FROM presence JOIN shift s ON s.refWorkerID = presence.refShiftID AND
+                                                   s.shiftDate = presence.refshiftDate AND
+                                                   s.shiftStart = presence.refshiftStart
+                                   JOIN worker w ON w.ID = s.refWorkerID
+                     WHERE overTimeFlag = FALSE AND
+                         shiftDate BETWEEN ? AND ?
+                     GROUP BY ID) AS ordinary_hours_table
+                LEFT OUTER JOIN
+                    (SELECT ID,
+                            SUM(TIMESTAMPDIFF(HOUR, entryTime, exitTime)) AS overtime_hours
+                    FROM presence JOIN shift s ON s.refWorkerID = presence.refShiftID AND
+                                                   s.shiftDate = presence.refshiftDate AND
+                                                   s.shiftStart = presence.refshiftStart
+                        JOIN worker w ON w.ID = s.refWorkerID
+                    WHERE overTimeFlag = TRUE AND
+                        shiftDate BETWEEN ? AND ?
+                    GROUP BY ID) AS overtime_hours_table
+                ON ordinary_hours_table.ID = overtime_hours_table.ID
+                JOIN
+                counters
+                ON refWorkerID = ordinary_hours_table.ID ) AS counters_table
+                ON counters_table.ID = amount_table.refWorkerID
+                """)
+        ) {
+            /* Ottieni la data dell'ultimo stipendio e calcola il suo periodo di riferimento.
+            Questo periodo andrà da un mese prima alla data ottenuta alla data ottenuta stessa. */
+            var endDate = getLastSalaryDate(id); // TODo: forse un giorno indietro...
+            var startDate = endDate.minusMonths(1);
+
+            st.setString(1, id);
+            st.setDate(2, Date.valueOf(endDate));
+            st.setDate(3, Date.valueOf(startDate));
+            st.setDate(4, Date.valueOf(endDate));
+            st.setDate(5, Date.valueOf(startDate));
+            st.setDate(6, Date.valueOf(endDate));
+
+            var resultSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Dovrebbe esserci un solo dipendente per matricola */
+
+            /* Assembla i risultati */
+            var map = maps.get(0);
+            var ordinaryHours = Double.parseDouble(map.get("ordinary_hours"));
+            var overtimeHours = Double.parseDouble(map.get("overtime_hours"));
+            var parentalLeaveHours = Double.parseDouble(map.get("parentalLeave_hours"));
+            HoursRecap recap = new HoursRecap(ordinaryHours, overtimeHours, parentalLeaveHours);
+
+            return Map.of(recap, Double.parseDouble(map.get("amount")));
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
      * Memorizza lo stipendio relativo al mese specificato per il dipendente specificato.
      * @param id la matricola del dipendente
      * @param date la data di caricamento dello stipendio
@@ -1170,15 +1312,29 @@ public class DBMSDaemon {
      */
     public void setSalary(String id, LocalDate date, Double salary) throws DBMSException {
         try (
-                var st = connection.prepareStatement("""
+                var inSt = connection.prepareStatement("""
                 INSERT INTO Salary(refWorkerID, salaryDate, amount)
                 VALUES (?, ?, ?)
+                """);
+                /* Query per salvare il contatore usato per il calcolo per usi futuri */
+                var upSt = connection.prepareStatement("""
+                UPDATE counters
+                SET lastParentalLeaveRequest = (
+                                                SELECT consumedParentalLeave
+                                                FROM counters
+                                                WHERE refWorkerID = ?
+                                                )
+                WHERE refWorkerID = ?
                 """)
         ) {
-            st.setString(1, id);
-            st.setDate(2, Date.valueOf(date));
-            st.setDouble(3, salary);
-            st.execute();
+            inSt.setString(1, id);
+            inSt.setDate(2, Date.valueOf(date));
+            inSt.setDouble(3, salary);
+            upSt.setString(1, id);
+            upSt.setString(2, id);
+
+            inSt.execute();
+            upSt.execute();
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
