@@ -75,7 +75,7 @@ public class ViewShiftsScreen extends LoggedScreen {
                     Session.getInstance().getWorker().getRank(), LocalDate.parse("2023-01-02"),
                     LocalTime.parse("21:00:00"),LocalTime.parse("22:00:00") ));
             shiftsList.add(new Shift(Session.getInstance().getWorker(),
-                    Session.getInstance().getWorker().getRank(), LocalDate.parse("2023-01-05"),
+                    Session.getInstance().getWorker().getRank(), LocalDate.parse("2022-12-27"),
                     LocalTime.parse("09:00:00"),LocalTime.parse("15:00:00") ));
         } catch (DBMSException e) {
             //TODO:
@@ -91,7 +91,7 @@ public class ViewShiftsScreen extends LoggedScreen {
         abstentionsMenu.getStyleClass().add("abstentionsMenu");
         synchroBar();
         insertAllShiftsCard(Session.getInstance().getWorker().getId(),
-                Session.getInstance().getWorker().getFullName(), shiftsList);
+                Session.getInstance().getWorker().getFullName(), weekShiftsList);
     }
 
     private List<Shift> shiftsOfCurrentWeek() {
