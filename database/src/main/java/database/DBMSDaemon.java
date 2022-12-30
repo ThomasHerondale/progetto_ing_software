@@ -10,7 +10,6 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
 import java.util.*;
 
 public class DBMSDaemon {
@@ -1405,6 +1404,32 @@ public class DBMSDaemon {
             }
         } catch (SQLException e) {
             throw new DBMSException(e);
+        }
+    }
+
+    /**
+     * Registra automaticamente l'uscita per i turni specificati, settandola all'orario di fine del turno
+     * stesso.
+     * @param shifts i turni di cui registrare l'uscita
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void recordAutoExit(List<Shift> shifts) throws DBMSException {
+        for (var shift : shifts) {
+            try (
+                    var st = connection.prepareStatement("""
+                    UPDATE Presence
+                    SET exitTime = ?
+                    WHERE refShiftID = ? AND refShiftDate = ? and refShiftStart = ?
+                    """)
+            ) {
+                st.setTime(1, Time.valueOf(shift.getEndTime()));
+                st.setString(2, shift.getOwner().getId());
+                st.setDate(3, Date.valueOf(shift.getDate()));
+                st.setTime(4, Time.valueOf(shift.getStartTime()));
+                st.execute();
+            } catch (SQLException e) {
+                throw new DBMSException(e);
+            }
         }
     }
 
