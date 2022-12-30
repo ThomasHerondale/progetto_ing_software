@@ -52,6 +52,7 @@ public class NavigationManager {
         SCREEN_MAP.put("Confirm","FXML/ConfirmPopup.fxml");
         SCREEN_MAP.put("Salary","FXML/SalaryScreen.fxml");
         SCREEN_MAP.put("View Shifts", "FXML/ViewShiftsScreen.fxml");
+        SCREEN_MAP.put("Shift Info", "FXML/ShiftInfoPopup.fxml");
         //...
     }
     private HashMap<String, Stage> stagesPopup;
@@ -95,7 +96,7 @@ public class NavigationManager {
             stagesPopup.put(popupName, newStage);
 
             if (popupName.equals("Success")){
-                // Ignora l'evento di chiusura della finestra
+                /* Ignora l'evento di chiusura della finestra */
                 newStage.setOnCloseRequest(Event::consume);
             } else {
                 /* per chiudere con la X */
