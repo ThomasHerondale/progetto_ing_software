@@ -60,10 +60,10 @@ public class ViewShiftsScreen extends LoggedScreen {
         this.shiftHandler = handler;
         accountInfoHandler = new AccountInfoHandler();
         try {
-        /* questo è giusto ma per ora faccio prove
+        /* questo è giusto ma per ora faccio prove */
             shiftsList = DBMSDaemon.getInstance().getShiftsList(Session.getInstance().getWorker().getId());
-        */
-            DBMSDaemon.getInstance().getShiftsList(Session.getInstance().getWorker().getId());
+
+        /*    DBMSDaemon.getInstance().getShiftsList(Session.getInstance().getWorker().getId());
             //prove
             shiftsList = new ArrayList<>();
             shiftsList.add(new Shift(Session.getInstance().getWorker(),
@@ -78,6 +78,7 @@ public class ViewShiftsScreen extends LoggedScreen {
             shiftsList.add(new Shift(Session.getInstance().getWorker(),
                     Session.getInstance().getWorker().getRank(), LocalDate.parse("2022-12-27"),
                     LocalTime.parse("09:00:00"),LocalTime.parse("15:00:00") ));
+         */
         } catch (DBMSException e) {
             //TODO:
         }
@@ -94,7 +95,7 @@ public class ViewShiftsScreen extends LoggedScreen {
         weekShiftsList = shiftsOfShowedWeek(showedWeek);
         abstentionsMenu.getStylesheets().add(String.valueOf(getClass().getResource("css/AbstentionsMenuStyle.css")));
         abstentionsMenu.getStyleClass().add("abstentionsMenu");
-        insertAllShiftsCard(weekShiftsList);
+        insertAllShiftsCard(shiftsList);
     }
 
     /**
@@ -155,7 +156,13 @@ public class ViewShiftsScreen extends LoggedScreen {
             shiftsPane.getChildren().get(i).setLayoutY(cardLayoutY);
             shiftsPane.getChildren().get(i).setLayoutX(cardLayoutX);
             Shift finalShift = shift;
-            shiftCard.setOnMouseClicked(mouseEvent -> new ViewShiftsInfoHandler().clickedShift(finalShift));
+            shiftCard.setOnMouseClicked(mouseEvent -> {
+                try {
+                    new ViewShiftsInfoHandler().clickedShift(finalShift);
+                } catch (DBMSException e) {
+                    //TODO:
+                }
+            });
         }
     }
 
