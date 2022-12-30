@@ -1,16 +1,42 @@
 package entities;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Objects;
 
+/**
+ * Questa classe modella l'oggetto entity {@code <<Shift>>}, il singolo turno di un dipendente specifico,
+ * in un ufficio specifico, in un giorno e con un orario specifico.
+ */
 public class Shift {
+    /**
+     * Il dipendente assegnatario del turno.
+     */
     private final Worker owner;
+    /**
+     * Il livello dell'ufficio a cui fa riferimento il turno.
+     */
     private final char rank;
+    /**
+     * La data del turno.
+     */
     private final LocalDate date;
+    /**
+     * L'ora di inizio del turno.
+     */
     private final LocalTime startTime;
+    /**
+     * L'ora di fine del turno.
+     */
     private final LocalTime endTime;
+    /**
+     * Contrassegna i turni che costituiscono straordinari.
+     */
     private boolean isOvertime;
+    /**
+     * Contrassegna i turni che sono stati riassegnati.
+     */
     private boolean isSubstitution;
 
     public Shift(Worker owner, char rank, LocalDate date, LocalTime startTime, LocalTime endTime) {
@@ -59,6 +85,14 @@ public class Shift {
 
     public boolean isSubstitution() {
         return isSubstitution;
+    }
+
+    /**
+     * Ritorna il giorno della settimana in cui si svolge il turno.
+     * @return una costante dell enum {@link DayOfWeek} rappresentante il giorno della settimana
+     */
+    public DayOfWeek dayOfWeek() {
+        return date.getDayOfWeek();
     }
 
     @Override
