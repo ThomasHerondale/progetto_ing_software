@@ -1210,6 +1210,28 @@ public class DBMSDaemon {
         }
     }
 
+    public Shift getShiftFlags(Shift shift) throws DBMSException {
+        try (
+            var st = connection.prepareStatement("""
+            SELECT overTimeFlag, subFlag
+            FROM shift
+            WHERE refWorkerID = ? AND shiftDate = ? AND shiftStart = ?
+            """)
+        ) {
+            st.setString(1, shift.getOwner().getId());
+            st.setDate(2, Date.valueOf(shift.getDate()));
+            st.setTime(3, Time.valueOf(shift.getStartTime()));
+            var resultSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Dovrebbe esserci un solo turno con questi dati */
+
+
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
     /**
      * Ottiene la data di caricamento dell'ultimo stipendio.
      */
