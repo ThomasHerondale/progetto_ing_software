@@ -1233,7 +1233,7 @@ public class DBMSDaemon {
             assert maps.size() == 1; /* Dovrebbe esserci un solo turno con questi dati */
 
             var map = maps.get(0);
-            var overtimeFlag = map.get("overtimeFlag").equals("1");
+            var overtimeFlag = map.get("overTimeFlag").equals("1");
             var substitutionFlag = map.get("subFlag").equals("1");
             shift.setFlags(overtimeFlag, substitutionFlag);
 
