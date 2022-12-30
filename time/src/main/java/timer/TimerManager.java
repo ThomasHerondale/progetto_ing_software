@@ -18,6 +18,10 @@ public class TimerManager {
      */
     private MonthlyTimer resetCountersTimer;
     /**
+     * Il timer che si occupa del calcolo degli stipendi.
+     */
+    private MonthlyTimer newSalariesTimer;
+    /**
      * L'intervallo tra una registrazione di uscite automatiche e un'altra.
      */
     private static final long AUTO_EXIT_RATE = 1_800_000;
