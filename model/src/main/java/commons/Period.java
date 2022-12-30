@@ -22,11 +22,31 @@ public record Period(LocalDate start, LocalDate end) {
     }
 
     /**
+     * Verifica che la data specificata si trovi nel periodo specificato.
+     * @param startDate la data di inizio del periodo
+     * @param endDate la data di fine del periodo
+     * @param other la data oggetto della verifica
+     * @return true se {@code other} si trova in mezzo a {@code start} e {@code end}, false altrimenti
+     */
+    public static boolean comprehends(LocalDate startDate, LocalDate endDate, LocalDate other) {
+        return startDate.isBefore(other) && endDate.isAfter(other);
+    }
+
+    /**
      * Ritorna il numero di giorni compreso in questo periodo.
      * @return il numero di giorni compresi tra la data di inizio e quella di fine di questo periodo,
      * estremi inclusi
      */
     public int dayCount() {
-        return between(start, end.plusDays(1)).getDays();
+        return dayCount(start, end);
+    }
+
+    /**
+     * Verifica che la data specificata si trovi in questo periodo.
+     * @param date la data oggetto della verifica
+     * @return true se la data si trova in questo periodo, false altrimenti
+     */
+    public boolean comprehends(LocalDate date) {
+        return comprehends(start, end, date);
     }
 }
