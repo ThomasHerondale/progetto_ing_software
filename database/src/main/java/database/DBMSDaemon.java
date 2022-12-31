@@ -1447,22 +1447,65 @@ public class DBMSDaemon {
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public void recordAutoExit(List<Shift> shifts) throws DBMSException {
-        for (var shift : shifts) {
-            try (
-                    var st = connection.prepareStatement("""
-                    UPDATE Presence
-                    SET exitTime = ?
-                    WHERE refShiftID = ? AND refShiftDate = ? and refShiftStart = ?
-                    """)
-            ) {
-                st.setTime(1, Time.valueOf(shift.getEndTime()));
-                st.setString(2, shift.getOwner().getId());
-                st.setDate(3, Date.valueOf(shift.getDate()));
-                st.setTime(4, Time.valueOf(shift.getStartTime()));
-                st.execute();
-            } catch (SQLException e) {
-                throw new DBMSException(e);
-            }
+        for (var shift : shifts)
+            recordExit(shift.getOwner().getId(), shift.getDate(), shift.getStartTime(), shift.getEndTime());
+    }
+
+    /**
+     * Registra l'uscita dal lavoro per il dipendente specificato, in una data e ad un'ora specifici.
+     * @param id la matricola del dipendente
+     * @param date la data del turno
+     * @param exitTime l'ora di uscita da memorizzare
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void recordExit(String id, LocalDate date, LocalTime exitTime) throws DBMSException {
+        recordExit(id, date, getLastShiftStart(id, date), exitTime);
+    }
+
+    /**
+     * Registra l'uscita nel database.
+     */
+    private void recordExit(String id, LocalDate date, LocalTime shiftStartTime, LocalTime exitTime)
+            throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                UPDATE presence
+                SET exitTime = ?
+                WHERE refShiftID = ? and refShiftDate = ? and refShiftStart = ?
+                """)
+        ) {
+            st.setTime(1, Time.valueOf(exitTime));
+            st.setString(2, id);
+            st.setDate(3, Date.valueOf(date));
+            st.setTime(4, Time.valueOf(shiftStartTime));
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
+     * Ritorna l'orario di inizio del turno più recente senza uscita.
+     */
+    private LocalTime getLastShiftStart(String id, LocalDate date) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT MIN(p2.refShiftStart) AS shiftStart
+                FROM presence p2
+                WHERE p2.refShiftID = ?
+                AND p2.refShiftDate = ?
+                AND p2.exitTime IS NULL
+                """)
+        ) {
+            st.setString(1, id);
+            st.setDate(2, Date.valueOf(date));
+            var resultSet = st.executeQuery();
+
+            var maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Dovrebbe esserci un solo minimo */
+
+            return LocalTime.parse(maps.get(0).get("shiftStart"));
+        } catch (SQLException e) {
+            throw new DBMSException(e);
         }
     }
 
