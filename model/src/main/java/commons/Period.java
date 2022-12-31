@@ -22,14 +22,15 @@ public record Period(LocalDate start, LocalDate end) {
     }
 
     /**
-     * Verifica che la data specificata si trovi nel periodo specificato.
+     * Verifica che la data specificata si trovi nel periodo specificato, estremi inclusi.
      * @param startDate la data di inizio del periodo
      * @param endDate la data di fine del periodo
      * @param other la data oggetto della verifica
      * @return true se {@code other} si trova in mezzo a {@code start} e {@code end}, false altrimenti
      */
     public static boolean comprehends(LocalDate startDate, LocalDate endDate, LocalDate other) {
-        return startDate.isBefore(other) && endDate.isAfter(other);
+        return startDate.equals(other) || endDate.equals(other) ||
+                (startDate.isBefore(other) && endDate.isAfter(other));
     }
 
     /**
