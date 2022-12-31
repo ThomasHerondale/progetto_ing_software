@@ -15,9 +15,9 @@ import javafx.scene.layout.AnchorPane;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.Month;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
 public class ViewShiftsScreen extends LoggedScreen {
@@ -58,6 +58,7 @@ public class ViewShiftsScreen extends LoggedScreen {
     private List<Shift> shiftsList;
     private Period showedWeek;
     private static Random RANDOM = new Random();
+    private LocalDate updatedDate;
 
     public ViewShiftsScreen(ShiftHandler handler){
         this.shiftHandler = handler;
@@ -90,8 +91,9 @@ public class ViewShiftsScreen extends LoggedScreen {
     public void initialize(){
         super.initialize();
         synchroBar();
-        weekLabel.setText(weekString(LocalDate.now()));
-        showedWeek = computeWeek(LocalDate.now());
+        updatedDate = LocalDate.now();
+        weekLabel.setText(weekString(updatedDate));
+        showedWeek = computeWeek(updatedDate);
         weekShiftsList = shiftsOfShowedWeek(showedWeek);
         abstentionsMenu.getStylesheets().add(String.valueOf(getClass().getResource("css/AbstentionsMenuStyle.css")));
         abstentionsMenu.getStyleClass().add("abstentionsMenu");
@@ -292,6 +294,7 @@ public class ViewShiftsScreen extends LoggedScreen {
         shiftCard.setMinHeight(height);
         shiftCard.setMaxHeight(height);
     }
+
     /**
      * Ritorna una mappa con valore gli interi da utilizzare per il calcolo della posizione Y.
      * @return una mappa chiave LocalTime e valore Integer per calcolare la posizione Y di una shiftCard.
@@ -329,22 +332,38 @@ public class ViewShiftsScreen extends LoggedScreen {
 
     @FXML
     public void clickNextMonth(ActionEvent event) {
-
+        updatedDate = updatedDate.plusMonths(1).with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY));
+        updateShiftsPane(updatedDate);
     }
 
     @FXML
     public void clickNextWeek(ActionEvent event) {
-
+        updatedDate = updatedDate.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        updateShiftsPane(updatedDate);
     }
 
     @FXML
     public void clickPreviousMonth(ActionEvent event) {
-
+        updatedDate = updatedDate.minusMonths(1).with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY));
+        updateShiftsPane(updatedDate);
     }
 
     @FXML
     public void clickPreviousWeek(ActionEvent event) {
+        updatedDate = updatedDate.with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
+        updateShiftsPane(updatedDate);
+    }
 
+    /**
+     * Aggiorna il panello dei turni con i nuovi turni relativi alla settimana della data passata per parametro.
+     * @param date data su cui vengono aggiornati i turni della settimana
+     */
+    private void updateShiftsPane(LocalDate date) {
+        showedWeek = computeWeek(date);
+        weekShiftsList = shiftsOfShowedWeek(showedWeek);
+        shiftsPane.getChildren().clear();
+        insertAllShiftsCard(weekShiftsList);
+        weekLabel.setText(weekString(date));
     }
 
 }
