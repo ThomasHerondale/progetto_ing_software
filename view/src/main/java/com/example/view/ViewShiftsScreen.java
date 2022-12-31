@@ -6,7 +6,6 @@ import database.DBMSDaemon;
 import database.DBMSException;
 import entities.Shift;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
@@ -16,6 +15,9 @@ import javafx.scene.layout.AnchorPane;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.Month;
+import java.time.format.TextStyle;
+import java.time.temporal.ChronoField;
 import java.util.*;
 
 public class ViewShiftsScreen extends LoggedScreen {
@@ -55,6 +57,7 @@ public class ViewShiftsScreen extends LoggedScreen {
     private List<Shift> weekShiftsList;
     private List<Shift> shiftsList;
     private Period showedWeek;
+    private static Random RANDOM = new Random();
 
     public ViewShiftsScreen(ShiftHandler handler){
         this.shiftHandler = handler;
@@ -87,14 +90,24 @@ public class ViewShiftsScreen extends LoggedScreen {
     public void initialize(){
         super.initialize();
         synchroBar();
-        //inizializza pure weekLabel
-        weekLabel.setText(getWeekString());
-
+        weekLabel.setText(weekString(LocalDate.now()));
         showedWeek = computeWeek(LocalDate.now());
         weekShiftsList = shiftsOfShowedWeek(showedWeek);
         abstentionsMenu.getStylesheets().add(String.valueOf(getClass().getResource("css/AbstentionsMenuStyle.css")));
         abstentionsMenu.getStyleClass().add("abstentionsMenu");
-        insertAllShiftsCard(weekShiftsList);
+        insertAllShiftsCard(shiftsList);
+    }
+
+    /**
+     * Ritorna la stringa della settimana corrente con tutte le informazioni tipo numero della settimana,
+     * mese e anno.
+     * @param date data su cui calcola le informazioni
+     * @return ritorna la stringa con le informazioni
+     */
+    private String weekString(LocalDate date) {
+        return getWeekNumber(date) + " Sett. "
+                + (date.getMonth().getDisplayName(TextStyle.FULL_STANDALONE, Locale.ITALIAN))
+                + " " + date.getYear();
     }
 
     /**
@@ -109,8 +122,42 @@ public class ViewShiftsScreen extends LoggedScreen {
         return new Period(startWeekDate, endWeekDate);
     }
 
-    private String getWeekString() {
-        return "";
+    /**
+     * Ritorna la stringa in numero romano della settimana che contiene la data passata per parametro.
+     * @param date data su cui calcolare il numero della settimana
+     * @return ritorna una stringa in numero romano
+     */
+    private String getWeekNumber(LocalDate date) {
+        //TODO:
+        int numberOfWeek = date.get(ChronoField.ALIGNED_WEEK_OF_MONTH);
+        return intToRoman(numberOfWeek);
+    }
+
+    /**
+     * Converte un intero in stringa che corrisponde al numero romano del numero passato.
+     * @param num numero che si vuole convertire
+     * @return ritorna la rappresentazione del parametro in numero romano come stringa
+     */
+    private String intToRoman(int num) {
+        // Array che contiene tutti i simboli romani e i loro valori
+        int[] values = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+        String[] strs = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+
+        // Crea una stringa vuota per memorizzare il numero romano
+        StringBuilder sb = new StringBuilder();
+
+        // Itera attraverso il nostro array di valori
+        for (int i = 0; i < values.length; i++) {
+            // Continua a sottrarre il valore corrente finché num è maggiore o uguale a esso
+            while (num >= values[i]) {
+                // Aggiungi il simbolo romano corrispondente alla stringa
+                sb.append(strs[i]);
+                // Sottrai il valore corrente da num
+                num -= values[i];
+            }
+        }
+
+        return sb.toString();
     }
 
     /**
@@ -155,6 +202,12 @@ public class ViewShiftsScreen extends LoggedScreen {
             shiftsPane.getChildren().get(i).setLayoutY(cardLayoutY);
             shiftsPane.getChildren().get(i).setLayoutX(cardLayoutX);
             Shift finalShift = shift;
+            String color = getRandomColor();
+            shiftCard.setStyle("-fx-background-color: " + color);
+            if (color.equals("#558D92") || color.equals("#929292")){
+                shiftCard.getChildren().get(0).setStyle("-fx-text-fill: white");
+                shiftCard.getChildren().get(1).setStyle("-fx-text-fill: white");
+            }
             shiftCard.setOnMouseClicked(mouseEvent -> {
                 try {
                     new ViewShiftsInfoHandler().clickedShift(finalShift);
@@ -163,6 +216,21 @@ public class ViewShiftsScreen extends LoggedScreen {
                 }
             });
         }
+    }
+
+    /**
+     * Calcola un colore random e ritorna la stringa esadecimale.
+     * @return ritorna la stringa esadecimale di un colore
+     */
+
+    private String getRandomColor(){
+        return switch (RANDOM.nextInt(5)){
+            case 0 -> "#8FBA90";
+            case 1 -> "#558D92";
+            case 2 -> "#A99494";
+            case 3 -> "#EABC8E";
+            default -> "#929292";
+        };
     }
 
     /**
