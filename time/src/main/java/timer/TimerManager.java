@@ -22,6 +22,10 @@ public class TimerManager {
      */
     private MonthlyTimer newSalariesTimer;
     /**
+     * Il timer che si occupa del calcolo della nuova proposta di turnazione.
+     */
+    private MonthlyTimer shiftProposalTimer;
+    /**
      * L'intervallo tra una registrazione di uscite automatiche e un'altra.
      */
     private static final long AUTO_EXIT_RATE = 1_800_000;
