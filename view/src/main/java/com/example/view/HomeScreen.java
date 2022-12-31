@@ -24,11 +24,13 @@ public class HomeScreen extends LoggedScreen{
     private final AccountInfoHandler accountInfoHandler;
     private final ViewSalaryHandler viewSalaryHandler;
     private final ShiftHandler shiftHandler;
+    private final ShowPresencesHandler showPresencesHandler;
 
     public HomeScreen(){
         accountInfoHandler = new AccountInfoHandler();
         viewSalaryHandler = new ViewSalaryHandler();
         shiftHandler = new ShiftHandler();
+        showPresencesHandler = new ShowPresencesHandler();
     }
     @Override
     public void initialize(){
@@ -37,7 +39,7 @@ public class HomeScreen extends LoggedScreen{
 
     @FXML
     public void clickPresences(MouseEvent event) {
-        //TODO:
+        showPresencesHandler.clickedPresences();
     }
 
     @FXML

@@ -72,14 +72,10 @@ public class ViewShiftsScreen extends LoggedScreen {
     private static Random RANDOM = new Random();
     private LocalDate updatedDate;
 
-    public ViewShiftsScreen(ShiftHandler handler){
+    public ViewShiftsScreen(List<Shift> shiftsList, ShiftHandler handler){
         this.shiftHandler = handler;
         accountInfoHandler = new AccountInfoHandler();
-        try {
-            shiftsList = DBMSDaemon.getInstance().getShiftsList(Session.getInstance().getWorker().getId());
-        } catch (DBMSException e) {
-            //TODO:
-        }
+        this.shiftsList = shiftsList;
     }
 
     @FXML
