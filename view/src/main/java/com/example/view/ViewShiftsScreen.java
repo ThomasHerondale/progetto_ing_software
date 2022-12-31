@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
@@ -65,23 +66,6 @@ public class ViewShiftsScreen extends LoggedScreen {
         accountInfoHandler = new AccountInfoHandler();
         try {
             shiftsList = DBMSDaemon.getInstance().getShiftsList(Session.getInstance().getWorker().getId());
-
-        /*    DBMSDaemon.getInstance().getShiftsList(Session.getInstance().getWorker().getId());
-            //prove
-            shiftsList = new ArrayList<>();
-            shiftsList.add(new Shift(Session.getInstance().getWorker(),
-                    Session.getInstance().getWorker().getRank(), LocalDate.parse("2023-01-02"),
-                    LocalTime.parse("09:00:00"),LocalTime.parse("10:00:00") ));
-            shiftsList.add(new Shift(Session.getInstance().getWorker(),
-                    Session.getInstance().getWorker().getRank(), LocalDate.parse("2022-12-26"),
-                    LocalTime.parse("12:00:00"),LocalTime.parse("21:00:00") ));
-            shiftsList.add(new Shift(Session.getInstance().getWorker(),
-                    Session.getInstance().getWorker().getRank(), LocalDate.parse("2022-12-26"),
-                    LocalTime.parse("21:00:00"),LocalTime.parse("22:00:00") ));
-            shiftsList.add(new Shift(Session.getInstance().getWorker(),
-                    Session.getInstance().getWorker().getRank(), LocalDate.parse("2022-12-27"),
-                    LocalTime.parse("09:00:00"),LocalTime.parse("15:00:00") ));
-         */
         } catch (DBMSException e) {
             //TODO:
         }
@@ -91,13 +75,10 @@ public class ViewShiftsScreen extends LoggedScreen {
     public void initialize(){
         super.initialize();
         synchroBar();
-        updatedDate = LocalDate.now();
-        weekLabel.setText(weekString(updatedDate));
-        showedWeek = computeWeek(updatedDate);
-        weekShiftsList = shiftsOfShowedWeek(showedWeek);
         abstentionsMenu.getStylesheets().add(String.valueOf(getClass().getResource("css/AbstentionsMenuStyle.css")));
         abstentionsMenu.getStyleClass().add("abstentionsMenu");
-        insertAllShiftsCard(weekShiftsList);
+        updatedDate = LocalDate.now();
+        updateShiftsPane(updatedDate);
     }
 
     /**
@@ -131,8 +112,9 @@ public class ViewShiftsScreen extends LoggedScreen {
      */
     private String getWeekNumber(LocalDate date) {
         //TODO:
-        int numberOfWeek = date.get(ChronoField.ALIGNED_WEEK_OF_MONTH);
-        return intToRoman(numberOfWeek);
+        LocalDate firstMonday = date.with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY));
+        int weeksBetween = (int) ChronoUnit.WEEKS.between(firstMonday, date);
+        return intToRoman(weeksBetween + 1);
     }
 
     /**
