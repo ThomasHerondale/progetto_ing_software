@@ -97,7 +97,7 @@ public class ViewShiftsScreen extends LoggedScreen {
         weekShiftsList = shiftsOfShowedWeek(showedWeek);
         abstentionsMenu.getStylesheets().add(String.valueOf(getClass().getResource("css/AbstentionsMenuStyle.css")));
         abstentionsMenu.getStyleClass().add("abstentionsMenu");
-        insertAllShiftsCard(shiftsList);
+        insertAllShiftsCard(weekShiftsList);
     }
 
     /**
