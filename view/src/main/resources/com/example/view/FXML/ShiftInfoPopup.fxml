@@ -50,7 +50,7 @@
             <Font name="System Bold" size="20.0" />
          </font>
       </Label>
-      <Label fx:id="overtimeLabel" layoutX="584.5" layoutY="69.0" opacity="0.3" text="Straordinario" AnchorPane.rightAnchor="32.0" AnchorPane.topAnchor="69.0">
+      <Label fx:id="ordinaryLabel" layoutX="584.5" layoutY="69.0" text="Ordinario" AnchorPane.rightAnchor="32.0" AnchorPane.topAnchor="69.0">
          <font>
             <Font size="18.0" />
          </font>
@@ -70,6 +70,11 @@
       <Label layoutX="649.5" layoutY="24.0" text="Info" AnchorPane.rightAnchor="32.0" AnchorPane.topAnchor="24.0">
          <font>
             <Font name="System Bold" size="20.0" />
+         </font>
+      </Label>
+      <Label fx:id="overtimeLabel" layoutX="584.0" layoutY="133.0" opacity="0.3" text="Straordinario" AnchorPane.rightAnchor="32.0" AnchorPane.topAnchor="121.0">
+         <font>
+            <Font size="18.0" />
          </font>
       </Label>
    </children>

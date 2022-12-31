@@ -30,6 +30,9 @@ public class ShiftInfoPopup {
     private Label rankLabel;
 
     @FXML
+    private Label ordinaryLabel;
+
+    @FXML
     private Button recordEntryButton;
 
     @FXML
@@ -48,9 +51,11 @@ public class ShiftInfoPopup {
         dateLabel.setText(String.valueOf(shift.getDate().format(formatter)));
         if (shift.isOvertime()){
             overtimeLabel.setOpacity(1.0);
+            ordinaryLabel.setOpacity(0.3);
         }
         if (shift.isSubstitution()){
-            overtimeLabel.setOpacity(1.0);
+            substitutionLabel.setOpacity(1.0);
+            ordinaryLabel.setOpacity(0.3);
         }
     }
 
