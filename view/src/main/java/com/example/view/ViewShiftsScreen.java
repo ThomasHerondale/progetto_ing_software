@@ -24,6 +24,17 @@ import java.util.*;
 public class ViewShiftsScreen extends LoggedScreen {
 
     @FXML
+    private MenuItem holidayButton;
+    @FXML
+    private MenuItem leavesButton;
+    @FXML
+    private MenuItem illnessButton;
+    @FXML
+    private MenuItem strikesButton;
+    @FXML
+    private MenuItem parentalLeaveButton;
+
+    @FXML
     private Button nextWeekButton;
     @FXML
     private Button nextMonthButton;
@@ -332,7 +343,7 @@ public class ViewShiftsScreen extends LoggedScreen {
 
     @FXML
     public void clickPreviousWeek(ActionEvent event) {
-        updatedDate = updatedDate.with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
+        updatedDate = updatedDate.minusWeeks(1).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         updateShiftsPane(updatedDate);
     }
 
@@ -346,6 +357,27 @@ public class ViewShiftsScreen extends LoggedScreen {
         shiftsPane.getChildren().clear();
         insertAllShiftsCard(weekShiftsList);
         weekLabel.setText(weekString(date));
+    }
+
+    @FXML
+    public void clickStrikes(ActionEvent event){
+        //TODO:
+    }
+    @FXML
+    public void clickParentalLeave(ActionEvent event){
+        //TODO:
+    }
+    @FXML
+    public void clickHoliday(ActionEvent event){
+        //TODO:
+    }
+    @FXML
+    public void clickIllness(ActionEvent event){
+        //TODO:
+    }
+    @FXML
+    public void clickLeave(ActionEvent event){
+        //TODO:
     }
 
 }

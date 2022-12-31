@@ -67,7 +67,7 @@ public class ShiftInfoPopup {
 
     @FXML
     void clickRecordEntry(ActionEvent event) {
-
+        //TODO:
     }
 
 }

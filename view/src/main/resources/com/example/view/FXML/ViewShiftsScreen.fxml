@@ -327,11 +327,11 @@
       </Button>
       <MenuButton fx:id="abstentionsMenu" alignment="CENTER" layoutX="919.0" layoutY="47.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="128.0" text="Astensioni" textAlignment="CENTER" AnchorPane.leftAnchor="1042.0" AnchorPane.topAnchor="43.0">
         <items>
-          <MenuItem mnemonicParsing="false" text="Comunica Ferie" />
-          <MenuItem mnemonicParsing="false" text="Scioperi" />
-            <MenuItem mnemonicParsing="false" text="Comunica Cong. Paren." />
-            <MenuItem mnemonicParsing="false" text="Permessi" />
-            <MenuItem mnemonicParsing="false" text="Comunica Malattia" />
+          <MenuItem fx:id="holidayButton" mnemonicParsing="false" onAction="#clickHoliday" text="Comunica Ferie" />
+          <MenuItem fx:id="strikesButton" mnemonicParsing="false" onAction="#clickStrikes" text="Scioperi" />
+            <MenuItem fx:id="parentalLeaveButton" mnemonicParsing="false" onAction="#clickParentalLeave" text="Comunica Cong. Paren." />
+            <MenuItem fx:id="leavesButton" mnemonicParsing="false" onAction="#clickLeave" text="Permessi" />
+            <MenuItem fx:id="illnessButton" mnemonicParsing="false" onAction="#clickIllness" text="Comunica Malattia" />
         </items>
          <font>
             <Font size="15.0" />
