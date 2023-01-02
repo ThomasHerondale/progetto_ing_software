@@ -1510,6 +1510,34 @@ public class DBMSDaemon {
     }
 
     /**
+     * Ottiene dal database la lista dei lavoratori presenti al lavoro (i.e. entrati ma non usciti)
+     * nella data specificata.
+     * @param currentDate la data di riferimento
+     * @return una mappa del tipo {("ID", string), ("workerName", string), ("workerSurname", string),
+     * "shiftRank", char), ("entryTime", time)}
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     * @apiNote essendo la mappa {@code <String, String>} i <i>char</i> e <i>time</i> ai valori della mappa
+     * sono le loro rappresentazioni in forma di stringa, opportunamente da castare al bisogno.
+     */
+    public List<HashMap<String, String>> getPresencesList(LocalDate currentDate) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT W.ID, W.workerName, W.workerSurname, S.shiftRank, P.entryTime
+                FROM Worker W join Shift S on ( W.ID = S.refWorkerID) join Presence P on ( S.refWorkerID= P.refShiftID
+                and S.shiftDate = P.refShiftDate and S.shiftStart = P.refShiftStart)
+                WHERE P.refShiftDate = ? AND P.exitTime IS NULL;
+                """)
+        ) {
+            st.setDate(1, Date.valueOf(currentDate));
+            var resultSet = st.executeQuery();
+
+            return extractResults(resultSet);
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
      * Estrae tutte le righe del resultSet specificato, convertendole in mappe (nome_colonna, valore_colonna).
      */
     private List<HashMap<String, String>> extractResults(ResultSet resultSet) throws SQLException {
