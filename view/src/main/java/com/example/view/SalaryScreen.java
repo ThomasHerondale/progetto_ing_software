@@ -41,8 +41,6 @@ public class SalaryScreen extends LoggedScreen {
     private Map<HoursRecap, Double> salaryData;
 
     public SalaryScreen(Map<HoursRecap, Double> salaryData, ViewSalaryHandler handler){
-        //mancano ancora delle cose
-        //TODO:
         this.viewSalaryHandler = handler;
         accountInfoHandler = new AccountInfoHandler();
         this.salaryData = salaryData;
