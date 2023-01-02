@@ -59,7 +59,11 @@ public class ShiftProposalHandler {
         }
 
         public boolean isAvailable(int startTime, int endTime) {
-
+            for (Period period : holidays) {
+                if (period.getStartDate().getHours() <= startTime && period.getEndDate().getHours() >= endTime) {
+                    return false; // If the worker has requested a leave, return false
+                }
+            }
         }
     }
 }
