@@ -1,7 +1,6 @@
 package com.example.view;
 
 import commons.Session;
-import entities.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
