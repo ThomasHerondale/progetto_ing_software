@@ -15,6 +15,7 @@ public class ShowPresencesHandler {
         try {
             presences = DBMSDaemon.getInstance().getPresencesList(currentDate);
         } catch (DBMSException e) {
+            //TODO:
             throw new RuntimeException(e);
         }
         NavigationManager.getInstance().createScreen("Presence",

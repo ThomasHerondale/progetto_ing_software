@@ -46,9 +46,9 @@ public class ShiftInfoPopup {
         idLabel.setText(shift.getOwner().getId());
         fullNameLabel.setText(shift.getOwner().getFullName());
         rankLabel.setText("Livello " + shift.getRank());
-        hoursLabel.setText(String.valueOf(shift.getStartTime()) + " - " + shift.getEndTime() + " (" + shift.getHours() + "h)");
+        hoursLabel.setText(shift.getStartTime() + " - " + shift.getEndTime() + " (" + shift.getHours() + "h)");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        dateLabel.setText(String.valueOf(shift.getDate().format(formatter)));
+        dateLabel.setText(shift.getDate().format(formatter));
         if (shift.isOvertime()){
             overtimeLabel.setOpacity(1.0);
             ordinaryLabel.setOpacity(0.3);

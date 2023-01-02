@@ -13,7 +13,7 @@
             <Font name="System Bold" size="24.0" />
          </font>
       </Label>
-      <Label fx:id="description" alignment="CENTER" contentDisplay="CENTER" layoutY="56.0" prefHeight="96.0" prefWidth="432.0" text="Description" wrapText="true" AnchorPane.topAnchor="56.0">
+      <Label fx:id="description" alignment="CENTER" contentDisplay="CENTER" layoutY="56.0" prefHeight="96.0" prefWidth="432.0" text="Description" textAlignment="CENTER" wrapText="true" AnchorPane.topAnchor="56.0">
          <font>
             <Font size="20.0" />
          </font>

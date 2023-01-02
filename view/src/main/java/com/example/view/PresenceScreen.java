@@ -49,6 +49,7 @@ public class PresenceScreen extends LoggedScreen{
 
     private final AccountInfoHandler accountInfoHandler;
     private final ShowPresencesHandler showPresencesHandler;
+    private InsertPresenceHandler insertPresenceHandler;
     private List<HashMap<String, String>> presences;
     private List<HashMap<String, String>> presencesFilter;
 
@@ -133,7 +134,8 @@ public class PresenceScreen extends LoggedScreen{
 
     @FXML
     public void clickInsertPresence(ActionEvent event) {
-
+        insertPresenceHandler = new InsertPresenceHandler();
+        insertPresenceHandler.clickedInsertPresence();
     }
 
     @FXML
