@@ -1,0 +1,6 @@
+.presenceCard {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 20;
+    -fx-background-radius: 4;
+    /* -fx-background-color: #313146; */
+}
