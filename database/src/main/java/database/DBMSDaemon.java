@@ -1447,22 +1447,93 @@ public class DBMSDaemon {
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public void recordAutoExit(List<Shift> shifts) throws DBMSException {
-        for (var shift : shifts) {
-            try (
-                    var st = connection.prepareStatement("""
-                    UPDATE Presence
-                    SET exitTime = ?
-                    WHERE refShiftID = ? AND refShiftDate = ? and refShiftStart = ?
-                    """)
-            ) {
-                st.setTime(1, Time.valueOf(shift.getEndTime()));
-                st.setString(2, shift.getOwner().getId());
-                st.setDate(3, Date.valueOf(shift.getDate()));
-                st.setTime(4, Time.valueOf(shift.getStartTime()));
-                st.execute();
-            } catch (SQLException e) {
-                throw new DBMSException(e);
-            }
+        for (var shift : shifts)
+            recordExit(shift.getOwner().getId(), shift.getDate(), shift.getStartTime(), shift.getEndTime());
+    }
+
+    /**
+     * Registra l'uscita dal lavoro per il dipendente specificato, in una data e ad un'ora specifici.
+     * @param id la matricola del dipendente
+     * @param date la data del turno
+     * @param exitTime l'ora di uscita da memorizzare
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void recordExit(String id, LocalDate date, LocalTime exitTime) throws DBMSException {
+        recordExit(id, date, getLastShiftStart(id, date), exitTime);
+    }
+
+    /**
+     * Registra l'uscita nel database.
+     */
+    private void recordExit(String id, LocalDate date, LocalTime shiftStartTime, LocalTime exitTime)
+            throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                UPDATE presence
+                SET exitTime = ?
+                WHERE refShiftID = ? and refShiftDate = ? and refShiftStart = ?
+                """)
+        ) {
+            st.setTime(1, Time.valueOf(exitTime));
+            st.setString(2, id);
+            st.setDate(3, Date.valueOf(date));
+            st.setTime(4, Time.valueOf(shiftStartTime));
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
+     * Ritorna l'orario di inizio del turno più recente senza uscita.
+     */
+    private LocalTime getLastShiftStart(String id, LocalDate date) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT MIN(p2.refShiftStart) AS shiftStart
+                FROM presence p2
+                WHERE p2.refShiftID = ?
+                AND p2.refShiftDate = ?
+                AND p2.exitTime IS NULL
+                """)
+        ) {
+            st.setString(1, id);
+            st.setDate(2, Date.valueOf(date));
+            var resultSet = st.executeQuery();
+
+            var maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Dovrebbe esserci un solo minimo */
+
+            return LocalTime.parse(maps.get(0).get("shiftStart"));
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
+     * Ottiene dal database la lista dei lavoratori presenti al lavoro (i.e. entrati ma non usciti)
+     * nella data specificata.
+     * @param currentDate la data di riferimento
+     * @return una mappa del tipo {("ID", string), ("workerName", string), ("workerSurname", string),
+     * "shiftRank", char), ("entryTime", time)}
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     * @apiNote essendo la mappa {@code <String, String>} i <i>char</i> e <i>time</i> ai valori della mappa
+     * sono le loro rappresentazioni in forma di stringa, opportunamente da castare al bisogno.
+     */
+    public List<HashMap<String, String>> getPresencesList(LocalDate currentDate) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT W.ID, W.workerName, W.workerSurname, S.shiftRank, P.entryTime
+                FROM Worker W join Shift S on ( W.ID = S.refWorkerID) join Presence P on ( S.refWorkerID= P.refShiftID
+                and S.shiftDate = P.refShiftDate and S.shiftStart = P.refShiftStart)
+                WHERE P.refShiftDate = ? AND P.exitTime IS NULL;
+                """)
+        ) {
+            st.setDate(1, Date.valueOf(currentDate));
+            var resultSet = st.executeQuery();
+
+            return extractResults(resultSet);
+        } catch (SQLException e) {
+            throw new DBMSException(e);
         }
     }
 

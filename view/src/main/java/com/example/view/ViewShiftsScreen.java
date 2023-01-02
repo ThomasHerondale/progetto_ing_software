@@ -6,7 +6,6 @@ import database.DBMSDaemon;
 import database.DBMSException;
 import entities.Shift;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
@@ -16,9 +15,24 @@ import javafx.scene.layout.AnchorPane;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.TextStyle;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
 public class ViewShiftsScreen extends LoggedScreen {
+
+    @FXML
+    private MenuItem holidayButton;
+    @FXML
+    private MenuItem leavesButton;
+    @FXML
+    private MenuItem illnessButton;
+    @FXML
+    private MenuItem strikesButton;
+    @FXML
+    private MenuItem parentalLeaveButton;
 
     @FXML
     private Button nextWeekButton;
@@ -55,52 +69,41 @@ public class ViewShiftsScreen extends LoggedScreen {
     private List<Shift> weekShiftsList;
     private List<Shift> shiftsList;
     private Period showedWeek;
+    private static Random RANDOM = new Random();
+    private LocalDate updatedDate;
 
-    public ViewShiftsScreen(ShiftHandler handler){
+    public ViewShiftsScreen(List<Shift> shiftsList, ShiftHandler handler){
         this.shiftHandler = handler;
         accountInfoHandler = new AccountInfoHandler();
-        try {
-            shiftsList = DBMSDaemon.getInstance().getShiftsList(Session.getInstance().getWorker().getId());
-
-        /*    DBMSDaemon.getInstance().getShiftsList(Session.getInstance().getWorker().getId());
-            //prove
-            shiftsList = new ArrayList<>();
-            shiftsList.add(new Shift(Session.getInstance().getWorker(),
-                    Session.getInstance().getWorker().getRank(), LocalDate.parse("2023-01-02"),
-                    LocalTime.parse("09:00:00"),LocalTime.parse("10:00:00") ));
-            shiftsList.add(new Shift(Session.getInstance().getWorker(),
-                    Session.getInstance().getWorker().getRank(), LocalDate.parse("2022-12-26"),
-                    LocalTime.parse("12:00:00"),LocalTime.parse("21:00:00") ));
-            shiftsList.add(new Shift(Session.getInstance().getWorker(),
-                    Session.getInstance().getWorker().getRank(), LocalDate.parse("2022-12-26"),
-                    LocalTime.parse("21:00:00"),LocalTime.parse("22:00:00") ));
-            shiftsList.add(new Shift(Session.getInstance().getWorker(),
-                    Session.getInstance().getWorker().getRank(), LocalDate.parse("2022-12-27"),
-                    LocalTime.parse("09:00:00"),LocalTime.parse("15:00:00") ));
-         */
-        } catch (DBMSException e) {
-            //TODO:
-        }
+        this.shiftsList = shiftsList;
     }
 
     @FXML
     public void initialize(){
         super.initialize();
         synchroBar();
-        //inizializza pure weekLabel
-        weekLabel.setText(getWeekString());
-
-        showedWeek = computeWeek(LocalDate.now());
-        weekShiftsList = shiftsOfShowedWeek(showedWeek);
         abstentionsMenu.getStylesheets().add(String.valueOf(getClass().getResource("css/AbstentionsMenuStyle.css")));
         abstentionsMenu.getStyleClass().add("abstentionsMenu");
-        insertAllShiftsCard(weekShiftsList);
+        updatedDate = LocalDate.now();
+        updateShiftsPane(updatedDate);
+    }
+
+    /**
+     * Ritorna la stringa della settimana corrente con tutte le informazioni tipo numero della settimana,
+     * mese e anno.
+     * @param date data su cui calcola le informazioni
+     * @return ritorna la stringa con le informazioni
+     */
+    private String weekString(LocalDate date) {
+        return getWeekNumber(date) + " Sett. "
+                + (date.getMonth().getDisplayName(TextStyle.FULL_STANDALONE, Locale.ITALIAN))
+                + " " + date.getYear();
     }
 
     /**
      * calcola la settimana relativa al parametro LocalDate passato.
      * Ritorna una variabile Period.
-     * @param localDate
+     * @param localDate data su cui calcolare il Period
      * @return variabile Period di una settimana che contiene il parametro passato
      */
     private Period computeWeek(LocalDate localDate) {
@@ -109,8 +112,43 @@ public class ViewShiftsScreen extends LoggedScreen {
         return new Period(startWeekDate, endWeekDate);
     }
 
-    private String getWeekString() {
-        return "";
+    /**
+     * Ritorna la stringa in numero romano della settimana che contiene la data passata per parametro.
+     * @param date data su cui calcolare il numero della settimana
+     * @return ritorna una stringa in numero romano
+     */
+    private String getWeekNumber(LocalDate date) {
+        //TODO:
+        LocalDate firstMonday = date.with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY));
+        int weeksBetween = (int) ChronoUnit.WEEKS.between(firstMonday, date);
+        return intToRoman(weeksBetween + 1);
+    }
+
+    /**
+     * Converte un intero in stringa che corrisponde al numero romano del numero passato.
+     * @param num numero che si vuole convertire
+     * @return ritorna la rappresentazione del parametro in numero romano come stringa
+     */
+    private String intToRoman(int num) {
+        // Array che contiene tutti i simboli romani e i loro valori
+        int[] values = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+        String[] strs = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+
+        // Crea una stringa vuota per memorizzare il numero romano
+        StringBuilder sb = new StringBuilder();
+
+        // Itera attraverso il nostro array di valori
+        for (int i = 0; i < values.length; i++) {
+            // Continua a sottrarre il valore corrente finché num è maggiore o uguale a esso
+            while (num >= values[i]) {
+                // Aggiungi il simbolo romano corrispondente alla stringa
+                sb.append(strs[i]);
+                // Sottrai il valore corrente da num
+                num -= values[i];
+            }
+        }
+
+        return sb.toString();
     }
 
     /**
@@ -155,6 +193,12 @@ public class ViewShiftsScreen extends LoggedScreen {
             shiftsPane.getChildren().get(i).setLayoutY(cardLayoutY);
             shiftsPane.getChildren().get(i).setLayoutX(cardLayoutX);
             Shift finalShift = shift;
+            String color = getRandomColor();
+            shiftCard.setStyle("-fx-background-color: " + color);
+            if (color.equals("#558D92") || color.equals("#929292")){
+                shiftCard.getChildren().get(0).setStyle("-fx-text-fill: white");
+                shiftCard.getChildren().get(1).setStyle("-fx-text-fill: white");
+            }
             shiftCard.setOnMouseClicked(mouseEvent -> {
                 try {
                     new ViewShiftsInfoHandler().clickedShift(finalShift);
@@ -163,6 +207,21 @@ public class ViewShiftsScreen extends LoggedScreen {
                 }
             });
         }
+    }
+
+    /**
+     * Calcola un colore random e ritorna la stringa esadecimale.
+     * @return ritorna la stringa esadecimale di un colore
+     */
+
+    private String getRandomColor(){
+        return switch (RANDOM.nextInt(5)){
+            case 0 -> "#8FBA90";
+            case 1 -> "#558D92";
+            case 2 -> "#A99494";
+            case 3 -> "#EABC8E";
+            default -> "#929292";
+        };
     }
 
     /**
@@ -224,6 +283,7 @@ public class ViewShiftsScreen extends LoggedScreen {
         shiftCard.setMinHeight(height);
         shiftCard.setMaxHeight(height);
     }
+
     /**
      * Ritorna una mappa con valore gli interi da utilizzare per il calcolo della posizione Y.
      * @return una mappa chiave LocalTime e valore Integer per calcolare la posizione Y di una shiftCard.
@@ -261,22 +321,59 @@ public class ViewShiftsScreen extends LoggedScreen {
 
     @FXML
     public void clickNextMonth(ActionEvent event) {
-
+        updatedDate = updatedDate.plusMonths(1).with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY));
+        updateShiftsPane(updatedDate);
     }
 
     @FXML
     public void clickNextWeek(ActionEvent event) {
-
+        updatedDate = updatedDate.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        updateShiftsPane(updatedDate);
     }
 
     @FXML
     public void clickPreviousMonth(ActionEvent event) {
-
+        updatedDate = updatedDate.minusMonths(1).with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY));
+        updateShiftsPane(updatedDate);
     }
 
     @FXML
     public void clickPreviousWeek(ActionEvent event) {
+        updatedDate = updatedDate.minusWeeks(1).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        updateShiftsPane(updatedDate);
+    }
 
+    /**
+     * Aggiorna il panello dei turni con i nuovi turni relativi alla settimana della data passata per parametro.
+     * @param date data su cui vengono aggiornati i turni della settimana
+     */
+    private void updateShiftsPane(LocalDate date) {
+        showedWeek = computeWeek(date);
+        weekShiftsList = shiftsOfShowedWeek(showedWeek);
+        shiftsPane.getChildren().clear();
+        insertAllShiftsCard(weekShiftsList);
+        weekLabel.setText(weekString(date));
+    }
+
+    @FXML
+    public void clickStrikes(ActionEvent event){
+        //TODO:
+    }
+    @FXML
+    public void clickParentalLeave(ActionEvent event){
+        //TODO:
+    }
+    @FXML
+    public void clickHoliday(ActionEvent event){
+        //TODO:
+    }
+    @FXML
+    public void clickIllness(ActionEvent event){
+        //TODO:
+    }
+    @FXML
+    public void clickLeave(ActionEvent event){
+        //TODO:
     }
 
 }

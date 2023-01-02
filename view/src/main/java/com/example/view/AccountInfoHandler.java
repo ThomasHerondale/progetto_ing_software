@@ -1,5 +1,6 @@
 package com.example.view;
 
+import commons.ConfirmAction;
 import commons.Counters;
 import commons.EditableProperty;
 import commons.Session;
@@ -30,7 +31,7 @@ public class AccountInfoHandler {
     public void clickedLogout() {
         //serve la ConfirmAction enum...
         NavigationManager.getInstance().createPopup("Confirm",
-                controller -> new ConfirmPopup(this));
+                controller -> new ConfirmPopup(ConfirmAction.LOGOUT, this));
     }
 
     public void clickedConfirmLogout() {
