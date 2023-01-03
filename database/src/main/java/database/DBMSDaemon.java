@@ -755,6 +755,8 @@ public class DBMSDaemon {
             }
 
             assert statusMap.size() == workers.size();
+            System.out.println(statusMap);
+            System.out.println(workers);
             return statusMap;
         } catch (SQLException e) {
             throw new DBMSException(e);
