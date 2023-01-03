@@ -1538,6 +1538,48 @@ public class DBMSDaemon {
     }
 
     /**
+     * Ottiene la lista dei dipendenti assenti per astensione nella data specificata.
+     * @param date la data di riferimento
+     * @return la lista dei dipendenti assenti
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public List<Worker> getAbsentWorkersList(LocalDate date) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT W.ID, W.workerName, W.workerSurname, W.telNumber, W.email, W.IBAN, W.workerRank
+                FROM Worker W join Shift S1 on (W.ID = S1.refWorkerID)
+                WHERE S1.shiftDate = ? and W.ID NOT IN (
+                                            SELECT S2.refWorkerID
+                                            FROM Shift S2 join Presence P on (S2.refWorkerID = P.refShiftID and
+                                            S2.shiftDate = P.refShiftDate and S2.shiftStart = P.refShiftStart)
+                                            WHERE S2.shiftDate = S1.shiftDate)
+                """)
+        ) {
+            st.setDate(1, Date.valueOf(date));
+            var resultSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+
+            List<Worker> workers = new ArrayList<>(maps.size());
+            for (var map : maps) {
+                workers.add(new Worker(
+                        map.get("ID"),
+                        map.get("workerName"),
+                        map.get("workerSurname"),
+                        map.get("workerRank").charAt(0),
+                        map.get("telNumber"),
+                        map.get("email"),
+                        map.get("IBAN")
+                ));
+            }
+
+            return workers;
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
      * Estrae tutte le righe del resultSet specificato, convertendole in mappe (nome_colonna, valore_colonna).
      */
     private List<HashMap<String, String>> extractResults(ResultSet resultSet) throws SQLException {

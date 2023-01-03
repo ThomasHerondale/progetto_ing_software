@@ -29,7 +29,6 @@ public class AccountInfoHandler {
         NavigationManager.getInstance().closeAccountInfoScreen();
     }
     public void clickedLogout() {
-        //serve la ConfirmAction enum...
         NavigationManager.getInstance().createPopup("Confirm",
                 controller -> new ConfirmPopup(ConfirmAction.LOGOUT, this));
     }

@@ -78,8 +78,16 @@ public class Shift {
         return startTime;
     }
 
+    public int getIntStartTime() {
+        return startTime.getHour();
+    }
+
     public LocalTime getEndTime() {
         return endTime;
+    }
+
+    public int getIntEndTime() {
+        return endTime.getHour();
     }
 
     public boolean isOvertime() {

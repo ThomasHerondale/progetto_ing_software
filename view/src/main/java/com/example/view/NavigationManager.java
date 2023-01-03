@@ -54,6 +54,7 @@ public class NavigationManager {
         SCREEN_MAP.put("View Shifts", "FXML/ViewShiftsScreen.fxml");
         SCREEN_MAP.put("Shift Info", "FXML/ShiftInfoPopup.fxml");
         SCREEN_MAP.put("Presence", "FXML/PresenceScreen.fxml");
+        SCREEN_MAP.put("Insert Presence", "FXML/InsertPresencePopup.fxml");
         //...
     }
     private HashMap<String, Stage> stagesPopup;
