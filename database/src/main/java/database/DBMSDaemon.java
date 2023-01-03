@@ -744,8 +744,8 @@ public class DBMSDaemon {
             }
 
             for (var presenceMap : presenceMaps) {
-                assert !statusMap.containsKey(presenceMap.get("refWorkerID"));
-                statusMap.put(presenceMap.get("refWorkerID"), WORKING);
+                assert !statusMap.containsKey(presenceMap.get("refShiftID"));
+                statusMap.put(presenceMap.get("refShiftID"), WORKING);
             }
 
             /* Se non sono in nessuna delle precedenti, sono liberi */
