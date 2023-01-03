@@ -54,15 +54,23 @@ public class ShiftProposalHandler {
                         continue;
                     }
 
-                    if (startTime < lastShiftEnd + minShiftDuration) {
-                        System.out.println("\t Too near wrt last shift -> retrying later");
+                    if (startTime >= 22 - minShiftDuration) {
+                        System.out.println("\t Too little time remaining -> retrying next day");
                         currentDay = currentDay.plusDays(1);
                         lastShiftEnd = -1;
                         startTime = 8;
                         continue;
                     }
 
-                    if (!availability.isAvailable(currentDay, startTime, endTime)) {
+                    /*if (startTime < lastShiftEnd + minShiftDuration) {
+                        System.out.println("\t Too near wrt last shift -> retrying later");
+                        currentDay = currentDay.plusDays(1);
+                        lastShiftEnd = -1;
+                        startTime = 8;
+                        continue;
+                    }*/
+
+                    if (!availability.isAvailable(currentDay, startTime, endTime, minShiftDuration)) {
                         startTime++;
                         continue;
                     }
@@ -131,7 +139,7 @@ public class ShiftProposalHandler {
         var w = new Worker("000", "", "", 'A', "", "", "");
         var x = new Worker("111", "", "", 'A', "", "", "");
         var y = new Worker("222", "", "", 'A', "", "", "");
-        var z = new Worker("333", "", "", 'B', "", "", "");
+        var z = new Worker("333", "", "", 'A', "", "", "");
         var sh = new ShiftProposalHandler(
                 List.of(w, x, y, z),
                 Map.of(
@@ -236,7 +244,7 @@ public class ShiftProposalHandler {
             this.totalHours = 0;
         }
 
-        public boolean isAvailable(LocalDate date, int startTime, int endTime) {
+        public boolean isAvailable(LocalDate date, int startTime, int endTime, int minimumGap) {
             System.out.println("[" + worker.getId() + "] Checking for availability" +
                     " of " + date + " (" + startTime + "-" + endTime + ")");
             for (var holidayPeriod : holidays) {
@@ -247,11 +255,20 @@ public class ShiftProposalHandler {
             }
 
             Boolean[] dayPlan = availability.get(date);
+
             for (var i = startTime; i < endTime; i++) {
                 /* Normalizza l'indice */
                 int idx = i - 8;
                 if (Boolean.FALSE.equals(dayPlan[idx])) {
                     System.out.println("\t Already busy");
+                    return false;
+                }
+            }
+
+            for (var i = Math.max(8, startTime - minimumGap); i < startTime; i++) {
+                int idx = i - 8;
+                if (Boolean.FALSE.equals(dayPlan[idx])) {
+                    System.out.println("\t Too near to another shift");
                     return false;
                 }
             }
