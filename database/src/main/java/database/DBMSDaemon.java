@@ -1487,7 +1487,7 @@ public class DBMSDaemon {
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public void recordExit(String id, LocalDate date, LocalTime exitTime) throws DBMSException {
-        recordExit(id, date, getLastShiftStart(id, date), exitTime);
+        recordExit(id, date, getLastMissingExitShiftStart(id, date), exitTime);
     }
 
     /**
@@ -1514,7 +1514,7 @@ public class DBMSDaemon {
     /**
      * Ritorna l'orario di inizio del turno più recente senza uscita.
      */
-    private LocalTime getLastShiftStart(String id, LocalDate date) throws DBMSException {
+    private LocalTime getLastMissingExitShiftStart(String id, LocalDate date) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
                 SELECT MIN(p2.refShiftStart) AS shiftStart
@@ -1535,6 +1535,65 @@ public class DBMSDaemon {
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
+    }
+
+    private LocalTime getLastShiftStart(String id, LocalDate date) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT MIN(shiftStart) AS shiftStart
+                FROM shift
+                WHERE refWorkerID = ?
+                AND shiftDate = ?
+                """)
+        ) {
+            st.setString(1, id);
+            st.setDate(2, Date.valueOf(date));
+            var resultSet = st.executeQuery();
+
+            var maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Dovrebbe esserci un solo minimo */
+
+            return LocalTime.parse(maps.get(0).get("shiftStart"));
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
+     * Registra la presenza al lavoro per il dipendente specificato nella data specificata.
+     * @param id la matricola del dipendente
+     * @param date la data in cui il dipendente risulterà presente
+     * @throws DBMSException
+     * @apiNote la presenza verrà registrata sul primo turno disponibile nella giornata
+     */
+    public void recordPresence(String id, LocalDate date) throws DBMSException {
+       try (
+               var st = connection.prepareStatement("""
+               INSERT INTO Presence(refShiftID, refShiftDate, refShiftStart, entryTime, exitTime)
+               VALUES (?, ?, ?, ( -- query per ottenere l'orario di inizio turno
+                                    SELECT shiftStart
+                                    FROM shift
+                                    WHERE refWorkerID = ? AND shiftDate = ? AND shiftStart = ?
+                                ), ( -- query per ottenere l'orario di fine turno
+                                    SELECT shiftEnd
+                                    FROM shift
+                                    WHERE refWorkerID = ? AND shiftDate = ? AND shiftStart = ?)
+                     )
+               """)
+       ) {
+           st.setString(1, id);
+           st.setDate(2, Date.valueOf(date));
+           st.setTime(3, Time.valueOf(getLastShiftStart(id, date)));
+           st.setString(4, id);
+           st.setDate(5, Date.valueOf(date));
+           st.setTime(6, Time.valueOf(getLastShiftStart(id, date)));
+           st.setString(7, id);
+           st.setDate(8, Date.valueOf(date));
+           st.setTime(9, Time.valueOf(getLastShiftStart(id, date)));
+           st.execute();
+       } catch (SQLException e) {
+           throw new DBMSException(e);
+       }
     }
 
     /**
