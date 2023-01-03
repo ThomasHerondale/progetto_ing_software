@@ -36,6 +36,12 @@ public class SalaryScreen extends LoggedScreen {
     @FXML
     private Label totSalary;
 
+    @FXML
+    private Label baseAmount;
+
+    @FXML
+    private Label rankAmount;
+
     private final ViewSalaryHandler viewSalaryHandler;
     private final AccountInfoHandler accountInfoHandler;
     private Map<HoursRecap, Double> salaryData;
@@ -45,7 +51,7 @@ public class SalaryScreen extends LoggedScreen {
         accountInfoHandler = new AccountInfoHandler();
         this.salaryData = salaryData;
     }
-    @Override
+    @FXML
     public void initialize(){
         super.initialize();
         IDLabel.setText(Session.getInstance().getWorker().getId());
@@ -55,7 +61,21 @@ public class SalaryScreen extends LoggedScreen {
         overtimeSalary.setText(String.valueOf(salaryData.entrySet().iterator().next().getKey().overtimeHours()));
         parentalLeaveSalary.setText(String.valueOf(salaryData.entrySet().iterator().next().getKey().parentalLeaveHours()));
         totSalary.setText(totSalary.getText() + " " + salaryData.entrySet().iterator().next().getValue());
+        baseAmount.setText("€ 150");
+        rankAmount.setText("€ " + getRankAmount());
     }
+
+    private String getRankAmount() {
+        char rank = Session.getInstance().getWorker().getRank();
+        switch (rank){
+            case 'A' -> {return "300";}
+            case 'B' -> {return "250";}
+            case 'C' -> {return "150";}
+            case 'D' -> {return "100";}
+            default -> {return "350";}
+        }
+    }
+
     @FXML
     public void clickBack(ActionEvent event) {
         viewSalaryHandler.clickedBack();

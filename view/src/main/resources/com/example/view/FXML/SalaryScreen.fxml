@@ -50,7 +50,7 @@
          </cursor>
       </Group>
       <Line endX="430.0" AnchorPane.leftAnchor="820.0" AnchorPane.rightAnchor="189.0" AnchorPane.topAnchor="224.0" />
-      <Label layoutX="823.0" layoutY="186.0" text="Salario" AnchorPane.leftAnchor="823.0" AnchorPane.topAnchor="186.0">
+      <Label layoutX="823.0" layoutY="186.0" text="Calcolo salario" AnchorPane.leftAnchor="823.0" AnchorPane.topAnchor="186.0">
          <font>
             <Font name="System Bold" size="24.0" />
          </font>
@@ -116,6 +116,26 @@
          </font>
       </Label>
       <Label fx:id="totSalary" layoutX="1057.0" layoutY="619.0" prefHeight="35.0" prefWidth="128.0" text="€" AnchorPane.rightAnchor="255.0" AnchorPane.topAnchor="619.0">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="843.0" layoutY="206.0" text="Stipendio base" AnchorPane.leftAnchor="823.0" AnchorPane.topAnchor="419.0">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="853.0" layoutY="216.0" text="Supplemento livello" AnchorPane.leftAnchor="823.0" AnchorPane.topAnchor="473.0">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <Label fx:id="baseAmount" alignment="CENTER_RIGHT" layoutX="1184.0" layoutY="286.0" prefHeight="35.0" prefWidth="128.0" text="0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="419.0">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label fx:id="rankAmount" alignment="CENTER_RIGHT" layoutX="1194.0" layoutY="296.0" prefHeight="35.0" prefWidth="128.0" text="0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="473.0">
          <font>
             <Font size="24.0" />
          </font>
