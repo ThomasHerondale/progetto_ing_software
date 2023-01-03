@@ -9,111 +9,72 @@ import java.time.LocalTime;
 import java.util.*;
 
 public class ShiftProposalHandler {
-    List<Worker> workers;
-    Map<Worker, List<Period>> holidays = Collections.emptyMap();
+    private List<Worker> workers;
+    private Map<Worker, List<Period>> holidays;
 
+    public List<Shift> shiftProposal;
 
-    LocalDate firstDayOfQuarter = LocalDate.of(2023, 1, 9);
+    private GeneralWeekAvailabilities generalAvailabilities;
 
-    public List<Shift> shiftProposal = new ArrayList<>();
+    private static final List<Character> rankList = List.of('A', 'B', 'C', 'D', 'H');
 
-    Map<LocalDate, Boolean[]> generalAvailabilityA = new HashMap<>();
-    Map<LocalDate, Boolean[]> generalAvailabilityB = new HashMap<>();
-    Map<LocalDate, Boolean[]> generalAvailabilityC = new HashMap<>();
-    Map<LocalDate, Boolean[]> generalAvailabilityD = new HashMap<>();
-    Map<LocalDate, Boolean[]> generalAvailabilityH = new HashMap<>();
-
-    public ShiftProposalHandler(List<Worker> workers, Map<Worker, List<Period>> holidays) {
-        this.holidays = holidays;
-        this.workers = workers;
-        for (var i = 0; i < 6; i++) {
-            Boolean[] booleans = new Boolean[14];
-            Arrays.fill(booleans, true);
-            generalAvailabilityA.put(firstDayOfQuarter.plusDays(i), booleans);
-        }
-        for (var i = 0; i < 6; i++) {
-            Boolean[] booleans = new Boolean[14];
-            Arrays.fill(booleans, true);
-            generalAvailabilityB.put(firstDayOfQuarter.plusDays(i), booleans);
-        }
-        for (var i = 0; i < 6; i++) {
-            Boolean[] booleans = new Boolean[14];
-            Arrays.fill(booleans, true);
-            generalAvailabilityC.put(firstDayOfQuarter.plusDays(i), booleans);
-        }
-        for (var i = 0; i < 6; i++) {
-            Boolean[] booleans = new Boolean[14];
-            Arrays.fill(booleans, true);
-            generalAvailabilityD.put(firstDayOfQuarter.plusDays(i), booleans);
-        }
-        for (var i = 0; i < 6; i++) {
-            Boolean[] booleans = new Boolean[14];
-            Arrays.fill(booleans, true);
-            generalAvailabilityH.put(firstDayOfQuarter.plusDays(i), booleans);
-        }
-    }
     public void computeNewShiftsProposal() {
         var rng = new Random(42);
-        var rankList = List.of('A', 'B', 'C', 'D', 'H');
 
         for (var rank : rankList) {
             List<Worker> filteredWorkers = new ArrayList<>(
                     workers.stream().filter(worker -> worker.getRank() == rank).toList()
             );
+
             for (var worker : filteredWorkers) {
-                System.out.println("----------------------" + worker.getId() + "" + worker.getRank());
+                System.out.println("***" + worker.getId() + " - " + worker.getRank() + "***");
+
                 int lastShiftEnd = -1;
                 int startTime = 8;
                 int minShiftDuration = 4;
                 int maxShiftDuration = 6;
-                var availability = new WorkerAvailability(worker, holidays.get(worker),
-                        LocalDate.of(2023, 1, 9));
 
-                var currentDay = firstDayOfQuarter;
+                var availability = new WorkerAvailability(
+                        worker,
+                        holidays.get(worker),
+                        LocalDate.of(2023, 1, 9) // TODO:
+                );
+
+                var currentDay = LocalDate.of(2023, 1, 9); // TODO:
+                var lastDayOfWeek = LocalDate.of(2023, 1, 9).plusDays(6);
                 while (availability.totalHours < 18) {
+                    System.out.println("Checking " + currentDay);
                     int shiftDuration = rng.nextInt(maxShiftDuration - minShiftDuration + 1) + minShiftDuration;
-                    System.out.println(currentDay);
-                    System.out.println("----- TOTHOURS " + availability.totalHours);
-                    System.out.println("----- STARTIME " + startTime);
                     int endTime = Math.min(startTime + shiftDuration, 22);
-                    System.out.println("_____ENDTIME" + endTime);
 
-                    if (currentDay.equals(firstDayOfQuarter.plusDays(6))) {
-                        System.out.println("End of week, retrying with smaller shifts");
-                        currentDay = firstDayOfQuarter;
+                    if (currentDay.equals(lastDayOfWeek)) {
+                        System.out.println("\t End of week -> retrying smaller shifts");
+                        currentDay = LocalDate.of(2023, 1, 9);
                         minShiftDuration = minShiftDuration / 2;
                         continue;
                     }
 
                     if (startTime < lastShiftEnd + minShiftDuration) {
-                        System.out.println(startTime + "<" + (lastShiftEnd + minShiftDuration) + " Too near -> going later");
-                        startTime++;
-                        continue;
-                    }
-
-                    if (startTime >= 22 - minShiftDuration) { // Forse senza l'uguale...
-                        System.out.println("Too short -> next day");
+                        System.out.println("\t Too near wrt last shift -> retrying later");
                         currentDay = currentDay.plusDays(1);
                         lastShiftEnd = -1;
                         startTime = 8;
                         continue;
                     }
 
-
                     if (!availability.isAvailable(currentDay, startTime, endTime)) {
-                        System.out.println("Unavailable");
                         startTime++;
                         continue;
                     }
 
-                    if (!isGenerallyAvailable(rank, currentDay, startTime, endTime)) {
-                        System.out.println("Already taken");
+                    if (!generalAvailabilities.isAvailable(rank, currentDay, startTime, endTime)) {
                         startTime++;
                         continue;
                     }
 
                     if (availability.totalHours + shiftDuration > 18) {
-                        System.out.println("Too late -> next day");
+                        // TODO: che cazzo è?
+                        System.out.println("\tToo late to find a shift -> retrying next day");
                         currentDay = currentDay.plusDays(1);
                         lastShiftEnd = -1;
                         startTime = 8;
@@ -121,7 +82,8 @@ public class ShiftProposalHandler {
                     }
 
                     if (availability.totalHours + shiftDuration < minShiftDuration) {
-                        System.out.println("Too little space remaining -> next day");
+                        // TODO: che cazzo è?
+                        System.out.println("\tToo little space remaining -> retrying next day");
                         currentDay = currentDay.plusDays(1);
                         lastShiftEnd = -1;
                         startTime = 8;
@@ -129,153 +91,190 @@ public class ShiftProposalHandler {
                     }
 
                     if (startTime == endTime) {
-                        System.out.println("Start time can't be equal to end time");
+                        System.out.println("\t Start time can't be equal to end time -> retrying next" +
+                                " day");
                         currentDay = currentDay.plusDays(1);
                         lastShiftEnd = -1;
                         startTime = 8;
                         continue;
                     }
 
-                    var shift = new Shift(worker,
+                    var shift = new Shift(
+                            worker,
                             worker.getRank(),
                             currentDay,
                             LocalTime.of(startTime, 0),
-                            LocalTime.of(endTime, 0));
-                    setGeneralAvailability(rank, currentDay, startTime, endTime);
-                    shiftProposal.add(shift);
+                            LocalTime.of(endTime, 0)
+                    );
 
+                    generalAvailabilities.setAvailability(rank, currentDay, startTime, endTime);
                     availability.setAvailability(currentDay, startTime, endTime);
                     availability.totalHours += (endTime - startTime);
+
+                    shiftProposal.add(shift);
+
                     lastShiftEnd = endTime;
-                    startTime = lastShiftEnd;
-                    System.out.println("Tot. hours:" + availability.totalHours);
+                    startTime = endTime;
+
                     for (var s : shiftProposal) {
                         System.out.println(s.getOwner().getId() + " : " + s.getDate() + "  " + s.getStartTime() + "   " +
                                 s.getEndTime() + "  r: " + s.getRank());
                     }
                 }
+
+                System.out.println(worker.getId() + " tot. hours: " + availability.totalHours);
             }
         }
     }
 
-        public void setGeneralAvailability(char rank, LocalDate date, int startTime, int endTime) {
+    public static void main(String[] args) {
+        var w = new Worker("000", "", "", 'A', "", "", "");
+        var x = new Worker("111", "", "", 'A', "", "", "");
+        var y = new Worker("222", "", "", 'A', "", "", "");
+        var z = new Worker("333", "", "", 'B', "", "", "");
+        var sh = new ShiftProposalHandler(
+                List.of(w, x, y, z),
+                Map.of(
+                        w, List.of(),
+                        x, List.of(),
+                        y, List.of(),
+                        z, List.of()
+                )
+        );
+        sh.computeNewShiftsProposal();
+    }
 
+    public ShiftProposalHandler(List<Worker> workers, Map<Worker, List<Period>> holidays) {
+        this.workers = workers;
+        this.holidays = holidays;
+        this.shiftProposal = new ArrayList<>();
+        this.generalAvailabilities = new GeneralWeekAvailabilities(
+                LocalDate.of(2023, 1, 9)
+        );
+    }
+
+    private static class GeneralWeekAvailabilities {
+        public Map<LocalDate, Boolean[]> a;
+        public Map<LocalDate, Boolean[]> b;
+        public Map<LocalDate, Boolean[]> c;
+        public Map<LocalDate, Boolean[]> d;
+        public Map<LocalDate, Boolean[]> h;
+        private final LocalDate firstDayOfWeek;
+
+        public GeneralWeekAvailabilities(LocalDate firstDayOfWeek) {
+            this.firstDayOfWeek = firstDayOfWeek;
+            a = initializeAvailabilities();
+            b = initializeAvailabilities();
+            c = initializeAvailabilities();
+            d = initializeAvailabilities();
+            h = initializeAvailabilities();
+        }
+
+        public boolean isAvailable(char rank, LocalDate date, int startTime, int endTime) {
+            var availability = selectAvailability(rank);
+            Boolean[] dayPlan = availability.get(date);
+
+            for (var i = startTime; i < endTime; i++) {
+                /* Normalizza l'indice */
+                int idx = i - 8;
+                if (Boolean.FALSE.equals(dayPlan[idx]))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public void setAvailability(char rank, LocalDate date, int startTime, int endTime) {
             Boolean[] dayPlan = switch (rank) {
-                case 'A' -> generalAvailabilityA.get(date);
-                case 'B' -> generalAvailabilityB.get(date);
-                case 'C' -> generalAvailabilityC.get(date);
-                case 'D' -> generalAvailabilityD.get(date);
-                case 'H' -> generalAvailabilityH.get(date);
-                default -> throw new IllegalStateException("Unexpected value: " + rank);
+                case 'A' -> a.get(date);
+                case 'B' -> b.get(date);
+                case 'C' -> c.get(date);
+                case 'D' -> d.get(date);
+                case 'H' -> h.get(date);
+                default -> throw new IllegalArgumentException();
             };
             for (var i = startTime; i < endTime; i++) {
                 var idx = i - 8;
                 dayPlan[idx] = false;
             }
-            //generalAvailability.forEach((e, v) -> System.out.println(Arrays.toString(v)));
         }
 
-    public boolean isGenerallyAvailable(char rank, LocalDate date, int startTime, int endTime) {
-
-        // Check if the worker has already been assigned a shift at the specified time
-        Boolean[] dayPlan = switch (rank) {
-            case 'A' -> generalAvailabilityA.get(date);
-            case 'B' -> generalAvailabilityB.get(date);
-            case 'C' -> generalAvailabilityC.get(date);
-            case 'D' -> generalAvailabilityD.get(date);
-            case 'H' -> generalAvailabilityH.get(date);
-            default -> throw new IllegalStateException("Unexpected value: " + rank);
-        };
-        for (var i = startTime; i < endTime; i++) {
-            /* Normalizza l'indice */
-            int idx = i - 8;
-            if (Boolean.FALSE.equals(dayPlan[idx]))
-                return false;
+        private Map<LocalDate, Boolean[]> selectAvailability(char rank) {
+            return switch (rank) {
+                case 'A' -> a;
+                case 'B' -> b;
+                case 'C' -> c;
+                case 'D' -> d;
+                case 'H' -> h;
+                default -> throw new IllegalArgumentException();
+            };
         }
 
-        // If the worker has not requested a leave and is not already assigned a shift, return true
-        return true;
-    }
-
-        public static void main(String[] args) {
-/*        var weekStart = LocalDate.of(2023, 1, 2);
-        var date = LocalDate.of(2023, 1, 5);
-        var d = new WorkerAvailability(w, List.of(
-                new Period(LocalDate.of(2023, 1, 9),
-                        LocalDate.of(2023, 1, 13))),
-                LocalDate.of(2023, 1, 9));
-        System.out.println(d.isAvailable(LocalDate.of(2023, 1, 13), 8, 12));*/
-            var w = new Worker("098", "", "", 'A', "", "", "");
-            var x = new Worker("678", "", "", 'B', "", "", "");
-            var y = new Worker("123", "", "", 'A', "", "", "");
-            var z = new Worker("000", "", "", 'B', "", "", "");
-            var q = new Worker("888", "", "", 'C', "", "", "");
-            var sh = new ShiftProposalHandler(List.of(w, x, y, z, q), Map.of(x, List.of()/*List.<Period>of(
-                    new Period(LocalDate.of(2023, 1, 9),
-                            LocalDate.of(2023, 1, 9)))*/, w, List.of(), y, List.of(), z, List.of(), q, List.of())
-            );
-        sh.computeNewShiftsProposal();
-        }
-
-    private static class WorkerAvailability {
-        Worker worker;
-        Map<LocalDate, Boolean[]> availability;
-        int totalHours;
-        List<Period> holidays;
-
-        LocalDate weekStart;
-
-        // startDate è la data di inizio della settimana, inclusa i.e. la data del lunedì
-        public WorkerAvailability(Worker worker, List<Period> holidays, LocalDate startDate) {
-            this.worker = worker;
-            this.availability = new HashMap<>();
-            this.totalHours = 0;
-            this.holidays = holidays;
-            this.weekStart = startDate;
-
+        private Map<LocalDate, Boolean[]> initializeAvailabilities() {
+            Map<LocalDate, Boolean[]> availability = new HashMap<>();
             for (var i = 0; i < 6; i++) {
                 Boolean[] booleans = new Boolean[14];
                 Arrays.fill(booleans, true);
-                availability.put(startDate.plusDays(i), booleans);
+                availability.put(firstDayOfWeek.plusDays(i), booleans);
             }
-        }
-
-
-
-            public boolean isAvailable(LocalDate date, int startTime, int endTime) {
-                if (startTime > 24)
-                    System.exit(1);
-                System.out.println("Checking availability of " + date + "--" + startTime + " " + endTime);
-                for (var holidayPeriod : holidays) {
-                    if (holidayPeriod.comprehends(date)) {
-                        System.out.println("HOLIDAY");
-                        return false;
-                    }
-
-                }
-
-
-
-                // Check if the worker has already been assigned a shift at the specified time
-                Boolean[] dayPlan = availability.get(date);
-                //System.out.println("Getting ----" + date);
-                for (var i = startTime; i < endTime; i++) {
-                    /* Normalizza l'indice */
-                    int idx = i - 8;
-                    if (Boolean.FALSE.equals(dayPlan[idx]))
-                        return false;
-                }
-
-                // If the worker has not requested a leave and is not already assigned a shift, return true
-                return true;
-            }
-
-            public void setAvailability(LocalDate date, int startTime, int endTime) {
-                Boolean[] dayPlan = availability.get(date);
-                for (var i = startTime; i < endTime; i++) {
-                    var idx = i - 8;
-                    dayPlan[idx] = false;
-                }
-            }
+            return availability;
         }
     }
+
+    private static class WorkerAvailability {
+        private Worker worker;
+        private List<Period> holidays;
+        private LocalDate firstDayOfWeek;
+        private Map<LocalDate, Boolean[]> availability;
+        int totalHours;
+
+        public WorkerAvailability(Worker worker, List<Period> holidays, LocalDate firstDayOfWeek) {
+            this.worker = worker;
+            this.holidays = holidays;
+            this.firstDayOfWeek = firstDayOfWeek;
+            this.availability = initializeAvailabilities();
+            this.totalHours = 0;
+        }
+
+        public boolean isAvailable(LocalDate date, int startTime, int endTime) {
+            System.out.println("[" + worker.getId() + "] Checking for availability" +
+                    " of " + date + " (" + startTime + "-" + endTime + ")");
+            for (var holidayPeriod : holidays) {
+                if (holidayPeriod.comprehends(date)) {
+                    System.out.println("\t Holiday");
+                    return false;
+                }
+            }
+
+            Boolean[] dayPlan = availability.get(date);
+            for (var i = startTime; i < endTime; i++) {
+                /* Normalizza l'indice */
+                int idx = i - 8;
+                if (Boolean.FALSE.equals(dayPlan[idx])) {
+                    System.out.println("\t Already busy");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public void setAvailability(LocalDate date, int startTime, int endTime) {
+            Boolean[] dayPlan = availability.get(date);
+            for (var i = startTime; i < endTime; i++) {
+                var idx = i - 8;
+                dayPlan[idx] = false;
+            }
+        }
+
+        private Map<LocalDate, Boolean[]> initializeAvailabilities() {
+            Map<LocalDate, Boolean[]> newAvailability = new HashMap<>();
+            for (var i = 0; i < 6; i++) {
+                Boolean[] booleans = new Boolean[14];
+                Arrays.fill(booleans, true);
+                newAvailability.put(firstDayOfWeek.plusDays(i), booleans);
+            }
+            return newAvailability;
+        }
+    }
+}
