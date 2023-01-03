@@ -178,6 +178,9 @@ public class PresenceScreen extends LoggedScreen{
         Label idLabel = new Label(id);
         Label fullNameLabel = new Label(fullName);
         Label rankLabel = new Label("Livello " + rank);
+        if (rank.equals("H")){
+            rankLabel.setText("Admin");
+        }
         Label entryTimeLabel = new Label(entryTime);
         Circle greenCircle = new Circle();
         greenCircle.setRadius(10);

@@ -83,7 +83,7 @@
                   <Font size="15.0" />
                </font>
             </CheckBox>
-            <CheckBox fx:id="rankH" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onFilterClick" text="H" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="141.0">
+            <CheckBox fx:id="rankH" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onFilterClick" text="Admin" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="141.0">
                <font>
                   <Font size="15.0" />
                </font>
