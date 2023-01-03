@@ -753,10 +753,11 @@ public class DBMSDaemon {
                 if (!statusMap.containsKey(worker.getId()))
                     statusMap.put(worker.getId(), FREE);
             }
-
-            assert statusMap.size() == workers.size();
             System.out.println(statusMap);
             System.out.println(workers);
+
+            assert statusMap.size() == workers.size();
+
             return statusMap;
         } catch (SQLException e) {
             throw new DBMSException(e);
