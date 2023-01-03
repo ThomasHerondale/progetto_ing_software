@@ -51,7 +51,7 @@ public class ShiftProposalHandler {
                 int endTime = Math.min(startTime + shiftDuration, 22);
                 System.out.println("_____ENDTIME" + endTime);
 
-                if (currentDay.equals(firstDayOfQuarter.plusDays(5))) {
+                if (currentDay.equals(firstDayOfQuarter.plusDays(6))) {
                     System.out.println("End of week, retrying with smaller shifts");
                     currentDay = firstDayOfQuarter;
                     minShiftDuration = minShiftDuration / 2;
@@ -163,9 +163,10 @@ public class ShiftProposalHandler {
         System.out.println(d.isAvailable(LocalDate.of(2023, 1, 13), 8, 12));*/
             var w = new Worker("098", "", "", 'A', "", "", "");
             var x = new Worker("678", "", "", 'A', "", "", "");
-            var sh = new ShiftProposalHandler(List.of(w, x), Map.of(x, List.<Period>of(
+            var y = new Worker("123", "", "", 'A', "", "", "");
+            var sh = new ShiftProposalHandler(List.of(w, x, y), Map.of(x, List.<Period>of(
                     new Period(LocalDate.of(2023, 1, 9),
-                            LocalDate.of(2023, 1, 9))), w, List.<Period>of())
+                            LocalDate.of(2023, 1, 9))), w, List.<Period>of(), y, List.of())
             );
         sh.computeNewShiftsProposal();
         }
@@ -196,8 +197,8 @@ public class ShiftProposalHandler {
 
 
             public boolean isAvailable(LocalDate date, int startTime, int endTime) {
-            if (startTime > 24)
-                System.exit(1);
+                if (startTime > 24)
+                    System.exit(1);
                 System.out.println("Checking availability of " + date + "--" + startTime + " " + endTime);
                 for (var holidayPeriod : holidays) {
                     if (holidayPeriod.comprehends(date))
