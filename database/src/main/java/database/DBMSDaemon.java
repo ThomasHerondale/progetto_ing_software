@@ -1596,10 +1596,6 @@ public class DBMSDaemon {
        }
     }
 
-    public static void main(String[] args) throws DBMSException {
-        DBMSDaemon.getInstance().recordPresence("0233454", LocalDate.parse("2023-01-13"));
-    }
-
     /**
      * Ottiene dal database la lista dei lavoratori presenti al lavoro (i.e. entrati ma non usciti)
      * nella data specificata.
