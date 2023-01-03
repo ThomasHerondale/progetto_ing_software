@@ -33,6 +33,9 @@ public class PresenceScreen extends LoggedScreen{
     private CheckBox rankD;
 
     @FXML
+    private CheckBox rankH;
+
+    @FXML
     private TextField searchBar;
 
     @FXML
@@ -67,6 +70,7 @@ public class PresenceScreen extends LoggedScreen{
         rankB.setSelected(true);
         rankC.setSelected(true);
         rankD.setSelected(true);
+        rankH.setSelected(true);
         insertAllPresencesCard(presences);
     }
 
@@ -142,7 +146,7 @@ public class PresenceScreen extends LoggedScreen{
     public void clickSearch(MouseEvent event) {
         presencesFilter.clear();
         presencesFilter = showPresencesHandler.clickedSearch(searchBar.getText(), presences, rankA.isSelected(),
-                rankB.isSelected(), rankC.isSelected(), rankD.isSelected());
+                rankB.isSelected(), rankC.isSelected(), rankD.isSelected(), rankH.isSelected());
         updateCardsPane(presencesFilter);
     }
 
@@ -150,7 +154,7 @@ public class PresenceScreen extends LoggedScreen{
     public void onFilterClick(ActionEvent event) {
         presencesFilter.clear();
         presencesFilter = showPresencesHandler.clickedSearch(searchBar.getText(), presences, rankA.isSelected(),
-                rankB.isSelected(), rankC.isSelected(), rankD.isSelected());
+                rankB.isSelected(), rankC.isSelected(), rankD.isSelected(), rankH.isSelected());
         updateCardsPane(presencesFilter);
     }
 

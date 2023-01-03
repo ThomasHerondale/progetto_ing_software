@@ -15,7 +15,6 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-
 <AnchorPane prefHeight="800.0" prefWidth="1440.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.view.PresenceScreen">
    <children>
       <Button fx:id="backButton" layoutX="20.0" layoutY="20.0" mnemonicParsing="false" onAction="#clickBack" prefHeight="46.0" prefWidth="128.0" style="-fx-background-color: #d9d9d9; -fx-background-radius: 6;" text="Indietro">
@@ -56,7 +55,7 @@
             </ImageView>
          </children>
       </AnchorPane>
-      <AnchorPane prefHeight="153.0" prefWidth="200.0" style="-fx-background-color: #d9d9d9; -fx-background-radius: 10;" AnchorPane.leftAnchor="83.0" AnchorPane.rightAnchor="1157.0" AnchorPane.topAnchor="181.0">
+      <AnchorPane prefHeight="183.0" prefWidth="200.0" style="-fx-background-color: #d9d9d9; -fx-background-radius: 10;" AnchorPane.leftAnchor="83.0" AnchorPane.rightAnchor="1157.0" AnchorPane.topAnchor="181.0">
          <children>
             <Label text="Livello" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="19.0">
                <font>
@@ -80,6 +79,11 @@
                </font>
             </CheckBox>
             <CheckBox fx:id="rankD" mnemonicParsing="false" onAction="#onFilterClick" text="D" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="118.0">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </CheckBox>
+            <CheckBox fx:id="rankH" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onFilterClick" text="H" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="141.0">
                <font>
                   <Font size="15.0" />
                </font>
