@@ -1647,7 +1647,7 @@ public class DBMSDaemon {
      * Registra la presenza al lavoro per il dipendente specificato nella data specificata.
      * @param id la matricola del dipendente
      * @param date la data in cui il dipendente risulterà presente
-     * @throws DBMSException
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      * @apiNote la presenza verrà registrata sul primo turno disponibile nella giornata
      */
     public void recordPresence(String id, LocalDate date) throws DBMSException {
@@ -1717,13 +1717,14 @@ public class DBMSDaemon {
     public List<Worker> getAbsentWorkersList(LocalDate date) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
-                SELECT W.ID, W.workerName, W.workerSurname, W.telNumber, W.email, W.IBAN, W.workerRank
+                SELECT DISTINCT W.ID, W.workerName, W.workerSurname, W.telNumber, W.email, W.IBAN, W.workerRank
                 FROM Worker W join Shift S1 on (W.ID = S1.refWorkerID)
-                WHERE S1.shiftDate = ? and W.ID NOT IN (
-                                            SELECT S2.refWorkerID
-                                            FROM Shift S2 join Presence P on (S2.refWorkerID = P.refShiftID and
-                                            S2.shiftDate = P.refShiftDate and S2.shiftStart = P.refShiftStart)
-                                            WHERE S2.shiftDate = S1.shiftDate)
+                WHERE S1.shiftDate = ? AND NOT EXISTS(
+                                                     SELECT *
+                                                     FROM presence
+                                                     WHERE refShiftID = S1.refWorkerID AND
+                                                     refShiftStart = S1.shiftStart AND
+                                                     refShiftDate = S1.shiftDate)
                 """)
         ) {
             st.setDate(1, Date.valueOf(date));
