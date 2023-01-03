@@ -1638,6 +1638,7 @@ public class DBMSDaemon {
             var maps = extractResults(resultSet);
             assert maps.size() == 1; /* Dovrebbe esserci un solo minimo */
 
+            System.out.println(LocalTime.parse(maps.get(0).get("shiftStart")));
             return LocalTime.parse(maps.get(0).get("shiftStart"));
         } catch (SQLException e) {
             throw new DBMSException(e);
