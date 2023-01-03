@@ -84,7 +84,7 @@ public class WorkersRecapHandler {
         Predicate<Worker> searchFilter = digitedText.isEmpty() ?
                 worker -> true
                 :
-                worker -> worker.getFullName().contains(digitedText);
+                worker -> worker.getFullName().concat(worker.getId()).contains(digitedText);
 
         List<Worker> list = workersList
                 .stream()
