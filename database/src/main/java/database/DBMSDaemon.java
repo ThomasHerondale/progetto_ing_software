@@ -2,6 +2,7 @@ package database;
 
 import commons.HoursRecap;
 import commons.Period;
+import commons.WorkerStatus;
 import entities.Shift;
 import entities.Worker;
 
@@ -11,6 +12,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+
+import static commons.WorkerStatus.*;
 
 public class DBMSDaemon {
     private Connection connection;
@@ -671,6 +674,91 @@ public class DBMSDaemon {
             }
 
             return workers;
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
+     * Ottiene lo stato attuale di tutti i dipendenti dell'azienda.
+     * @param date la data di riferimento
+     * @return una mappa di coppie (id, status)
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public Map<String, WorkerStatus> getWorkersStatus(LocalDate date) throws DBMSException {
+        try (
+                var strikeSt = connection.prepareStatement("""
+                SELECT strikeparticipation.refWorkerID
+                FROM strikeparticipation
+                WHERE refStrikeDate = ?
+                """);
+                var abstSt = connection.prepareStatement("""
+                SELECT refWorkerID, startDate, endDate, type
+                FROM abstention
+                WHERE endDate > ?
+                """);
+                var presSt = connection.prepareStatement("""
+                SELECT refShiftID
+                FROM presence
+                WHERE refShiftDate = ? AND exitTime IS NULL
+                """)
+        ) {
+            var workers = getWorkersList();
+
+            strikeSt.setDate(1, Date.valueOf(date));
+            abstSt.setDate(1, Date.valueOf(date));
+            presSt.setDate(1, Date.valueOf(date));
+
+            var strikeResultSet = strikeSt.executeQuery();
+            var abstResultSet = abstSt.executeQuery();
+            var presResultSet = presSt.executeQuery();
+
+            var strikeMaps = extractResults(strikeResultSet);
+            var abstentionMaps = extractResults(abstResultSet);
+            var presenceMaps = extractResults(presResultSet);
+
+            Map<String, WorkerStatus> statusMap = new HashMap<>(workers.size());
+
+            /* Imposta lo stato in sciopero per chi ha aderito a scioperi oggi */
+            for (var strikeMap : strikeMaps)
+                statusMap.put(strikeMap.get("refWorkerID"), STRIKING);
+
+            for (var abstentionMap : abstentionMaps) {
+                /* Estrai la data di inizio e di fine del periodo di astensione */
+                var start = LocalDate.parse(abstentionMap.get("startDate"));
+                var end = LocalDate.parse(abstentionMap.get("endDate"));
+
+                /* Se la data di oggi ricade in questo periodo */
+                if (Period.comprehends(start, end, date)) {
+                    /* Imposta lo stato in base al tipo di astensione */
+                    WorkerStatus status = switch (abstentionMap.get("type")) {
+                        case "Holiday", "Leave" -> ON_HOLIDAY;
+                        case "ParentalLeave" -> PARENTAL_LEAVE;
+                        case "Illness" -> ILL;
+                        default -> throw new AssertionError("Errore nel tipo di astensione del db.");
+                    };
+                    /* Ogni impiegato dovrebbe essere in astensione solo in un modo */
+                    assert !statusMap.containsKey(abstentionMap.get("refWorkerID"));
+                    statusMap.put(abstentionMap.get("refWorkerID"), status);
+                }
+            }
+
+            for (var presenceMap : presenceMaps) {
+                assert !statusMap.containsKey(presenceMap.get("refShiftID"));
+                statusMap.put(presenceMap.get("refShiftID"), WORKING);
+            }
+
+            /* Se non sono in nessuna delle precedenti, sono liberi */
+            for (var worker : workers) {
+                if (!statusMap.containsKey(worker.getId()))
+                    statusMap.put(worker.getId(), FREE);
+            }
+            System.out.println(statusMap);
+            System.out.println(workers);
+
+            assert statusMap.size() == workers.size();
+
+            return statusMap;
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
@@ -1441,6 +1529,34 @@ public class DBMSDaemon {
     }
 
     /**
+     * Registra l'ingresso al lavoro per il dipendente specificato, in una data e ad un'ora specifici.
+     * @param id la matricola del dipendente
+     * @param date la data di ingresso
+     * @param time l'ora di ingresso
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     * @apiNote l'ingresso viene registrato nel database relativamente al turno che inizia prima di tutti gli altri
+     */
+    public void recordEntrance(String id, LocalDate date, LocalTime time) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                INSERT INTO Presence(refShiftID, refShiftDate, refShiftStart, entryTime)
+                VALUES (?, ?, ?, ?)
+                """)
+        ) {
+            /* Ottieni l'orario di inizio del primo turno */
+            var startTime = getLastShiftStart(id, date);
+
+            st.setString(1, id);
+            st.setDate(2, Date.valueOf(date));
+            st.setTime(3, Time.valueOf(startTime));
+            st.setTime(4, Time.valueOf(time));
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
      * Registra automaticamente l'uscita per i turni specificati, settandola all'orario di fine del turno
      * stesso.
      * @param shifts i turni di cui registrare l'uscita
@@ -1459,7 +1575,7 @@ public class DBMSDaemon {
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public void recordExit(String id, LocalDate date, LocalTime exitTime) throws DBMSException {
-        recordExit(id, date, getLastShiftStart(id, date), exitTime);
+        recordExit(id, date, getLastMissingExitShiftStart(id, date), exitTime);
     }
 
     /**
@@ -1486,7 +1602,7 @@ public class DBMSDaemon {
     /**
      * Ritorna l'orario di inizio del turno più recente senza uscita.
      */
-    private LocalTime getLastShiftStart(String id, LocalDate date) throws DBMSException {
+    private LocalTime getLastMissingExitShiftStart(String id, LocalDate date) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
                 SELECT MIN(p2.refShiftStart) AS shiftStart
@@ -1507,6 +1623,71 @@ public class DBMSDaemon {
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
+    }
+
+    private LocalTime getLastShiftStart(String id, LocalDate date) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT MIN(shiftStart) AS shiftStart
+                FROM shift
+                WHERE refWorkerID = ?
+                AND shiftDate = ? AND NOT EXISTS(
+                                                 SELECT *
+                                                 FROM presence
+                                                 WHERE refShiftID = refWorkerID AND
+                                                 refShiftDate = shiftDate AND
+                                                 refShiftStart = shiftStart
+                                                 )
+                """)
+        ) {
+            st.setString(1, id);
+            st.setDate(2, Date.valueOf(date));
+            var resultSet = st.executeQuery();
+
+            var maps = extractResults(resultSet);
+            assert maps.size() <= 1; /* Dovrebbe esserci al più un solo minimo */
+
+            return LocalTime.parse(maps.get(0).get("shiftStart"));
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
+     * Registra la presenza al lavoro per il dipendente specificato nella data specificata.
+     * @param id la matricola del dipendente
+     * @param date la data in cui il dipendente risulterà presente
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     * @apiNote la presenza verrà registrata sul primo turno disponibile nella giornata
+     */
+    public void recordPresence(String id, LocalDate date) throws DBMSException {
+       try (
+               var st = connection.prepareStatement("""
+               INSERT INTO Presence(refShiftID, refShiftDate, refShiftStart, entryTime, exitTime)
+               VALUES (?, ?, ?, ( -- query per ottenere l'orario di inizio turno
+                                    SELECT shiftStart
+                                    FROM shift
+                                    WHERE refWorkerID = ? AND shiftDate = ? AND shiftStart = ?
+                                ), ( -- query per ottenere l'orario di fine turno
+                                    SELECT shiftEnd
+                                    FROM shift
+                                    WHERE refWorkerID = ? AND shiftDate = ? AND shiftStart = ?)
+                     )
+               """)
+       ) {
+           st.setString(1, id);
+           st.setDate(2, Date.valueOf(date));
+           st.setTime(3, Time.valueOf(getLastShiftStart(id, date)));
+           st.setString(4, id);
+           st.setDate(5, Date.valueOf(date));
+           st.setTime(6, Time.valueOf(getLastShiftStart(id, date)));
+           st.setString(7, id);
+           st.setDate(8, Date.valueOf(date));
+           st.setTime(9, Time.valueOf(getLastShiftStart(id, date)));
+           st.execute();
+       } catch (SQLException e) {
+           throw new DBMSException(e);
+       }
     }
 
     /**
@@ -1546,13 +1727,14 @@ public class DBMSDaemon {
     public List<Worker> getAbsentWorkersList(LocalDate date) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
-                SELECT W.ID, W.workerName, W.workerSurname, W.telNumber, W.email, W.IBAN, W.workerRank
+                SELECT DISTINCT W.ID, W.workerName, W.workerSurname, W.telNumber, W.email, W.IBAN, W.workerRank
                 FROM Worker W join Shift S1 on (W.ID = S1.refWorkerID)
-                WHERE S1.shiftDate = ? and W.ID NOT IN (
-                                            SELECT S2.refWorkerID
-                                            FROM Shift S2 join Presence P on (S2.refWorkerID = P.refShiftID and
-                                            S2.shiftDate = P.refShiftDate and S2.shiftStart = P.refShiftStart)
-                                            WHERE S2.shiftDate = S1.shiftDate)
+                WHERE S1.shiftDate = ? AND NOT EXISTS(
+                                                     SELECT *
+                                                     FROM presence
+                                                     WHERE refShiftID = S1.refWorkerID AND
+                                                     refShiftStart = S1.shiftStart AND
+                                                     refShiftDate = S1.shiftDate)
                 """)
         ) {
             st.setDate(1, Date.valueOf(date));
@@ -1633,6 +1815,6 @@ public class DBMSDaemon {
         }
         return true;
     }
-    
+
 
 }

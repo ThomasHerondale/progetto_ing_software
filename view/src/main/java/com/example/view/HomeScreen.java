@@ -25,12 +25,14 @@ public class HomeScreen extends LoggedScreen{
     private final ViewSalaryHandler viewSalaryHandler;
     private final ShiftHandler shiftHandler;
     private final ShowPresencesHandler showPresencesHandler;
+    private final WorkersRecapHandler workersRecapHandler;
 
     public HomeScreen(){
         accountInfoHandler = new AccountInfoHandler();
         viewSalaryHandler = new ViewSalaryHandler();
         shiftHandler = new ShiftHandler();
         showPresencesHandler = new ShowPresencesHandler();
+        workersRecapHandler = new WorkersRecapHandler();
     }
     @Override
     public void initialize(){
@@ -64,7 +66,7 @@ public class HomeScreen extends LoggedScreen{
 
     @FXML
     public void clickWorkers(MouseEvent event) {
-        //TODO:
+        workersRecapHandler.clickedWorkers();
     }
 
 }

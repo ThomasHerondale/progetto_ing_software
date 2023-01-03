@@ -27,7 +27,8 @@ public class ShowPresencesHandler {
     }
 
     public List<HashMap<String, String>> clickedSearch(String digitedText, List<HashMap<String, String>> presences,
-                                                       Boolean rankA, Boolean rankB, Boolean rankC, Boolean rankD) {
+                                                       Boolean rankA, Boolean rankB,
+                                                       Boolean rankC, Boolean rankD, Boolean rankH) {
         List<HashMap<String, String>> presencesFilter = new ArrayList<>();
         String shiftRank = "shiftRank";
         String workerName = "workerName";
@@ -51,6 +52,11 @@ public class ShowPresencesHandler {
                 }
                 if (rankD) {
                     if (presence.get(shiftRank).equals("D")) {
+                        presencesFilter.add(presence);
+                    }
+                }
+                if (rankH) {
+                    if (presence.get(shiftRank).equals("H")){
                         presencesFilter.add(presence);
                     }
                 }
@@ -84,6 +90,14 @@ public class ShowPresencesHandler {
                 }
                 if (rankD) {
                     if (presence.get(shiftRank).equals("D") && (
+                            presence.get("ID").contains(digitedText) ||
+                                    presence.get(workerName).contains(digitedText) ||
+                                    presence.get(workerSurname).contains(digitedText))) {
+                        presencesFilter.add(presence);
+                    }
+                }
+                if (rankH) {
+                    if (presence.get(shiftRank).equals("H") && (
                             presence.get("ID").contains(digitedText) ||
                                     presence.get(workerName).contains(digitedText) ||
                                     presence.get(workerSurname).contains(digitedText))) {

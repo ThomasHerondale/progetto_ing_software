@@ -199,13 +199,8 @@ public class ViewShiftsScreen extends LoggedScreen {
                 shiftCard.getChildren().get(0).setStyle("-fx-text-fill: white");
                 shiftCard.getChildren().get(1).setStyle("-fx-text-fill: white");
             }
-            shiftCard.setOnMouseClicked(mouseEvent -> {
-                try {
-                    new ViewShiftsInfoHandler().clickedShift(finalShift);
-                } catch (DBMSException e) {
-                    //TODO:
-                }
-            });
+            shiftCard.setOnMouseClicked(mouseEvent ->
+                    new ViewShiftsInfoHandler().clickedShift(finalShift));
         }
     }
 
