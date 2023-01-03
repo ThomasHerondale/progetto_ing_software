@@ -1,23 +1,29 @@
 package com.example.view;
 
+import commons.WorkerStatus;
 import database.DBMSDaemon;
 import database.DBMSException;
 import entities.Worker;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class WorkersRecapHandler {
     List<Worker> workersList;
+    Map<String, WorkerStatus> workersStatus;
     public void clickedWorkers(){
+        LocalDate currentDate = LocalDate.now();
         try {
             workersList = DBMSDaemon.getInstance().getWorkersList();
+            workersStatus = DBMSDaemon.getInstance().getWorkersStatus(currentDate);
         } catch (DBMSException e) {
             //TODO:
             throw new RuntimeException(e);
         }
         NavigationManager.getInstance().createScreen("Workers Recap",
-                controller -> new WorkersRecapScreen(workersList, this));
+                controller -> new WorkersRecapScreen(workersList, workersStatus, this));
     }
     public void clickedBack(){
         NavigationManager.getInstance().createScreen("Home (Admin)",
@@ -30,7 +36,8 @@ public class WorkersRecapHandler {
         System.out.println("prova");
     }
 
-    public List<Worker> clickedSearch(String digitedText, List<Worker> workersList, boolean rankA, boolean rankB,
+    public List<Worker> clickedSearch(String digitedText, List<Worker> workersList,
+                                      Map<String, WorkerStatus> workersStatus, boolean rankA, boolean rankB,
                                       boolean rankC, boolean rankD, boolean rankH, boolean workingStatus,
                                       boolean freeStatus, boolean onHolidayStatus, boolean illStatus,
                                       boolean strikingStatus, boolean parentalLeaveStatus) {

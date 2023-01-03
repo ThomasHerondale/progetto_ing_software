@@ -1,17 +1,20 @@
 package com.example.view;
 
+import commons.WorkerStatus;
+import database.DBMSDaemon;
 import entities.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class WorkersRecapScreen extends LoggedScreen{
 
@@ -72,13 +75,16 @@ public class WorkersRecapScreen extends LoggedScreen{
 
     private List<Worker> workersList;
     private List<Worker> workersFilter;
+    private Map<String, WorkerStatus> workersStatus;
     private final WorkersRecapHandler workersRecapHandler;
     private final AccountInfoHandler accountInfoHandler;
 
-    public WorkersRecapScreen(List<Worker> workersList, WorkersRecapHandler workersRecapHandler) {
+    public WorkersRecapScreen(List<Worker> workersList, Map<String, WorkerStatus> workersStatus, WorkersRecapHandler workersRecapHandler) {
         this.workersList = workersList;
         this.workersRecapHandler = workersRecapHandler;
         this.accountInfoHandler = new AccountInfoHandler();
+        workersFilter = new ArrayList<>();
+        this.workersStatus = workersStatus;
     }
     @FXML
     public void initialize(){
@@ -103,9 +109,8 @@ public class WorkersRecapScreen extends LoggedScreen{
             String id = workersList.get(i).getId();
             String fullName = workersList.get(i).getFullName();
             char rank = workersList.get(i).getRank();
-            //manca l'enum WorkerStatus per capire lo status del dipendente
-            String status = "";
-            String colorStatus = "#00FF38";
+            String status = workersStatus.get(id).getStringValue();
+            String colorStatus = workersStatus.get(id).getColorString();
             cardsPane.getChildren().add(i, createWorkerCard(id, fullName, rank, status, colorStatus));
             cardsPane.getChildren().get(i).setLayoutY(computeLayoutY(i));
             cardsPane.getChildren().get(i).setLayoutX(24);
@@ -129,6 +134,9 @@ public class WorkersRecapScreen extends LoggedScreen{
         Label idLabel = new Label(id);
         Label fullNameLabel = new Label(fullName);
         Label rankLabel = new Label("Livello " + rank);
+        if (rank == 'H'){
+            rankLabel = new Label("Admin");
+        }
         Label statusLabel = new Label (status);
         Circle circle = new Circle();
         circle.setRadius(10);
@@ -159,6 +167,7 @@ public class WorkersRecapScreen extends LoggedScreen{
         workerCard.getChildren().add(indexChildren, statusLabel);
         workerCard.getChildren().get(indexChildren).setLayoutX(506);
         workerCard.getChildren().get(indexChildren).setLayoutY(28);
+        workerCard.getChildren().get(indexChildren).setStyle("-fx-text-fill: white");
 
         workerCard.setStyle("-fx-background-color: #313146");
         workerCard.getStylesheets().add(String.valueOf(getClass().getResource("css/styleWorkerCard.css")));
@@ -217,7 +226,7 @@ public class WorkersRecapScreen extends LoggedScreen{
     @FXML
     void clickSearch(MouseEvent event) {
         workersFilter.clear();
-        workersFilter = workersRecapHandler.clickedSearch(searchBar.getText(), workersList, rankABox.isSelected(),
+        workersFilter = workersRecapHandler.clickedSearch(searchBar.getText(), workersList, workersStatus, rankABox.isSelected(),
                 rankBBox.isSelected(), rankCBox.isSelected(), rankDBox.isSelected(), rankHBox.isSelected(),
                 workingStatus.isSelected(), freeStatus.isSelected(), onHolidayStatus.isSelected(),
                 illStatus.isSelected(), strikingStatus.isSelected(), parentalLeaveStatus.isSelected());
@@ -228,7 +237,7 @@ public class WorkersRecapScreen extends LoggedScreen{
     @FXML
     void onFilterClick(ActionEvent event) {
         workersFilter.clear();
-        workersFilter = workersRecapHandler.clickedSearch(searchBar.getText(), workersList, rankABox.isSelected(),
+        workersFilter = workersRecapHandler.clickedSearch(searchBar.getText(), workersList, workersStatus, rankABox.isSelected(),
                 rankBBox.isSelected(), rankCBox.isSelected(), rankDBox.isSelected(), rankHBox.isSelected(),
                 workingStatus.isSelected(), freeStatus.isSelected(), onHolidayStatus.isSelected(),
                 illStatus.isSelected(), strikingStatus.isSelected(), parentalLeaveStatus.isSelected());
