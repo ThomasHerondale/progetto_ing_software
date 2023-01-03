@@ -7,9 +7,11 @@ import entities.Worker;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static commons.WorkerStatus.*;
@@ -87,12 +89,14 @@ public class WorkersRecapHandler {
                 :
                 worker -> worker.getFullName().contains(digitedText);
 
-        return workersList
+        List<Worker> list = workersList
                 .stream()
                 .filter(worker -> rankFilters.contains(worker.getRank()))
                 .filter(worker -> workersStatusCopy.containsKey(worker.getId()))
                 .filter(searchFilter)
                 .toList();
+
+        return new ArrayList<>(list);
     }
 
     /*public List<Worker> clickedSearch(String digitedText, List<Worker> workersList, boolean rankA, boolean rankB,
