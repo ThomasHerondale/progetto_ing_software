@@ -2,6 +2,7 @@ package database;
 
 import commons.HoursRecap;
 import commons.Period;
+import commons.WorkerStatus;
 import entities.Shift;
 import entities.Worker;
 
@@ -11,6 +12,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+
+import static commons.WorkerStatus.*;
 
 public class DBMSDaemon {
     private Connection connection;
@@ -671,6 +674,87 @@ public class DBMSDaemon {
             }
 
             return workers;
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
+     * Ottiene lo stato attuale di tutti i dipendenti dell'azienda.
+     * @param date la data di riferimento
+     * @return una mappa di coppie (id, status)
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public Map<String, WorkerStatus> getWorkersStatus(LocalDate date) throws DBMSException {
+        try (
+                var strikeSt = connection.prepareStatement("""
+                SELECT strikeparticipation.refWorkerID
+                FROM strikeparticipation
+                WHERE refStrikeDate = ?
+                """);
+                var abstSt = connection.prepareStatement("""
+                SELECT refWorkerID, startDate, endDate, type
+                FROM abstention
+                WHERE endDate > ?
+                """);
+                var presSt = connection.prepareStatement("""
+                SELECT refShiftID
+                FROM presence
+                WHERE refShiftDate = ? AND exitTime IS NULL
+                """)
+        ) {
+            var workers = getWorkersList();
+
+            strikeSt.setDate(1, Date.valueOf(date));
+            abstSt.setDate(1, Date.valueOf(date));
+            presSt.setDate(1, Date.valueOf(date));
+
+            var strikeResultSet = strikeSt.executeQuery();
+            var abstResultSet = abstSt.executeQuery();
+            var presResultSet = presSt.executeQuery();
+
+            var strikeMaps = extractResults(strikeResultSet);
+            var abstentionMaps = extractResults(abstResultSet);
+            var presenceMaps = extractResults(presResultSet);
+
+            Map<String, WorkerStatus> statusMap = new HashMap<>(workers.size());
+
+            /* Imposta lo stato in sciopero per chi ha aderito a scioperi oggi */
+            for (var strikeMap : strikeMaps)
+                statusMap.put(strikeMap.get("refWorkerID"), STRIKING);
+
+            for (var abstentionMap : abstentionMaps) {
+                /* Estrai la data di inizio e di fine del periodo di astensione */
+                var start = LocalDate.parse(abstentionMap.get("startDate"));
+                var end = LocalDate.parse(abstentionMap.get("endDate"));
+
+                /* Se la data di oggi ricade in questo periodo */
+                if (Period.comprehends(start, end, date)) {
+                    /* Imposta lo stato in base al tipo di astensione */
+                    WorkerStatus status = switch (abstentionMap.get("type")) {
+                        case "Holiday", "Leave" -> ON_HOLIDAY;
+                        case "ParentalLeave" -> PARENTAL_LEAVE;
+                        case "Illness" -> ILL;
+                    };
+                    /* Ogni impiegato dovrebbe essere in astensione solo in un modo */
+                    assert !statusMap.containsKey(abstentionMap.get("refWorkerID"));
+                    statusMap.put(abstentionMap.get("refWorkerID"), status);
+                }
+            }
+
+            for (var presenceMap : presenceMaps) {
+                assert !statusMap.containsKey(presenceMap.get("refWorkerID"));
+                statusMap.put(presenceMap.get("refWorkerID"), WORKING);
+            }
+
+            /* Se non sono in nessuna delle precedenti, sono liberi */
+            for (var worker : workers) {
+                if (!statusMap.containsKey(worker.getId()))
+                    statusMap.put(worker.getId(), FREE);
+            }
+
+            assert statusMap.size() == workers.size();
+            return statusMap;
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
