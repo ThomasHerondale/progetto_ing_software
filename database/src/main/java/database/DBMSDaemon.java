@@ -1441,6 +1441,34 @@ public class DBMSDaemon {
     }
 
     /**
+     * Registra l'ingresso al lavoro per il dipendente specificato, in una data e ad un'ora specifici.
+     * @param id la matricola del dipendente
+     * @param date la data di ingresso
+     * @param time l'ora di ingresso
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     * @apiNote l'ingresso viene registrato nel database relativamente al turno che inizia prima di tutti gli altri
+     */
+    public void recordEntrance(String id, LocalDate date, LocalTime time) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                INSERT INTO Presence(refShiftID, refShiftDate, refShiftStart, entryTime)
+                VALUES (?, ?, ?, ?)
+                """)
+        ) {
+            /* Ottieni l'orario di inizio del primo turno */
+            var startTime = getLastShiftStart(id, date);
+
+            st.setString(1, id);
+            st.setDate(2, Date.valueOf(date));
+            st.setTime(3, Time.valueOf(startTime));
+            st.setTime(4, Time.valueOf(time));
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
      * Registra automaticamente l'uscita per i turni specificati, settandola all'orario di fine del turno
      * stesso.
      * @param shifts i turni di cui registrare l'uscita
