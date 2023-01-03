@@ -33,13 +33,11 @@ public class InsertPresenceHandler {
                 controller -> new ConfirmPopup(ConfirmAction.PRESENCE, worker, currentDate, this));
     }
     public void clickedConfirm(){
-        /*
         try {
-            DBMSDaemon.getInstance().recordPresence(worker, currentDate);
+            DBMSDaemon.getInstance().recordPresence(worker.getId(), currentDate);
         } catch (DBMSException e){
             //TODO:
         }
-         */
         NavigationManager.getInstance().closePopup("Confirm");
         NavigationManager.getInstance().closePopup("Insert Presence");
     }
