@@ -1628,7 +1628,12 @@ public class DBMSDaemon {
                 SELECT MIN(shiftStart) AS shiftStart
                 FROM shift
                 WHERE refWorkerID = ?
-                AND shiftDate = ?
+                AND shiftDate = ? AND NOT EXISTS(
+                                                 SELECT *
+                                                 FROM presence JOIN project.shift s
+                                                 ON s.refWorkerID = presence.refShiftID AND
+                                                 s.shiftDate = presence.refShiftDate AND
+                                                 s.shiftStart = presence.refShiftStart)
                 """)
         ) {
             st.setString(1, id);
@@ -1638,7 +1643,6 @@ public class DBMSDaemon {
             var maps = extractResults(resultSet);
             assert maps.size() == 1; /* Dovrebbe esserci un solo minimo */
 
-            System.out.println(LocalTime.parse(maps.get(0).get("shiftStart")));
             return LocalTime.parse(maps.get(0).get("shiftStart"));
         } catch (SQLException e) {
             throw new DBMSException(e);
@@ -1807,6 +1811,6 @@ public class DBMSDaemon {
         }
         return true;
     }
-    
+
 
 }
