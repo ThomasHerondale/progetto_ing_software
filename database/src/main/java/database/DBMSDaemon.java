@@ -753,8 +753,11 @@ public class DBMSDaemon {
                 if (!statusMap.containsKey(worker.getId()))
                     statusMap.put(worker.getId(), FREE);
             }
+            System.out.println(statusMap);
+            System.out.println(workers);
 
             assert statusMap.size() == workers.size();
+
             return statusMap;
         } catch (SQLException e) {
             throw new DBMSException(e);
@@ -1630,10 +1633,11 @@ public class DBMSDaemon {
                 WHERE refWorkerID = ?
                 AND shiftDate = ? AND NOT EXISTS(
                                                  SELECT *
-                                                 FROM presence JOIN project.shift s
-                                                 ON s.refWorkerID = presence.refShiftID AND
-                                                 s.shiftDate = presence.refShiftDate AND
-                                                 s.shiftStart = presence.refShiftStart)
+                                                 FROM presence
+                                                 WHERE refShiftID = refWorkerID AND
+                                                 refShiftDate = shiftDate AND
+                                                 refShiftStart = shiftStart
+                                                 )
                 """)
         ) {
             st.setString(1, id);
@@ -1641,7 +1645,7 @@ public class DBMSDaemon {
             var resultSet = st.executeQuery();
 
             var maps = extractResults(resultSet);
-            assert maps.size() == 1; /* Dovrebbe esserci un solo minimo */
+            assert maps.size() <= 1; /* Dovrebbe esserci al più un solo minimo */
 
             return LocalTime.parse(maps.get(0).get("shiftStart"));
         } catch (SQLException e) {
