@@ -9,6 +9,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
+import static commons.WorkerStatus.*;
 
 public class WorkersRecapHandler {
     List<Worker> workersList;
@@ -37,6 +41,61 @@ public class WorkersRecapHandler {
     }
 
     public List<Worker> clickedSearch(String digitedText, List<Worker> workersList, boolean rankA, boolean rankB,
+                                      boolean rankC, boolean rankD, boolean rankH, boolean workingStatus,
+                                      boolean freeStatus, boolean onHolidayStatus, boolean illStatus,
+                                      boolean strikingStatus, boolean parentalLeaveStatus) {
+        var workersStatusCopy = workersStatus;
+
+        /* Costruisci la lista dei filtri del livello */
+        List<Character> rankFilters = new ArrayList<>();
+        if (rankA)
+            rankFilters.add('A');
+        if (rankB)
+            rankFilters.add('B');
+        if (rankC)
+            rankFilters.add('C');
+        if (rankD)
+            rankFilters.add('D');
+        if (rankH)
+            rankFilters.add('H');
+
+        /* Filtra i dipendenti in base al livello */
+
+        /* Costruisci la lista dei filtri dello status */
+        List<WorkerStatus> statusFilters = new ArrayList<>();
+        if (workingStatus)
+            statusFilters.add(WORKING);
+        if (freeStatus)
+            statusFilters.add(FREE);
+        if (onHolidayStatus)
+            statusFilters.add(ON_HOLIDAY);
+        if (illStatus)
+            statusFilters.add(ILL);
+        if (strikingStatus)
+            statusFilters.add(STRIKING);
+        if (parentalLeaveStatus)
+            statusFilters.add(PARENTAL_LEAVE);
+
+        /* Filtra i dipendenti in base allo stato */
+        workersStatusCopy
+                .entrySet()
+                .removeIf(entry -> !statusFilters.contains(entry.getValue()));
+
+        /* Costruisci il filtro in base al testo cercato */
+        Predicate<Worker> searchFilter = digitedText.isEmpty() ?
+                worker -> true
+                :
+                worker -> worker.getFullName().contains(digitedText);
+
+        return workersList
+                .stream()
+                .filter(worker -> rankFilters.contains(worker.getRank()))
+                .filter(worker -> workersStatusCopy.containsKey(worker.getId()))
+                .filter(searchFilter)
+                .toList();
+    }
+
+    /*public List<Worker> clickedSearch(String digitedText, List<Worker> workersList, boolean rankA, boolean rankB,
                                       boolean rankC, boolean rankD, boolean rankH, boolean workingStatus,
                                       boolean freeStatus, boolean onHolidayStatus, boolean illStatus,
                                       boolean strikingStatus, boolean parentalLeaveStatus) {
@@ -85,7 +144,7 @@ public class WorkersRecapHandler {
                         workersFilter.add(worker);
                     }
                 }
-                /*
+                *//*
                 if (workingStatus){
                     if (workersStatus.get(worker.getId()).equals(WorkerStatus.WORKING)){
                         workersFilter.add(worker);
@@ -117,7 +176,7 @@ public class WorkersRecapHandler {
                     }
                 }
 
-                 */
+                 *//*
             }
         } else {
             for (Worker worker : workersList) {
@@ -161,7 +220,7 @@ public class WorkersRecapHandler {
                         workersFilter.add(worker);
                     }
                 }
-                /*
+                *//*
                 if (workingStatus) {
                     if (workersStatus.get(worker.getId()).equals(WorkerStatus.WORKING) && (
                             worker.getId().contains(digitedText) ||
@@ -211,15 +270,15 @@ public class WorkersRecapHandler {
                     }
                 }
 
-                 */
+                 *//*
             }
         }
         return workersFilter;
-    }
+    }*/
 
     private boolean extracted(boolean workingStatus, boolean freeStatus, boolean onHolidayStatus,
                               boolean illStatus, boolean strikingStatus, boolean parentalLeaveStatus, Worker worker) {
-        if(workingStatus && workersStatus.get(worker.getId()).equals(WorkerStatus.WORKING)){
+        if(workingStatus && workersStatus.get(worker.getId()).equals(WORKING)){
             return true;
         }
         if(freeStatus && workersStatus.get(worker.getId()).equals(WorkerStatus.FREE)){
