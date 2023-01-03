@@ -37,26 +37,26 @@ public class ShiftInfoPopup {
 
     @FXML
     private Label substitutionLabel;
-    private final Shift shift;
-    public ShiftInfoPopup(Shift currentShift) {
-        this.shift = currentShift;
+    private final Shift shiftEntity;
+    public ShiftInfoPopup(Shift shiftEntity) {
+        this.shiftEntity = shiftEntity;
     }
     @FXML
     public void initialize(){
-        idLabel.setText(shift.getOwner().getId());
-        fullNameLabel.setText(shift.getOwner().getFullName());
-        rankLabel.setText("Livello " + shift.getRank());
-        if (shift.getRank() == 'H'){
+        idLabel.setText(shiftEntity.getOwner().getId());
+        fullNameLabel.setText(shiftEntity.getOwner().getFullName());
+        rankLabel.setText("Livello " + shiftEntity.getRank());
+        if (shiftEntity.getRank() == 'H'){
             rankLabel.setText("Admin");
         }
-        hoursLabel.setText(shift.getStartTime() + " - " + shift.getEndTime() + " (" + shift.getHours() + "h)");
+        hoursLabel.setText(shiftEntity.getStartTime() + " - " + shiftEntity.getEndTime() + " (" + shiftEntity.getHours() + "h)");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        dateLabel.setText(shift.getDate().format(formatter));
-        if (shift.isOvertime()){
+        dateLabel.setText(shiftEntity.getDate().format(formatter));
+        if (shiftEntity.isOvertime()){
             overtimeLabel.setOpacity(1.0);
             ordinaryLabel.setOpacity(0.3);
         }
-        if (shift.isSubstitution()){
+        if (shiftEntity.isSubstitution()){
             substitutionLabel.setOpacity(1.0);
             ordinaryLabel.setOpacity(0.3);
         }
@@ -70,7 +70,8 @@ public class ShiftInfoPopup {
 
     @FXML
     void clickRecordEntry(ActionEvent event) {
-        //TODO:
+        RecordEntryHandler recordEntryHandler = new RecordEntryHandler();
+        recordEntryHandler.clickedRecordEntry(shiftEntity);
     }
 
 }
