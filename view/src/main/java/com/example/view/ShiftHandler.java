@@ -15,22 +15,26 @@ import java.util.Map;
 public class ShiftHandler {
 
     public void clickedShowShifts() {
-        List<Shift> shiftList;
-       /* try {
+        /*List<Shift> shiftList;
+        try {
             shiftList = DBMSDaemon.getInstance().getShiftsList(Session.getInstance().getWorker().getId());
         } catch (DBMSException e) {
             //TODO:
             throw new RuntimeException(e);
         }*/
-        var w = new Worker("098", "", "", 'A', "", "", "");
-        var x = new Worker("678", "", "", 'A', "", "", "");
-        var y = new Worker("123", "", "", 'A', "", "", "");
-        var z = new Worker("000", "", "", 'A', "", "", "");
-        var p = new Worker("999", "", "", 'A', "", "", "");
-        var sh = new ShiftProposalHandler(List.of(w, x, y, z, p), Map.of(x, List.<Period>of(
-                new Period(LocalDate.of(2023, 1, 9),
-                        LocalDate.of(2023, 1, 9))), w, List.<Period>of(), y, List.of(),
-                z, List.of(), p, List.of())
+        var w = new Worker("000", "", "", 'A', "", "", "");
+        var x = new Worker("111", "", "", 'A', "", "", "");
+        var y = new Worker("222", "", "", 'A', "", "", "");
+        var z = new Worker("333", "", "", 'A', "", "", "");
+        var sh = new ShiftProposalHandler(
+                LocalDate.of(2023, 1, 2),
+                List.of(w, x, y, z),
+                Map.of(
+                        w, List.of(),
+                        x, List.of(),
+                        y, List.of(),
+                        z, List.of()
+                )
         );
         sh.computeNewShiftsProposal();
         NavigationManager.getInstance().createScreen("View Shifts",

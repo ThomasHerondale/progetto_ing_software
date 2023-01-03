@@ -4,21 +4,50 @@ import commons.Period;
 import entities.Shift;
 import entities.Worker;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class ShiftProposalHandler {
-    private List<Worker> workers;
-    private Map<Worker, List<Period>> holidays;
+
+    private final LocalDate firstDayOfQuarter;
+    private final List<LocalDate> firstDaysOfWeeks;
+    private final List<Worker> workers;
+    private final Map<Worker, List<Period>> holidays;
 
     public List<Shift> shiftProposal;
 
-    private GeneralWeekAvailabilities generalAvailabilities;
-
     private static final List<Character> rankList = List.of('A', 'B', 'C', 'D', 'H');
 
-    public void computeNewShiftsProposal() {
+    public ShiftProposalHandler(LocalDate firstDayOfQuarter, List<Worker> workers, Map<Worker, List<Period>> holidays) {
+        this.firstDayOfQuarter = firstDayOfQuarter;
+        var lastDayOfQuarter = firstDayOfQuarter.plus(3, ChronoUnit.MONTHS).minusDays(1);
+        /* Il trimestre finisce la domenica */
+        while (lastDayOfQuarter.getDayOfWeek() != DayOfWeek.SUNDAY)
+            lastDayOfQuarter = lastDayOfQuarter.plusDays(1);
+
+        /* Conta il numero di settimane nel trimestre */
+        var weekCount = 1;
+        var dayIterator = firstDayOfQuarter;
+        while (!dayIterator.equals(lastDayOfQuarter)) {
+            if (dayIterator.getDayOfWeek() == DayOfWeek.SUNDAY)
+                weekCount++;
+            dayIterator = dayIterator.plusDays(1);
+        }
+
+        /* Ottieni i lunedì di ogni settimana del trimestre */
+        firstDaysOfWeeks = new ArrayList<>(weekCount);
+        for (var i = 0; i < weekCount; i++)
+            firstDaysOfWeeks.add(firstDayOfQuarter.plusDays(i * 7L));
+
+        this.workers = workers;
+        this.holidays = holidays;
+        this.shiftProposal = new ArrayList<>();
+    }
+    private void computeNewWeeklyShiftsProposal(LocalDate firstDayOfWeek,
+                                                GeneralWeekAvailabilities weekAvailabilities) {
         var rng = new Random(42);
 
         for (var rank : rankList) {
@@ -37,11 +66,11 @@ public class ShiftProposalHandler {
                 var availability = new WorkerAvailability(
                         worker,
                         holidays.get(worker),
-                        LocalDate.of(2023, 1, 9) // TODO:
+                        firstDayOfWeek
                 );
 
-                var currentDay = LocalDate.of(2023, 1, 9); // TODO:
-                var lastDayOfWeek = LocalDate.of(2023, 1, 9).plusDays(6);
+                var currentDay = firstDayOfWeek;
+                var lastDayOfWeek = firstDayOfWeek.plusDays(6);
                 while (availability.totalHours < 18) {
                     System.out.println("Checking " + currentDay);
                     int shiftDuration = rng.nextInt(maxShiftDuration - minShiftDuration + 1) + minShiftDuration;
@@ -49,7 +78,7 @@ public class ShiftProposalHandler {
 
                     if (currentDay.equals(lastDayOfWeek)) {
                         System.out.println("\t End of week -> retrying smaller shifts");
-                        currentDay = LocalDate.of(2023, 1, 9);
+                        currentDay = firstDayOfWeek;
                         minShiftDuration = minShiftDuration / 2;
                         continue;
                     }
@@ -62,20 +91,12 @@ public class ShiftProposalHandler {
                         continue;
                     }
 
-                    /*if (startTime < lastShiftEnd + minShiftDuration) {
-                        System.out.println("\t Too near wrt last shift -> retrying later");
-                        currentDay = currentDay.plusDays(1);
-                        lastShiftEnd = -1;
-                        startTime = 8;
-                        continue;
-                    }*/
-
                     if (!availability.isAvailable(currentDay, startTime, endTime, minShiftDuration)) {
                         startTime++;
                         continue;
                     }
 
-                    if (!generalAvailabilities.isAvailable(rank, currentDay, startTime, endTime)) {
+                    if (!weekAvailabilities.isAvailable(rank, currentDay, startTime, endTime)) {
                         startTime++;
                         continue;
                     }
@@ -115,7 +136,7 @@ public class ShiftProposalHandler {
                             LocalTime.of(endTime, 0)
                     );
 
-                    generalAvailabilities.setAvailability(rank, currentDay, startTime, endTime);
+                    weekAvailabilities.setAvailability(rank, currentDay, startTime, endTime);
                     availability.setAvailability(currentDay, startTime, endTime);
                     availability.totalHours += (endTime - startTime);
 
@@ -135,12 +156,20 @@ public class ShiftProposalHandler {
         }
     }
 
+    public void computeNewShiftsProposal() {
+        for (var monday : firstDaysOfWeeks) {
+            System.out.println("---------------------------------------------------------");
+            computeNewWeeklyShiftsProposal(monday, new GeneralWeekAvailabilities(monday));
+        }
+    }
+
     public static void main(String[] args) {
         var w = new Worker("000", "", "", 'A', "", "", "");
         var x = new Worker("111", "", "", 'A', "", "", "");
         var y = new Worker("222", "", "", 'A', "", "", "");
         var z = new Worker("333", "", "", 'A', "", "", "");
         var sh = new ShiftProposalHandler(
+                LocalDate.of(2023, 2, 1),
                 List.of(w, x, y, z),
                 Map.of(
                         w, List.of(),
@@ -152,14 +181,7 @@ public class ShiftProposalHandler {
         sh.computeNewShiftsProposal();
     }
 
-    public ShiftProposalHandler(List<Worker> workers, Map<Worker, List<Period>> holidays) {
-        this.workers = workers;
-        this.holidays = holidays;
-        this.shiftProposal = new ArrayList<>();
-        this.generalAvailabilities = new GeneralWeekAvailabilities(
-                LocalDate.of(2023, 1, 9)
-        );
-    }
+
 
     private static class GeneralWeekAvailabilities {
         public Map<LocalDate, Boolean[]> a;
