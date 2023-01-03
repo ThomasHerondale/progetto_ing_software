@@ -735,6 +735,7 @@ public class DBMSDaemon {
                         case "Holiday", "Leave" -> ON_HOLIDAY;
                         case "ParentalLeave" -> PARENTAL_LEAVE;
                         case "Illness" -> ILL;
+                        default -> throw new AssertionError("Errore nel tipo di astensione del db.");
                     };
                     /* Ogni impiegato dovrebbe essere in astensione solo in un modo */
                     assert !statusMap.containsKey(abstentionMap.get("refWorkerID"));
