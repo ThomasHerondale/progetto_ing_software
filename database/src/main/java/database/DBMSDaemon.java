@@ -532,8 +532,34 @@ public class DBMSDaemon {
         }
     }
 
-    public void getWorkerInfo(String id) {
-        // TODO:
+    /**
+     * Ottiene dal database le informazioni relative al dipendente specificato.
+     * @param id la matricola del dipendente
+     * @return una mappa del tipo {("birthdate", date), ("birthPlace", string), ("sex", char), ("SSN", string),
+     * ("delayCount", int), ("autoExitCount", int), ("holidayCount", int), ("availabilityParentalLeave", int)}
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     * @apiNote si veda la documentazione di {@link DBMSDaemon#getPresencesList} per chiarimenti sulla
+     * mappa di ritorno
+     */
+    public Map<String, String> getWorkerInfo(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT birthdate, birthplace, sex, SSN,
+                delayCount, autoExitCount, holidayCount, availabilityParentalLeave
+                FROM worker JOIN counters c ON worker.ID = c.refWorkerID
+                WHERE ID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+            
+            var maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Dovrebbe esserci un solo dipendente per matricola */
+            
+            return maps.get(0);
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     /**
