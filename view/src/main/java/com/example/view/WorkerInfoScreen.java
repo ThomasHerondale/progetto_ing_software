@@ -7,8 +7,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 
-public class WorkerInfoScreen extends LoggedScreen{
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
+public class WorkerInfoScreen extends LoggedScreen{
     @FXML
     private Label IBANLabel;
 
@@ -66,20 +69,42 @@ public class WorkerInfoScreen extends LoggedScreen{
     private Label ssnLabel;
 
     private WorkersRecapHandler workersRecapHandler;
+    Worker viewedWorker;
+    private Map<String, String> workerInfo;
 
-    public WorkerInfoScreen(Worker worker, WorkersRecapHandler workersRecapHandler){
+    public WorkerInfoScreen(Worker worker, Map<String, String> workerInfo, WorkersRecapHandler workersRecapHandler){
         this.workersRecapHandler = workersRecapHandler;
+        this.viewedWorker = worker;
+        this.workerInfo = workerInfo;
     }
 
     @FXML
     public void initialize(){
         super.initialize();
+        IDLabel.setText(viewedWorker.getId());
+        fullNameLabel.setText(viewedWorker.getFullName());
+        birthDateLabel.setText(LocalDate.parse(workerInfo.get("birthdate")).
+                format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+        birthPlaceLabel.setText(workerInfo.get("birthplace"));
+        sexLabel.setText(workerInfo.get("sex"));
+        ssnLabel.setText(workerInfo.get("SSN"));
+        rankLabel.setText(String.valueOf(viewedWorker.getRank()));
+        if (viewedWorker.getRank() == 'H'){
+            rankLabel.setText("Admin");
+        }
+        IBANLabel.setText(viewedWorker.getIban());
+        phoneLabel.setText(viewedWorker.getPhone());
+        emailLabel.setText(viewedWorker.getEmail());
+        autoExitCountLabel.setText(workerInfo.get("autoExitCount"));
+        delayCountLabel.setText(workerInfo.get("delayCount"));
+        holidayCountLabel.setText(workerInfo.get("holidayCount"));
+        parentalLeaveLabel.setText(workerInfo.get("availabilityParentalLeave"));
     }
 
 
     @FXML
     public void clickBack(ActionEvent event) {
-        //TODO:
+        workersRecapHandler.clickedBack(false);
     }
 
     @FXML
