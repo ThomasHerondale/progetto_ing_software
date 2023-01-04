@@ -48,6 +48,8 @@ public class ShiftProposalHandler {
     }
     private void computeNewWeeklyShiftsProposal(LocalDate firstDayOfWeek,
                                                 GeneralWeekAvailabilities weekAvailabilities) {
+
+        Collections.shuffle(workers);
         var rng = new Random(42);
 
         for (var rank : rankList) {
@@ -58,7 +60,6 @@ public class ShiftProposalHandler {
             for (var worker : filteredWorkers) {
                 System.out.println("***" + worker.getId() + " - " + worker.getRank() + "***");
 
-                int lastShiftEnd = -1;
                 int startTime = 8;
                 int minShiftDuration = 4;
                 int maxShiftDuration = 6;
@@ -86,12 +87,11 @@ public class ShiftProposalHandler {
                     if (startTime >= 22 - minShiftDuration) {
                         System.out.println("\t Too little time remaining -> retrying next day");
                         currentDay = currentDay.plusDays(1);
-                        lastShiftEnd = -1;
                         startTime = 8;
                         continue;
                     }
 
-                    if (!availability.isAvailable(currentDay, startTime, endTime, minShiftDuration)) {
+                    if (availability.isUnavailable(currentDay, startTime, endTime, minShiftDuration)) {
                         startTime++;
                         continue;
                     }
@@ -105,7 +105,6 @@ public class ShiftProposalHandler {
                         // TODO: che cazzo è?
                         System.out.println("\tToo late to find a shift -> retrying next day");
                         currentDay = currentDay.plusDays(1);
-                        lastShiftEnd = -1;
                         startTime = 8;
                         continue;
                     }
@@ -114,7 +113,6 @@ public class ShiftProposalHandler {
                         // TODO: che cazzo è?
                         System.out.println("\tToo little space remaining -> retrying next day");
                         currentDay = currentDay.plusDays(1);
-                        lastShiftEnd = -1;
                         startTime = 8;
                         continue;
                     }
@@ -123,7 +121,6 @@ public class ShiftProposalHandler {
                         System.out.println("\t Start time can't be equal to end time -> retrying next" +
                                 " day");
                         currentDay = currentDay.plusDays(1);
-                        lastShiftEnd = -1;
                         startTime = 8;
                         continue;
                     }
@@ -142,7 +139,6 @@ public class ShiftProposalHandler {
 
                     shiftProposal.add(shift);
 
-                    lastShiftEnd = endTime;
                     startTime = endTime;
 
                     for (var s : shiftProposal) {
@@ -170,7 +166,7 @@ public class ShiftProposalHandler {
         var z = new Worker("333", "", "", 'A', "", "", "");
         var sh = new ShiftProposalHandler(
                 LocalDate.of(2023, 2, 1),
-                List.of(w, x, y, z),
+                new ArrayList<>(List.of(w, x, y, z)),
                 Map.of(
                         w, List.of(),
                         x, List.of(),
@@ -184,11 +180,11 @@ public class ShiftProposalHandler {
 
 
     private static class GeneralWeekAvailabilities {
-        public Map<LocalDate, Boolean[]> a;
-        public Map<LocalDate, Boolean[]> b;
-        public Map<LocalDate, Boolean[]> c;
-        public Map<LocalDate, Boolean[]> d;
-        public Map<LocalDate, Boolean[]> h;
+        private final Map<LocalDate, Boolean[]> a;
+        private final Map<LocalDate, Boolean[]> b;
+        private final Map<LocalDate, Boolean[]> c;
+        private final Map<LocalDate, Boolean[]> d;
+        private final Map<LocalDate, Boolean[]> h;
         private final LocalDate firstDayOfWeek;
 
         public GeneralWeekAvailabilities(LocalDate firstDayOfWeek) {
@@ -252,10 +248,10 @@ public class ShiftProposalHandler {
     }
 
     private static class WorkerAvailability {
-        private Worker worker;
-        private List<Period> holidays;
-        private LocalDate firstDayOfWeek;
-        private Map<LocalDate, Boolean[]> availability;
+        private final Worker worker;
+        private final List<Period> holidays;
+        private final LocalDate firstDayOfWeek;
+        private final Map<LocalDate, Boolean[]> availability;
         int totalHours;
 
         public WorkerAvailability(Worker worker, List<Period> holidays, LocalDate firstDayOfWeek) {
@@ -266,13 +262,13 @@ public class ShiftProposalHandler {
             this.totalHours = 0;
         }
 
-        public boolean isAvailable(LocalDate date, int startTime, int endTime, int minimumGap) {
+        public boolean isUnavailable(LocalDate date, int startTime, int endTime, int minimumGap) {
             System.out.println("[" + worker.getId() + "] Checking for availability" +
                     " of " + date + " (" + startTime + "-" + endTime + ")");
             for (var holidayPeriod : holidays) {
                 if (holidayPeriod.comprehends(date)) {
                     System.out.println("\t Holiday");
-                    return false;
+                    return true;
                 }
             }
 
@@ -283,7 +279,7 @@ public class ShiftProposalHandler {
                 int idx = i - 8;
                 if (Boolean.FALSE.equals(dayPlan[idx])) {
                     System.out.println("\t Already busy");
-                    return false;
+                    return true;
                 }
             }
 
@@ -291,11 +287,11 @@ public class ShiftProposalHandler {
                 int idx = i - 8;
                 if (Boolean.FALSE.equals(dayPlan[idx])) {
                     System.out.println("\t Too near to another shift");
-                    return false;
+                    return true;
                 }
             }
 
-            return true;
+            return false;
         }
 
         public void setAvailability(LocalDate date, int startTime, int endTime) {
