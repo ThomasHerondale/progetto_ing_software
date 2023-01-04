@@ -420,6 +420,10 @@ public class DBMSDaemon {
                 insert into Worker(ID, workerName, workerSurname, birthDate, birthplace, sex,
                 SSN, workerRank, IBAN, telNumber, email)
                 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """);
+                var countSt = connection.prepareStatement("""
+                INSERT INTO counters(refWorkerID)
+                VALUES (?)
                 """)
         ) {
             st.setString(1, worker.getId());
@@ -433,7 +437,11 @@ public class DBMSDaemon {
             st.setString(9, worker.getIban());
             st.setString(10, worker.getPhone());
             st.setString(11, worker.getEmail());
+
+            countSt.setString(1, worker.getId());
+
             st.execute();
+            countSt.execute();
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
