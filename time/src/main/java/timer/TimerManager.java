@@ -16,7 +16,7 @@ public class TimerManager {
     /**
      * Il timer che si occupa del reset dei contatori dei dipendenti.
      */
-    private QuarterlyTimer resetCountersTimer;
+    private MonthlyTimer resetCountersTimer;
     /**
      * Il timer che si occupa del calcolo degli stipendi.
      */
@@ -66,7 +66,7 @@ public class TimerManager {
     public void initialize() {
         var rate = debugMode ? 10_000 : AUTO_EXIT_RATE;
         autoExitTimer.scheduleAtFixedRate(new AutoExitTask(debugMode), Date.from(Instant.now()), rate);
-        this.resetCountersTimer = QuarterlyTimer.schedule(
+        this.resetCountersTimer = MonthlyTimer.schedule(
                 () -> {
                     try {
                         DBMSDaemon.getInstance().resetCounters();

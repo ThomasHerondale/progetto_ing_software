@@ -14,8 +14,8 @@ public class MonthlyTimer {
     private final int hourOfDay;
     private Timer current = new Timer();
 
-    public static QuarterlyTimer schedule(Runnable task, int dayOfMonth, int hourOfDay) {
-        return new QuarterlyTimer(task, dayOfMonth, hourOfDay);
+    public static MonthlyTimer schedule(Runnable task, int dayOfMonth, int hourOfDay) {
+        return new MonthlyTimer(task, dayOfMonth, hourOfDay);
     }
 
     public void cancelCurrent() {
@@ -23,7 +23,7 @@ public class MonthlyTimer {
         current.purge();
     }
 
-    private MonthlyTimer(Runnable task, int dayOfMonth, int hourOfDay) {
+    public MonthlyTimer(Runnable task, int dayOfMonth, int hourOfDay) {
         this.task = task;
         this.dayOfMonth = dayOfMonth;
         this.hourOfDay = hourOfDay;
