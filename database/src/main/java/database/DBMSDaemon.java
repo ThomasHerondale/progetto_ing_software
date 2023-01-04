@@ -876,8 +876,6 @@ public class DBMSDaemon {
                 if (!statusMap.containsKey(worker.getId()))
                     statusMap.put(worker.getId(), FREE);
             }
-            System.out.println(statusMap);
-            System.out.println(workers);
 
             assert statusMap.size() == workers.size();
 
