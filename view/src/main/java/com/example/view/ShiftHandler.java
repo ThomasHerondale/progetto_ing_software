@@ -15,13 +15,14 @@ import java.util.Map;
 public class ShiftHandler {
 
     public void clickedShowShifts() {
-        /*List<Shift> shiftList;
+        List<Shift> shiftList;
         try {
             shiftList = DBMSDaemon.getInstance().getShiftsList(Session.getInstance().getWorker().getId());
         } catch (DBMSException e) {
             //TODO:
             throw new RuntimeException(e);
-        }*/
+        }
+        /*
         var w = new Worker("000", "", "", 'A', "", "", "");
         var x = new Worker("111", "", "", 'A', "", "", "");
         var y = new Worker("222", "", "", 'A', "", "", "");
@@ -36,9 +37,9 @@ public class ShiftHandler {
                         z, List.of()
                 )
         );
-        sh.computeNewShiftsProposal();
+        sh.computeNewShiftsProposal(); */
         NavigationManager.getInstance().createScreen("View Shifts",
-                controller -> new ViewShiftsScreen(sh.shiftProposal, this));
+                controller -> new ViewShiftsScreen(shiftList, this));
     }
     public void clickedBack(){
         if (Session.getInstance().getWorker().getRank() == 'H'){

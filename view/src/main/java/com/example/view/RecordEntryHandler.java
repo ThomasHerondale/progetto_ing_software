@@ -36,7 +36,7 @@ public class RecordEntryHandler {
             NavigationManager.getInstance().closePopup("Shift Info");
         } catch (DBMSException e){
             //TODO:
-            // non ci sono presenze da registrare nella data fornita a recordEntrance o a recordDelay
+            System.out.println("Presenza per questo turno già registrata.");
         }
     }
 }
