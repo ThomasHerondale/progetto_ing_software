@@ -12,10 +12,14 @@
     -fx-pref-height: 46px;
     -fx-pref-width: 112px;
     -fx-background-radius: 6px;
+    -fx-text-fill: black;
+}
+.menu-item:focused {
+    -fx-background-color: #707070;
 }
 .context-menu {
     -fx-pref-width: 128px;
-    -fx-pref-height: 269px;
+    -fx-pref-height: 266px;
     -fx-background-color: #BEBEBE;
     -fx-background-radius: 6px;
 }
