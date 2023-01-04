@@ -262,6 +262,32 @@ public class DBMSDaemon {
     }
 
     /**
+     * Ottiene l'attuale conteggio dei ritardi del dipendente specificato.
+     * @param id la matricola del dipendente
+     * @return il conteggio dein ritardi
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public int getDelayCounter(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT delayCount
+                FROM counters
+                WHERE refWorkerID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+
+            var maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Dovrebbe esserci un solo conteggio per dipendente */
+
+            return Integer.parseInt(maps.get(0).get("delayCount"));
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
      * Ottiene le informazioni relative al recupero della password per il dipendente specificato.
      * @param id la matricola del dipendente
      * @return una mappa del tipo {("firstAccessFlag", int), ("question", string)} se
@@ -506,8 +532,60 @@ public class DBMSDaemon {
         }
     }
 
-    public void getWorkerInfo(String id) {
-        // TODO:
+    /**
+     * Ottiene dal database le informazioni relative al dipendente specificato.
+     * @param id la matricola del dipendente
+     * @return una mappa del tipo {("birthdate", date), ("birthPlace", string), ("sex", char), ("SSN", string),
+     * ("delayCount", int), ("autoExitCount", int), ("holidayCount", int), ("availabilityParentalLeave", int)}
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     * @apiNote si veda la documentazione di {@link DBMSDaemon#getPresencesList} per chiarimenti sulla
+     * mappa di ritorno
+     */
+    public Map<String, String> getWorkerInfo(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT birthdate, birthplace, sex, SSN,
+                delayCount, autoExitCount, holidayCount, availabilityParentalLeave
+                FROM worker JOIN counters c ON worker.ID = c.refWorkerID
+                WHERE ID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+            
+            var maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Dovrebbe esserci un solo dipendente per matricola */
+            
+            return maps.get(0);
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
+     * Ottiene casualmente dal database la mail di un dipendente del settore amministrativo.
+     * @return la mail di uno dei dipendenti amministrativi
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public String getAdminEmail() throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT email
+                FROM worker
+                WHERE workerRank = 'H'
+                ORDER BY RAND()
+                LIMIT 1;
+                """)
+        ) {
+            var resultSet = st.executeQuery();
+
+            var maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Deve ritornare per forza una mail */
+
+            return maps.get(0).get("email");
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     /**
@@ -601,6 +679,43 @@ public class DBMSDaemon {
             st.setString(1, String.valueOf(newRank));
             st.setString(2, id);
             st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
+     * Ottiene la lista dei periodi di ferie richiesti da ogni dipendente, dalla data specificata in poi.
+     * @param date la data da cui iniziare il controllo
+     * @return una mappa di coppie (id, lista_ferie)
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public Map<String, List<Period>> getRequestedHolidays(LocalDate date) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT refWorkerID, startDate, endDate
+                FROM abstention
+                WHERE startDate >= ? AND type = 'Holiday'
+                """)
+        ) {
+            st.setDate(1, Date.valueOf(date));
+            var resultSet = st.executeQuery();
+
+            var maps = extractResults(resultSet);
+
+            Map<String, List<Period>> holidays = new HashMap<>();
+            for (var map : maps) {
+                var id = map.get("refWorkerID");
+                var startDate = LocalDate.parse(map.get("startDate"));
+                var endDate = LocalDate.parse(map.get("endDate"));
+
+                if (!holidays.containsKey(id))
+                    holidays.put(id, new ArrayList<>());
+
+                holidays.get(id).add(new Period(startDate, endDate));
+            }
+
+            return holidays;
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
@@ -1544,12 +1659,40 @@ public class DBMSDaemon {
                 """)
         ) {
             /* Ottieni l'orario di inizio del primo turno */
-            var startTime = getLastShiftStart(id, date);
+            // var startTime = getLastShiftStart(id, date);
+            var startTime = LocalTime.of(time.getHour(), 0);
 
             st.setString(1, id);
             st.setDate(2, Date.valueOf(date));
             st.setTime(3, Time.valueOf(startTime));
             st.setTime(4, Time.valueOf(time));
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
+     * Registra l'ingresso in ritardo per il dipendente specificato, in una data e ad un'ora specifici.
+     * @param id la matricola del dipendente
+     * @param date la data di ingresso in ritardo
+     * @param time l'orario di ingresso
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void recordDelay(String id, LocalDate date, LocalTime time) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                UPDATE counters
+                SET delayCount = delayCount + 1
+                WHERE refWorkerID = ?
+                """)
+        ) {
+            st.setString(1, id);
+
+            /* Registra l'ingresso */
+            recordEntrance(id, date, time);
+
+            /* Registra il ritardo */
             st.execute();
         } catch (SQLException e) {
             throw new DBMSException(e);
