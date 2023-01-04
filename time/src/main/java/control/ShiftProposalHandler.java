@@ -13,15 +13,15 @@ import java.util.*;
 public class ShiftProposalHandler {
     private final List<LocalDate> firstDaysOfWeeks;
     private final List<Worker> workers;
-    private final Map<Worker, List<Period>> holidays;
+    private final Map<String, List<Period>> holidays;
 
-    public List<Shift> shiftProposal;
+    private final List<Shift> shiftProposal;
 
     private static final List<Character> rankList = List.of('A', 'B', 'C', 'D', 'H');
 
     public ShiftProposalHandler(LocalDate firstDayOfQuarter,
                                 List<Worker> workers,
-                                Map<Worker, List<Period>> holidays) {
+                                Map<String, List<Period>> holidays) {
         var lastDayOfQuarter = firstDayOfQuarter.plus(3, ChronoUnit.MONTHS).minusDays(1);
         /* Il trimestre finisce la domenica */
         while (lastDayOfQuarter.getDayOfWeek() != DayOfWeek.SUNDAY)
@@ -65,7 +65,7 @@ public class ShiftProposalHandler {
 
                 var availability = new WorkerAvailability(
                         worker,
-                        holidays.get(worker),
+                        holidays.get(worker.getId()),
                         firstDayOfWeek
                 );
 
@@ -169,17 +169,17 @@ public class ShiftProposalHandler {
                 LocalDate.of(2023, 1, 2),
                 new ArrayList<>(List.of(w, x, y, z, t, u, a, b)),
                 Map.of(
-                        w, List.of(),
-                        x, List.of(),
-                        y, List.of(new Period(
+                        w.getId(), List.of(),
+                        x.getId(), List.of(),
+                        y.getId(), List.of(new Period(
                                 LocalDate.of(2023, 1, 2),
                                 LocalDate.of(2023, 1, 4)
                         )),
-                        z, List.of(),
-                        t, List.of(),
-                        u, List.of(),
-                        a, List.of(),
-                        b, List.of()
+                        z.getId(), List.of(),
+                        t.getId(), List.of(),
+                        u.getId(), List.of(),
+                        a.getId(), List.of(),
+                        b.getId(), List.of()
                 )
         );
         sh.computeNewShiftsProposal();

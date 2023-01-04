@@ -16,15 +16,15 @@ public class TimerManager {
     /**
      * Il timer che si occupa del reset dei contatori dei dipendenti.
      */
-    private MonthlyTimer resetCountersTimer;
+    private QuarterlyTimer resetCountersTimer;
     /**
      * Il timer che si occupa del calcolo degli stipendi.
      */
-    private MonthlyTimer newSalariesTimer;
+    private QuarterlyTimer newSalariesTimer;
     /**
      * Il timer che si occupa del calcolo della nuova proposta di turnazione.
      */
-    private MonthlyTimer shiftProposalTimer;
+    private QuarterlyTimer shiftProposalTimer;
     /**
      * L'intervallo tra una registrazione di uscite automatiche e un'altra.
      */
@@ -66,7 +66,7 @@ public class TimerManager {
     public void initialize() {
         var rate = debugMode ? 10_000 : AUTO_EXIT_RATE;
         autoExitTimer.scheduleAtFixedRate(new AutoExitTask(debugMode), Date.from(Instant.now()), rate);
-        this.resetCountersTimer = MonthlyTimer.schedule(
+        this.resetCountersTimer = QuarterlyTimer.schedule(
                 () -> {
                     try {
                         DBMSDaemon.getInstance().resetCounters();
