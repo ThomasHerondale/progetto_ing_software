@@ -11,8 +11,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class ShiftProposalHandler {
-
-    private final LocalDate firstDayOfQuarter;
     private final List<LocalDate> firstDaysOfWeeks;
     private final List<Worker> workers;
     private final Map<Worker, List<Period>> holidays;
@@ -22,7 +20,6 @@ public class ShiftProposalHandler {
     private static final List<Character> rankList = List.of('A', 'B', 'C', 'D', 'H');
 
     public ShiftProposalHandler(LocalDate firstDayOfQuarter, List<Worker> workers, Map<Worker, List<Period>> holidays) {
-        this.firstDayOfQuarter = firstDayOfQuarter;
         var lastDayOfQuarter = firstDayOfQuarter.plus(3, ChronoUnit.MONTHS).minusDays(1);
         /* Il trimestre finisce la domenica */
         while (lastDayOfQuarter.getDayOfWeek() != DayOfWeek.SUNDAY)
@@ -164,14 +161,25 @@ public class ShiftProposalHandler {
         var x = new Worker("111", "", "", 'A', "", "", "");
         var y = new Worker("222", "", "", 'A', "", "", "");
         var z = new Worker("333", "", "", 'A', "", "", "");
+        var t = new Worker("444", "", "", 'B', "", "", "");
+        var u = new Worker("555", "", "", 'B', "", "", "");
+        var a = new Worker("666", "", "", 'B', "", "", "");
+        var b = new Worker("777", "", "", 'B', "", "", "");
         var sh = new ShiftProposalHandler(
-                LocalDate.of(2023, 2, 1),
-                new ArrayList<>(List.of(w, x, y, z)),
+                LocalDate.of(2023, 1, 2),
+                new ArrayList<>(List.of(w, x, y, z, t, u, a, b)),
                 Map.of(
                         w, List.of(),
                         x, List.of(),
-                        y, List.of(),
-                        z, List.of()
+                        y, List.of(new Period(
+                                LocalDate.of(2023, 1, 2),
+                                LocalDate.of(2023, 1, 4)
+                        )),
+                        z, List.of(),
+                        t, List.of(),
+                        u, List.of(),
+                        a, List.of(),
+                        b, List.of()
                 )
         );
         sh.computeNewShiftsProposal();
@@ -180,11 +188,11 @@ public class ShiftProposalHandler {
 
 
     private static class GeneralWeekAvailabilities {
-        private final Map<LocalDate, Boolean[]> a;
-        private final Map<LocalDate, Boolean[]> b;
-        private final Map<LocalDate, Boolean[]> c;
-        private final Map<LocalDate, Boolean[]> d;
-        private final Map<LocalDate, Boolean[]> h;
+        private final Map<LocalDate, Integer[]> a;
+        private final Map<LocalDate, Integer[]> b;
+        private final Map<LocalDate, Integer[]> c;
+        private final Map<LocalDate, Integer[]> d;
+        private final Map<LocalDate, Integer[]> h;
         private final LocalDate firstDayOfWeek;
 
         public GeneralWeekAvailabilities(LocalDate firstDayOfWeek) {
@@ -198,12 +206,12 @@ public class ShiftProposalHandler {
 
         public boolean isAvailable(char rank, LocalDate date, int startTime, int endTime) {
             var availability = selectAvailability(rank);
-            Boolean[] dayPlan = availability.get(date);
+            Integer[] dayPlan = availability.get(date);
 
             for (var i = startTime; i < endTime; i++) {
                 /* Normalizza l'indice */
                 int idx = i - 8;
-                if (Boolean.FALSE.equals(dayPlan[idx]))
+                if (dayPlan[idx] >= 3)
                     return false;
             }
 
@@ -211,7 +219,7 @@ public class ShiftProposalHandler {
         }
 
         public void setAvailability(char rank, LocalDate date, int startTime, int endTime) {
-            Boolean[] dayPlan = switch (rank) {
+            Integer[] dayPlan = switch (rank) {
                 case 'A' -> a.get(date);
                 case 'B' -> b.get(date);
                 case 'C' -> c.get(date);
@@ -221,11 +229,11 @@ public class ShiftProposalHandler {
             };
             for (var i = startTime; i < endTime; i++) {
                 var idx = i - 8;
-                dayPlan[idx] = false;
+                dayPlan[idx]++;
             }
         }
 
-        private Map<LocalDate, Boolean[]> selectAvailability(char rank) {
+        private Map<LocalDate, Integer[]> selectAvailability(char rank) {
             return switch (rank) {
                 case 'A' -> a;
                 case 'B' -> b;
@@ -236,11 +244,11 @@ public class ShiftProposalHandler {
             };
         }
 
-        private Map<LocalDate, Boolean[]> initializeAvailabilities() {
-            Map<LocalDate, Boolean[]> availability = new HashMap<>();
+        private Map<LocalDate, Integer[]> initializeAvailabilities() {
+            Map<LocalDate, Integer[]> availability = new HashMap<>();
             for (var i = 0; i < 6; i++) {
-                Boolean[] booleans = new Boolean[14];
-                Arrays.fill(booleans, true);
+                Integer[] booleans = new Integer[14];
+                Arrays.fill(booleans, 0);
                 availability.put(firstDayOfWeek.plusDays(i), booleans);
             }
             return availability;
