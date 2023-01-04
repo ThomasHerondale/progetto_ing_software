@@ -185,7 +185,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </RadioButton>
-      <RadioButton fx:id="RankAdmin" layoutX="399.0" layoutY="544.0" mnemonicParsing="false" text="Admin" toggleGroup="$group2" AnchorPane.leftAnchor="400.0" AnchorPane.topAnchor="541.0">
+      <RadioButton fx:id="rankAdmin" layoutX="399.0" layoutY="544.0" mnemonicParsing="false" text="Admin" toggleGroup="$group2" AnchorPane.leftAnchor="400.0" AnchorPane.topAnchor="541.0">
          <font>
             <Font size="24.0" />
          </font>

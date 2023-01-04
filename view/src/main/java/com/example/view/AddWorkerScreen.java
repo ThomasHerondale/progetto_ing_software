@@ -1,6 +1,7 @@
 package com.example.view;
 
 import database.DBMSDaemon;
+import entities.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -23,9 +24,6 @@ public class AddWorkerScreen extends LoggedScreen{
 
     @FXML
     private Label IDLabel;
-
-    @FXML
-    private RadioButton RankAdmin;
 
     @FXML
     private Button backButton;
@@ -67,6 +65,8 @@ public class AddWorkerScreen extends LoggedScreen{
 
     @FXML
     private RadioButton rankD;
+    @FXML
+    private RadioButton rankAdmin;
 
     @FXML
     private Button recapButton;
@@ -77,18 +77,66 @@ public class AddWorkerScreen extends LoggedScreen{
     @FXML
     private TextField surnameField;
 
+
+
     private String idWorker;
 
     private AddWorkerHandler addWorkerHandler;
+    private Worker worker;
+    private LocalDate birthDate;
+    private String birthPlace;
+    private char sex;
+    private String ssn;
 
     public AddWorkerScreen(String id, AddWorkerHandler addWorkerHandler){
         this.idWorker = id;
         this.addWorkerHandler = addWorkerHandler;
+        this.worker = new Worker("","","",'A',"","","");
+        this.birthPlace = "";
+        this.birthDate = LocalDate.of(2000,1,1);
+        this.sex = 'M';
+        this.ssn = "Codice Fiscale";
     }
+
+    public AddWorkerScreen(Worker worker, LocalDate birthDate, String birthPlace,
+                           char sex, String ssn, AddWorkerHandler addWorkerHandler) {
+        this.addWorkerHandler = addWorkerHandler;
+        this.worker = worker;
+        this.birthDate = birthDate;
+        this.birthPlace = birthPlace;
+        this.sex = sex;
+        this.ssn = ssn;
+        this.idWorker = worker.getId();
+    }
+
     @FXML
     public void initialize(){
         super.initialize();
         IDLabel.setText(idWorker);
+        nameField.setText(worker.getName());
+        surnameField.setText(worker.getSurname());
+        birthDateCalendar.setValue(birthDate);
+        birthPlaceField.setText(birthPlace);
+        if (sex == 'M'){
+            maleButton.setSelected(true);
+        } else {
+            femaleButton.setSelected(true);
+        }
+        ssnField.setText(ssn);
+        if (worker.getRank() == 'A'){
+            rankA.setSelected(true);
+        } else if (worker.getRank() == 'B') {
+            rankB.setSelected(true);
+        } else if (worker.getRank() == 'C') {
+            rankC.setSelected(true);
+        } else if (worker.getRank() == 'D') {
+            rankD.setSelected(true);
+        } else {
+            rankAdmin.setSelected(true);
+        }
+        IBANField.setText(worker.getIban());
+        phoneField.setText(worker.getPhone());
+        mailField.setText(worker.getEmail());
     }
 
     @FXML

@@ -1,11 +1,16 @@
 package com.example.view;
 
+import commons.WorkerStatus;
 import database.DBMSDaemon;
 import database.DBMSException;
 import entities.Worker;
+import mail.MailManager;
 import ssn.SSNComputer;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class AddWorkerHandler {
 
@@ -29,7 +34,11 @@ public class AddWorkerHandler {
     }
     public void clickedBack(){
         NavigationManager.getInstance().createScreen("Workers Recap",
-                controller -> workersRecapScreen);
+                    controller -> workersRecapScreen);
+    }
+    public void clickedBack(Worker worker, LocalDate birthDate, String birthPlace, char sex, String ssn){
+        NavigationManager.getInstance().createScreen("Add Worker",
+                controller -> new AddWorkerScreen(worker, birthDate, birthPlace, sex, ssn, this));
     }
 
     public String insertedData(String name, String surname, String birthDate, String birthPlace, char sex) {
@@ -40,6 +49,53 @@ public class AddWorkerHandler {
                              String birthPlace, String ssn, String iban, String phone, String email, char sex) {
         Worker worker = new Worker(idWorker, name, surname, rank, phone, email, iban);
         NavigationManager.getInstance().createScreen("New Worker Recap",
-                controller -> new NewWorkerRecapScreen(worker, birthDate, birthPlace, sex, ssn));
+                controller -> new NewWorkerRecapScreen(worker, birthDate, birthPlace, sex, ssn, this));
+    }
+
+    public void clickedConfirm(Worker worker, LocalDate birthDate, String birthPlace, char sex, String ssn) {
+        String password = computePassword();
+        try {
+            DBMSDaemon.getInstance().createWorker(worker, birthDate, birthPlace, sex, ssn, worker.getRank());
+            DBMSDaemon.getInstance().registerPassword(worker.getId(), password);
+        } catch (DBMSException e) {
+            //TODO:
+            throw new RuntimeException(e);
+        }
+        List<Worker> workersList;
+        Map<String, WorkerStatus> workersStatus;
+        try {
+            workersList = DBMSDaemon.getInstance().getWorkersList();
+            workersStatus = DBMSDaemon.getInstance().getWorkersStatus(LocalDate.now());
+        } catch (DBMSException e) {
+            //TODO:
+            throw new RuntimeException(e);
+        }
+        MailManager.getInstance().notifyHiring(worker.getEmail(), worker.getFullName(), password);
+        NavigationManager.getInstance().createScreen("Workers Recap",
+                controller -> new WorkersRecapScreen(workersList, workersStatus, new WorkersRecapHandler()));
+    }
+
+    private String computePassword() {
+        String password = "";
+        Random random = new Random();
+
+        // Sceglie casualmente 10 caratteri tra lettere e numeri
+        for (int i = 0; i < 10; i++) {
+            int charType = random.nextInt(3);
+            if (charType == 0) {
+                // Genera una lettera maiuscola
+                char c = (char) (random.nextInt(26) + 'A');
+                password += c;
+            } else if (charType == 1) {
+                // Genera una lettera minuscola
+                char c = (char) (random.nextInt(26) + 'a');
+                password += c;
+            } else {
+                // Genera un numero
+                char c = (char) (random.nextInt(10) + '0');
+                password += c;
+            }
+        }
+        return password;
     }
 }
