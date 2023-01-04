@@ -262,6 +262,32 @@ public class DBMSDaemon {
     }
 
     /**
+     * Ottiene l'attuale conteggio dei ritardi del dipendente specificato.
+     * @param id la matricola del dipendente
+     * @return il conteggio dein ritardi
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public int getDelayCounter(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT delayCount
+                FROM counters
+                WHERE refWorkerID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+
+            var maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Dovrebbe esserci un solo conteggio per dipendente */
+
+            return Integer.parseInt(maps.get(0).get("delayCount"));
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
      * Ottiene le informazioni relative al recupero della password per il dipendente specificato.
      * @param id la matricola del dipendente
      * @return una mappa del tipo {("firstAccessFlag", int), ("question", string)} se
@@ -508,6 +534,10 @@ public class DBMSDaemon {
 
     public void getWorkerInfo(String id) {
         // TODO:
+    }
+
+    public void getAdminEmail() {
+
     }
 
     /**
