@@ -19,7 +19,9 @@ public class ShiftProposalHandler {
 
     private static final List<Character> rankList = List.of('A', 'B', 'C', 'D', 'H');
 
-    public ShiftProposalHandler(LocalDate firstDayOfQuarter, List<Worker> workers, Map<Worker, List<Period>> holidays) {
+    public ShiftProposalHandler(LocalDate firstDayOfQuarter,
+                                List<Worker> workers,
+                                Map<Worker, List<Period>> holidays) {
         var lastDayOfQuarter = firstDayOfQuarter.plus(3, ChronoUnit.MONTHS).minusDays(1);
         /* Il trimestre finisce la domenica */
         while (lastDayOfQuarter.getDayOfWeek() != DayOfWeek.SUNDAY)
@@ -150,10 +152,8 @@ public class ShiftProposalHandler {
     }
 
     public void computeNewShiftsProposal() {
-        for (var monday : firstDaysOfWeeks) {
-            System.out.println("---------------------------------------------------------");
+        for (var monday : firstDaysOfWeeks)
             computeNewWeeklyShiftsProposal(monday, new GeneralWeekAvailabilities(monday));
-        }
     }
 
     public static void main(String[] args) {
@@ -184,8 +184,6 @@ public class ShiftProposalHandler {
         );
         sh.computeNewShiftsProposal();
     }
-
-
 
     private static class GeneralWeekAvailabilities {
         private final Map<LocalDate, Integer[]> a;
