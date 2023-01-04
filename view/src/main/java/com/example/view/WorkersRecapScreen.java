@@ -210,7 +210,8 @@ public class WorkersRecapScreen extends LoggedScreen{
 
     @FXML
     void clickAddWorker(ActionEvent event) {
-        //TODO:
+        AddWorkerHandler addWorkerHandler = new AddWorkerHandler();
+        addWorkerHandler.clickedAddWorker(this);
     }
 
     @FXML

@@ -109,7 +109,7 @@ public class WorkerInfoScreen extends LoggedScreen{
 
     @FXML
     public void clickEnableParentalLeave(ActionEvent event) {
-
+        //TODO:
     }
 
     @FXML
@@ -120,12 +120,12 @@ public class WorkerInfoScreen extends LoggedScreen{
 
     @FXML
     public void clickPromote(ActionEvent event) {
-
+        //TODO:
     }
 
     @FXML
     public void clickRemove(ActionEvent event) {
-
+        //TODO:
     }
 
 }
