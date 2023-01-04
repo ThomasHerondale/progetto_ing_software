@@ -439,8 +439,9 @@ public class DBMSDaemon {
             st.setString(11, worker.getEmail());
 
             countSt.setString(1, worker.getId());
-            countSt.execute();
+
             st.execute();
+            countSt.execute();
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
