@@ -1,4 +1,4 @@
-package com.example.control;
+package control;
 
 import commons.Period;
 import entities.Shift;
