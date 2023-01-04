@@ -1,5 +1,6 @@
 package com.example.view;
 
+import entities.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -64,8 +65,10 @@ public class WorkerInfoScreen extends LoggedScreen{
     @FXML
     private Label ssnLabel;
 
-    public WorkersRecapScreen(){
+    private WorkersRecapHandler workersRecapHandler;
 
+    public WorkerInfoScreen(Worker worker, WorkersRecapHandler workersRecapHandler){
+        this.workersRecapHandler = workersRecapHandler;
     }
 
     @FXML
@@ -76,7 +79,7 @@ public class WorkerInfoScreen extends LoggedScreen{
 
     @FXML
     public void clickBack(ActionEvent event) {
-
+        //TODO:
     }
 
     @FXML

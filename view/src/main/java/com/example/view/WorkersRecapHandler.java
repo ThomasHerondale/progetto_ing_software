@@ -34,9 +34,8 @@ public class WorkersRecapHandler {
     }
 
     public void selectedWorker(Worker worker) {
-        //TODO:
-        //NavigationManager.getInstance().createScreen();
-        System.out.println("prova");
+        NavigationManager.getInstance().createScreen("Worker Info",
+                controller -> new WorkerInfoScreen(worker, this));
     }
 
     public List<Worker> clickedSearch(String digitedText, List<Worker> workersList, boolean rankA, boolean rankB,
