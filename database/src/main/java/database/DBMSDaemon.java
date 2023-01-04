@@ -1557,6 +1557,33 @@ public class DBMSDaemon {
     }
 
     /**
+     * Registra l'ingresso in ritardo per il dipendente specificato, in una data e ad un'ora specifici.
+     * @param id la matricola del dipendente
+     * @param date la data di ingresso in ritardo
+     * @param time l'orario di ingresso
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void recordDelay(String id, LocalDate date, LocalTime time) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                UPDATE counters
+                SET delayCount = delayCount + 1
+                WHERE refWorkerID = ?
+                """)
+        ) {
+            st.setString(1, id);
+
+            /* Registra l'ingresso */
+            recordEntrance(id, date, time);
+
+            /* Registra il ritardo */
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
      * Registra automaticamente l'uscita per i turni specificati, settandola all'orario di fine del turno
      * stesso.
      * @param shifts i turni di cui registrare l'uscita
