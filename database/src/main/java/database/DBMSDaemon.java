@@ -262,6 +262,32 @@ public class DBMSDaemon {
     }
 
     /**
+     * Ottiene l'attuale conteggio dei ritardi del dipendente specificato.
+     * @param id la matricola del dipendente
+     * @return il conteggio dein ritardi
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public int getDelayCounter(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT delayCount
+                FROM counters
+                WHERE refWorkerID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+
+            var maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Dovrebbe esserci un solo conteggio per dipendente */
+
+            return Integer.parseInt(maps.get(0).get("delayCount"));
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
      * Ottiene le informazioni relative al recupero della password per il dipendente specificato.
      * @param id la matricola del dipendente
      * @return una mappa del tipo {("firstAccessFlag", int), ("question", string)} se
@@ -508,6 +534,32 @@ public class DBMSDaemon {
 
     public void getWorkerInfo(String id) {
         // TODO:
+    }
+
+    /**
+     * Ottiene casualmente dal database la mail di un dipendente del settore amministrativo.
+     * @return la mail di uno dei dipendenti amministrativi
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public String getAdminEmail() throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT email
+                FROM worker
+                WHERE workerRank = 'H'
+                ORDER BY RAND()
+                LIMIT 1;
+                """)
+        ) {
+            var resultSet = st.executeQuery();
+
+            var maps = extractResults(resultSet);
+            assert maps.size() == 1; /* Deve ritornare per forza una mail */
+
+            return maps.get(0).get("email");
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     /**
