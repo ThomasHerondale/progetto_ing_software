@@ -685,6 +685,43 @@ public class DBMSDaemon {
     }
 
     /**
+     * Ottiene la lista dei periodi di ferie richiesti da ogni dipendente, dalla data specificata in poi.
+     * @param date la data da cui iniziare il controllo
+     * @return una mappa di coppie (id, lista_ferie)
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public Map<String, List<Period>> getRequestedHolidays(LocalDate date) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT refWorkerID, startDate, endDate
+                FROM abstention
+                WHERE startDate >= ? AND type = 'Holiday'
+                """)
+        ) {
+            st.setDate(1, Date.valueOf(date));
+            var resultSet = st.executeQuery();
+
+            var maps = extractResults(resultSet);
+
+            Map<String, List<Period>> holidays = new HashMap<>();
+            for (var map : maps) {
+                var id = map.get("refWorkerID");
+                var startDate = LocalDate.parse(map.get("startDate"));
+                var endDate = LocalDate.parse(map.get("endDate"));
+
+                if (!holidays.containsKey(id))
+                    holidays.put(id, new ArrayList<>());
+
+                holidays.get(id).add(new Period(startDate, endDate));
+            }
+
+            return holidays;
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
      * Rimuove dal database il dipendente specificato e tutti i dati ad esso associati.
      * @param id la matricola del dipendente
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
