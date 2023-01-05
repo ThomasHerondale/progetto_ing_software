@@ -112,10 +112,13 @@ public class ShiftsRecapScreen extends LoggedScreen{
     private List<Shift> weekShiftsList;
     private List<Shift> shiftsList;
     private static Random RANDOM = new Random();
+    private final ShiftsRecapHandler shiftsRecapHandler;
 
-    public ShiftsRecapScreen(){
-        //TODO:
+    public ShiftsRecapScreen(List<Shift> shiftsList, ShiftsRecapHandler shiftsRecapHandler) {
+        this.shiftsList = shiftsList;
+        this.shiftsRecapHandler = shiftsRecapHandler;
     }
+
     @FXML
     public void initialize(){
         super.initialize();
@@ -129,6 +132,7 @@ public class ShiftsRecapScreen extends LoggedScreen{
         rankBox.setOnAction(this::onRankSelected);
 
         //prove
+        /*
         shiftsList = new ArrayList<>();
         shiftsList.add(new Shift(new Worker("123","Ale","Bor",'A',"123","@bho",
                 "it"),'A',LocalDate.of(2023,1,6),
@@ -154,6 +158,8 @@ public class ShiftsRecapScreen extends LoggedScreen{
         shiftsList.add(new Shift(new Worker("123","Gio","Van",'A',"123","@bho",
                 "it"),'H',LocalDate.of(2023,1,6),
                 LocalTime.of(16,0),LocalTime.of(17,0)));
+
+         */
 
         currentDate = LocalDate.now();
         updateAllShiftsPane(currentDate, rankBox.getValue());
@@ -262,11 +268,8 @@ public class ShiftsRecapScreen extends LoggedScreen{
                 shiftCard.getChildren().get(0).setStyle("-fx-text-fill: white");
                 shiftCard.getChildren().get(1).setStyle("-fx-text-fill: white");
             }
-            /*
             shiftCard.setOnMouseClicked(mouseEvent ->
-                    new ViewShiftsInfoHandler().clickedShift(finalShift));
-
-             */
+                    new ViewShiftsInfoHandler().clickedShift(finalShift, false));
         }
     }
 
@@ -535,7 +538,7 @@ public class ShiftsRecapScreen extends LoggedScreen{
 
     @FXML
     public void clickBack(ActionEvent event) {
-
+        shiftsRecapHandler.clickedBack();
     }
 
     @FXML
@@ -569,8 +572,8 @@ public class ShiftsRecapScreen extends LoggedScreen{
 
     @FXML
     public void clickProfile(MouseEvent event) {
-        //AccountInfoHandler accountInfoHandler = new AccountInfoHandler();
-        //accountInfoHandler.clickedProfile();
+        AccountInfoHandler accountInfoHandler = new AccountInfoHandler();
+        accountInfoHandler.clickedProfile();
     }
 
 }
