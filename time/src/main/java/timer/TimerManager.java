@@ -9,9 +9,7 @@ import database.DBMSException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
@@ -84,16 +82,9 @@ public class TimerManager {
                 :
                 LocalTime.now();
 
-
-
-        /* Scusate... */
-        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        try {
-            Date currentDateAgain = DateFormat.getDateInstance().parse(formatter.format(currentDate));
+        var currentDateAgain =
+                Date.from(ZonedDateTime.of(currentDate, currentTime, ZoneId.systemDefault()).toInstant());
             autoExitTimer.scheduleAtFixedRate(new AutoExitTask(debugMode), currentDateAgain, rate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
 
         /* Task di debug */
         if (debugMode) {
