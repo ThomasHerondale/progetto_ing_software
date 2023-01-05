@@ -57,6 +57,9 @@ public class NavigationManager {
         SCREEN_MAP.put("Insert Presence", "FXML/InsertPresencePopup.fxml");
         SCREEN_MAP.put("Workers Recap", "FXML/WorkersRecapScreen.fxml");
         SCREEN_MAP.put("Remote Record Entry", "FXML/RemoteRecordEntryPopup.fxml");
+        SCREEN_MAP.put("Worker Info", "FXML/WorkerInfoScreen.fxml");
+        SCREEN_MAP.put("Add Worker", "FXML/AddWorkerScreen.fxml");
+        SCREEN_MAP.put("New Worker Recap", "FXML/NewWorkerRecapScreen.fxml");
         //...
     }
     private HashMap<String, Stage> stagesPopup;

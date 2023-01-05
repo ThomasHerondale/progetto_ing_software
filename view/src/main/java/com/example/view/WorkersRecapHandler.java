@@ -8,8 +8,6 @@ import entities.Worker;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static commons.WorkerStatus.*;
 
@@ -28,18 +26,40 @@ public class WorkersRecapHandler {
         NavigationManager.getInstance().createScreen("Workers Recap",
                 controller -> new WorkersRecapScreen(workersList, workersStatus, this));
     }
-    public void clickedBack(){
-        NavigationManager.getInstance().createScreen("Home (Admin)",
-                controller -> new HomeScreen());
+    public void clickedBack(Boolean flag){
+        if (flag){
+            NavigationManager.getInstance().createScreen("Home (Admin)",
+                    controller -> new HomeScreen());
+        } else {
+            List<Worker> updatedWorkersList;
+            Map<String, WorkerStatus> updatedWorkersStatus;
+            try {
+                updatedWorkersList = DBMSDaemon.getInstance().getWorkersList();
+               updatedWorkersStatus = DBMSDaemon.getInstance().getWorkersStatus(LocalDate.now());
+            } catch (DBMSException e) {
+                //TODO:
+                throw new RuntimeException(e);
+            }
+            NavigationManager.getInstance().createScreen("Workers Recap",
+                    controller -> new WorkersRecapScreen(updatedWorkersList, updatedWorkersStatus, this));
+        }
+
     }
 
     public void selectedWorker(Worker worker) {
-        //TODO:
-        //NavigationManager.getInstance().createScreen();
-        System.out.println("prova");
+        Map<String, String> workerInfo;
+        try {
+            workerInfo = DBMSDaemon.getInstance().getWorkerInfo(worker.getId());
+        } catch (DBMSException e) {
+            //TODO:
+            throw new RuntimeException(e);
+        }
+        NavigationManager.getInstance().createScreen("Worker Info",
+                controller -> new WorkerInfoScreen(worker, workerInfo, this));
     }
 
-    public List<Worker> clickedSearch(String digitedText, List<Worker> workersList, boolean rankA, boolean rankB,
+    public List<Worker> clickedSearch(String digitedText, List<Worker> workersList,
+                                      Map<String, WorkerStatus> workersStatus, boolean rankA, boolean rankB,
                                       boolean rankC, boolean rankD, boolean rankH, boolean workingStatus,
                                       boolean freeStatus, boolean onHolidayStatus, boolean illStatus,
                                       boolean strikingStatus, boolean parentalLeaveStatus) {

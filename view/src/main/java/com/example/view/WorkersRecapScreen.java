@@ -210,12 +210,13 @@ public class WorkersRecapScreen extends LoggedScreen{
 
     @FXML
     void clickAddWorker(ActionEvent event) {
-        //TODO:
+        AddWorkerHandler addWorkerHandler = new AddWorkerHandler();
+        addWorkerHandler.clickedAddWorker(this);
     }
 
     @FXML
     void clickBack(ActionEvent event) {
-        workersRecapHandler.clickedBack();
+        workersRecapHandler.clickedBack(true);
     }
 
     @FXML
@@ -226,7 +227,7 @@ public class WorkersRecapScreen extends LoggedScreen{
     @FXML
     void clickSearch(MouseEvent event) {
         workersFilter.clear();
-        workersFilter = workersRecapHandler.clickedSearch(searchBar.getText(), workersList, rankABox.isSelected(),
+        workersFilter = workersRecapHandler.clickedSearch(searchBar.getText(), workersList, workersStatus, rankABox.isSelected(),
                 rankBBox.isSelected(), rankCBox.isSelected(), rankDBox.isSelected(), rankHBox.isSelected(),
                 workingStatus.isSelected(), freeStatus.isSelected(), onHolidayStatus.isSelected(),
                 illStatus.isSelected(), strikingStatus.isSelected(), parentalLeaveStatus.isSelected());
@@ -237,7 +238,7 @@ public class WorkersRecapScreen extends LoggedScreen{
     @FXML
     void onFilterClick(ActionEvent event) {
         workersFilter.clear();
-        workersFilter = workersRecapHandler.clickedSearch(searchBar.getText(), workersList, rankABox.isSelected(),
+        workersFilter = workersRecapHandler.clickedSearch(searchBar.getText(), workersList, workersStatus, rankABox.isSelected(),
                 rankBBox.isSelected(), rankCBox.isSelected(), rankDBox.isSelected(), rankHBox.isSelected(),
                 workingStatus.isSelected(), freeStatus.isSelected(), onHolidayStatus.isSelected(),
                 illStatus.isSelected(), strikingStatus.isSelected(), parentalLeaveStatus.isSelected());

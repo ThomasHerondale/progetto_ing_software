@@ -12,13 +12,12 @@ public class ViewSalaryHandler {
         Map<HoursRecap, Double> salaryData;
         try {
             salaryData = DBMSDaemon.getInstance().getWorkerSalaryData(Session.getInstance().getWorker().getId());
-        } catch (DBMSException e) {
-            //TODO:
-            throw new RuntimeException(e);
+            NavigationManager.getInstance().createScreen("Salary",
+                    controller -> new SalaryScreen(salaryData, this));
+        } catch (Exception ignored) {
+            //quando un impiegato è stato appena assunto non può visualizzare la schermata dello stipendio.
         }
-        //mancano le informazioni necessarie per tutti i valori del salario
-        NavigationManager.getInstance().createScreen("Salary",
-                controller -> new SalaryScreen(salaryData, this));
+
     }
 
     public void clickedBack() {
