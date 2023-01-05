@@ -44,7 +44,7 @@ public class TimerManager {
     private static TimerManager instance;
 
     private TimerManager() {
-        this.autoExitTimer = new Timer(false);
+        this.autoExitTimer = new Timer(true);
     }
 
     /**
@@ -123,6 +123,8 @@ public class TimerManager {
     }
 
     private void newShiftProposal(LocalDate firstDayOfQuarter) {
+        if (debugMode)
+            System.err.println("[DEBUG - SHIFT_PROPOSAL - ACTION]...");
         try {
             var workers = DBMSDaemon.getInstance().getWorkersList();
             var holidays = DBMSDaemon.getInstance().getRequestedHolidays(firstDayOfQuarter);
@@ -131,6 +133,8 @@ public class TimerManager {
         } catch (DBMSException e) {
             throw new TimerException(e.getMessage());
         }
+        if (debugMode)
+            System.err.println("[DEBUG - SHIFT_PROPOSAL - ACTION]");
     }
 
     private void newSalaries(LocalDate endDate) {
