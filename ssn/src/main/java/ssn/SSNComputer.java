@@ -186,7 +186,7 @@ public class SSNComputer {
         final var placeStr = preprocess(birthPlace);
         Optional<String> lineOpt;
 
-        try (Stream<String> stream = Files.lines(Path.of("src/main/resources/data.txt"))) {
+        try (Stream<String> stream = Files.lines(Path.of("ssn/src/main/resources/data.txt"))) {
             lineOpt = stream.filter(line -> line.split("\\t")[1].equals(placeStr)).findFirst();
         } catch (IOException e) {
             throw new RuntimeException(e); // TODO: eccezione
@@ -259,6 +259,12 @@ public class SSNComputer {
             return c - 48;
         else
             return c - 65;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(
+                SSNComputer.computeSSN("Alessandro", "Borgese", "04-09-2001",
+                        'M', "Palermo"));
     }
 }
 
