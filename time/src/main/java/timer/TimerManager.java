@@ -84,7 +84,7 @@ public class TimerManager {
 
         var currentDateAgain =
                 Date.from(ZonedDateTime.of(currentDate, currentTime, ZoneId.systemDefault()).toInstant());
-            autoExitTimer.scheduleAtFixedRate(new AutoExitTask(debugMode), currentDateAgain, rate);
+            autoExitTimer.scheduleAtFixedRate(new AutoExitTask(debugMode, currentDate), currentDateAgain, rate);
 
         /* Task di debug */
         if (debugMode) {
