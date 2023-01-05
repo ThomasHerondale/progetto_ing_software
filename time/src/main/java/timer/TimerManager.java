@@ -6,6 +6,9 @@ import control.ShiftProposalHandler;
 import database.DBMSDaemon;
 import database.DBMSException;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -81,7 +84,14 @@ public class TimerManager {
                 :
                 LocalTime.now();
 
-        autoExitTimer.scheduleAtFixedRate(new AutoExitTask(debugMode), Date.from(Instant.now()), rate);
+        /* Scusate... */
+        DateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+        try {
+            Date currentDateAgain = DateFormat.getDateInstance().parse(formatter.format(currentDate));
+            autoExitTimer.scheduleAtFixedRate(new AutoExitTask(debugMode), currentDateAgain, rate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         /* Task di debug */
         if (debugMode) {
