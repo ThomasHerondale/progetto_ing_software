@@ -2,13 +2,11 @@ package com.example.view;
 
 import commons.Period;
 import entities.Shift;
+import entities.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollBar;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
@@ -36,6 +34,15 @@ public class ShiftsRecapScreen extends LoggedScreen{
 
     @FXML
     private Button previousWeekButton;
+
+    @FXML
+    private Button holidayInterruptionButton;
+
+    @FXML
+    private Button authorizeStrikeButton;
+
+    @FXML
+    private ComboBox<String> rankBox;
 
     @FXML
     private ScrollPane verticalAndHorizonatalPane;
@@ -105,30 +112,78 @@ public class ShiftsRecapScreen extends LoggedScreen{
     private List<Shift> weekShiftsList;
     private List<Shift> shiftsList;
     private static Random RANDOM = new Random();
+    private final ShiftsRecapHandler shiftsRecapHandler;
 
-    public ShiftsRecapScreen(){
-        //TODO:
+    public ShiftsRecapScreen(List<Shift> shiftsList, ShiftsRecapHandler shiftsRecapHandler) {
+        this.shiftsList = shiftsList;
+        this.shiftsRecapHandler = shiftsRecapHandler;
     }
+
     @FXML
     public void initialize(){
         super.initialize();
         synchroBar();
+        rankBox.setValue("A");
+        rankBox.getItems().add("A");
+        rankBox.getItems().add("B");
+        rankBox.getItems().add("C");
+        rankBox.getItems().add("D");
+        rankBox.getItems().add("Admin");
+        rankBox.setOnAction(this::onRankSelected);
+
+        //prove
+        /*
+        shiftsList = new ArrayList<>();
+        shiftsList.add(new Shift(new Worker("123","Ale","Bor",'A',"123","@bho",
+                "it"),'A',LocalDate.of(2023,1,6),
+                LocalTime.of(8,0),LocalTime.of(13,0)));
+        shiftsList.add(new Shift(new Worker("123","Gio","Van",'A',"123","@bho",
+                "it"),'H',LocalDate.of(2023,1,6),
+                LocalTime.of(11,0),LocalTime.of(16,0)));
+        shiftsList.add(new Shift(new Worker("123","Gio","Van",'A',"123","@bho",
+                "it"),'H',LocalDate.of(2023,1,6),
+                LocalTime.of(14,0),LocalTime.of(19,0)));
+        shiftsList.add(new Shift(new Worker("123","Gio","Van",'A',"123","@bho",
+                "it"),'H',LocalDate.of(2023,1,6),
+                LocalTime.of(17,0),LocalTime.of(18,0)));
+        shiftsList.add(new Shift(new Worker("123","Gio","Van",'A',"123","@bho",
+                "it"),'H',LocalDate.of(2023,1,6),
+                LocalTime.of(17,0),LocalTime.of(18,0)));
+        shiftsList.add(new Shift(new Worker("123","Gio","Van",'A',"123","@bho",
+                "it"),'H',LocalDate.of(2023,1,6),
+                LocalTime.of(17,0),LocalTime.of(18,0)));
+        shiftsList.add(new Shift(new Worker("123","Gio","Van",'A',"123","@bho",
+                "it"),'H',LocalDate.of(2023,1,6),
+                LocalTime.of(16,0),LocalTime.of(17,0)));
+        shiftsList.add(new Shift(new Worker("123","Gio","Van",'A',"123","@bho",
+                "it"),'H',LocalDate.of(2023,1,6),
+                LocalTime.of(16,0),LocalTime.of(17,0)));
+
+         */
+
         currentDate = LocalDate.now();
-        updateAllShiftsPane(currentDate);
+        updateAllShiftsPane(currentDate, rankBox.getValue());
+    }
+
+    private void onRankSelected(ActionEvent actionEvent) {
+        updateAllShiftsPane(currentDate, rankBox.getValue());
     }
 
     /**
-     * Aggiorna i pannelli dei turni con i nuovi turni relativi alla settimana della data passata per parametro.
-     * @param date data su cui vengono aggiornati i turni della settimana
+     * Aggiorna i pannelli dei turni con i nuovi turni relativi alla settimana della data passata per parametro
+     * e relativi al filtro del livello.
+     *
+     * @param date  data su cui vengono aggiornati i turni della settimana
+     * @param filter filtro del livello
      */
-    private void updateAllShiftsPane(LocalDate date) {
+    private void updateAllShiftsPane(LocalDate date, String filter) {
         showedWeek = computeWeek(date);
         weekShiftsList = shiftsOfShowedWeek(showedWeek);
         List<AnchorPane> shiftsPanes = getPanesList();
         weekLabel.setText(weekString(date));
         List<Shift> dailyShiftsList;
         for (int i=0 ; i<shiftsPanes.size(); i++){
-            dailyShiftsList = insertShiftsOfTheDay(i, weekShiftsList);
+            dailyShiftsList = insertShiftsOfTheDay(i, weekShiftsList, filter);
             shiftsPanes.get(i).getChildren().clear();
             insertAllShiftsCard(dailyShiftsList, shiftsPanes.get(i));
         }
@@ -139,7 +194,13 @@ public class ShiftsRecapScreen extends LoggedScreen{
         double height;
         double cardLayoutY;
         double cardLayoutX;
+        int positionStartShift;
+        int numberOfOccupiedPositions;
+        List<Boolean[]> columns = new ArrayList<>();
+        columns.add(0, new Boolean[15]);
+        Arrays.fill(columns.get(0),false);
         for (int i=0; i<dailyShiftsList.size(); i++){
+            cardLayoutX = -1;
             shift = dailyShiftsList.get(i);
             AnchorPane shiftCard = createShiftCard(shift.getOwner().getId(),shift.getOwner().getFullName());
             height = getShiftCardSize(shift);
@@ -147,17 +208,55 @@ public class ShiftsRecapScreen extends LoggedScreen{
             shiftCard.setMinHeight(height);
             shiftCard.setMaxHeight(height);
             cardLayoutY = computeLayoutY(shift);
-            cardLayoutX = 0;
-            if (i>=1){
-                AnchorPane analizyingCard;
-                for (int j=0; j<currentShiftPane.getChildren().size(); j++){
-                    analizyingCard =(AnchorPane) currentShiftPane.getChildren().get(j);
-                    cardLayoutX = cardLayoutX + computeLayoutX(height, cardLayoutY,
-                            currentShiftPane.getChildren().get(j).getLayoutX(),
-                            currentShiftPane.getChildren().get(j).getLayoutY(), analizyingCard.getPrefHeight());
-
-                    currentShiftPane.setPrefWidth(currentShiftPane.getWidth() + cardLayoutX);
+            positionStartShift = getIntPosition(cardLayoutY);
+            numberOfOccupiedPositions = getOccupiedPositions(height);
+            /* Analizzo le colonne */
+            for (int k=0; k<columns.size(); k++){
+                boolean flagToVerify = true;
+                boolean secondFlag = false;
+                /* Fintanto che il flag è a true  */
+                while(flagToVerify){
+                    /* Analizzo tutte le posizioni di interesse dentro l'array della colonna attuale  */
+                    for (int m=0; m<numberOfOccupiedPositions; m++){
+                        /* Se l'attuale posizione è occupata allora fai capire che non puoi
+                        * inserire la card in questa colonna quindi interrompi il for e il while
+                        * e passa alla colonna successiva */
+                        if (columns.get(k)[positionStartShift + m]){
+                            flagToVerify = false;
+                            break;
+                        }
+                    }
+                    if (!flagToVerify){
+                        break;
+                    }
+                    /* Se dopo il for il while continua, significa che la card può essere inserita
+                    * in questa colonna  */
+                    flagToVerify = false;
+                    secondFlag = true;
+                    /* Occupa le posizioni della colonna settandolo a true  */
+                    for (int m=0; m<numberOfOccupiedPositions; m++){
+                        columns.get(k)[positionStartShift + m] = true;
+                    }
+                    /* Imposta il layoutX della card  */
+                    cardLayoutX = 0 + (15.0+227) * k ;
                 }
+                /* Arrivato a questo punto se dentro al while ha trovato un posto per la card nell'attuale
+                 colonna significa che il secondo flag è stato settato a true, quindi interrompo il ciclo */
+                if(secondFlag){
+                    break;
+                }
+            }
+            /* Se dopo questo ciclo enorme la cardLayoutX non è stata modificata
+            * aggiungi una nuova colonna alla lista columns e imposta la cardLayoutX */
+            if (cardLayoutX == -1){
+                int size = columns.size();
+                columns.add(size, new Boolean[15]);
+                Arrays.fill(columns.get(size), false);
+                /* Occupa le posizioni della colonna settandolo a true  */
+                for (int m=0; m<numberOfOccupiedPositions; m++){
+                    columns.get(size)[positionStartShift + m] = true;
+                }
+                cardLayoutX = size * (15.0 + 227);
             }
             currentShiftPane.getChildren().add(i, shiftCard);
             currentShiftPane.getChildren().get(i).setLayoutY(cardLayoutY);
@@ -170,31 +269,32 @@ public class ShiftsRecapScreen extends LoggedScreen{
                 shiftCard.getChildren().get(1).setStyle("-fx-text-fill: white");
             }
             shiftCard.setOnMouseClicked(mouseEvent ->
-                    new ViewShiftsInfoHandler().clickedShift(finalShift));
+                    new ViewShiftsInfoHandler().clickedShift(finalShift, false));
         }
     }
 
-    private double computeLayoutX(double thisHeightCard, double thisLayoutY, double layoutX,
-                               double layoutY, double secondHeightCard) {
-        int startCurrentCard = (int) thisLayoutY;
-        int endCurrentCard = (int) (thisLayoutY + thisHeightCard);
-        int startOtherCard = (int) layoutY;
-        int endOtherCard = (int) (layoutY + secondHeightCard);
-        if ((startCurrentCard >= startOtherCard && startCurrentCard <= endOtherCard) ||
-                (endCurrentCard >= startOtherCard && endCurrentCard <= endOtherCard) ||
-                (startOtherCard >= startCurrentCard && startOtherCard <= endCurrentCard) ||
-                (endOtherCard >= startCurrentCard && endOtherCard <= endCurrentCard)){
-            return (15.0 + 227) + layoutX;
-        } else {
-            return 0.0;
+    private int getOccupiedPositions(double height) {
+        for (int x=1; x<=15; x++){
+            if (height == (87.0*x) + (12*(x-1))){
+                return x;
+            }
         }
+        return 1;
+    }
+
+    private int getIntPosition(double cardLayoutY) {
+        for (int i=0; i<15; i++){
+            if (cardLayoutY == 4 + 99*i){
+                return i;
+            }
+        }
+        return 0;
     }
 
     /**
      * Calcola un colore random e ritorna la stringa esadecimale.
      * @return ritorna la stringa esadecimale di un colore
      */
-
     private String getRandomColor(){
         return switch (RANDOM.nextInt(5)){
             case 0 -> "#8FBA90";
@@ -248,28 +348,32 @@ public class ShiftsRecapScreen extends LoggedScreen{
      * @param showedWeek parametro che indica i turni della settimana
      * @return ritorna la lista completa di turni del giorno della settimana
      */
-    private List<Shift> insertShiftsOfTheDay(int i, List<Shift> showedWeek) {
+    private List<Shift> insertShiftsOfTheDay(int i, List<Shift> showedWeek, String filter) {
+        char filterChar = filter.charAt(0);
+        if (filter.equals("Admin")){
+            filterChar = 'H';
+        }
         List<Shift> dailyShiftsList = new ArrayList<>();
         for (Shift shift : showedWeek) {
-            if (i == 0 && shift.dayOfWeek() == DayOfWeek.MONDAY) {
+            if (i == 0 && shift.dayOfWeek() == DayOfWeek.MONDAY && shift.getRank() == filterChar) {
                 dailyShiftsList.add(shift);
             }
-            if (i == 1 && shift.dayOfWeek() == DayOfWeek.TUESDAY) {
+            if (i == 1 && shift.dayOfWeek() == DayOfWeek.TUESDAY && shift.getRank() == filterChar) {
                 dailyShiftsList.add(shift);
             }
-            if (i == 2 && shift.dayOfWeek() == DayOfWeek.WEDNESDAY) {
+            if (i == 2 && shift.dayOfWeek() == DayOfWeek.WEDNESDAY && shift.getRank() == filterChar) {
                 dailyShiftsList.add(shift);
             }
-            if (i == 3 && shift.dayOfWeek() == DayOfWeek.THURSDAY) {
+            if (i == 3 && shift.dayOfWeek() == DayOfWeek.THURSDAY && shift.getRank() == filterChar) {
                 dailyShiftsList.add(shift);
             }
-            if (i == 4 && shift.dayOfWeek() == DayOfWeek.FRIDAY) {
+            if (i == 4 && shift.dayOfWeek() == DayOfWeek.FRIDAY && shift.getRank() == filterChar) {
                 dailyShiftsList.add(shift);
             }
-            if (i == 5 && shift.dayOfWeek() == DayOfWeek.SATURDAY) {
+            if (i == 5 && shift.dayOfWeek() == DayOfWeek.SATURDAY && shift.getRank() == filterChar) {
                 dailyShiftsList.add(shift);
             }
-            if (i == 6 && shift.dayOfWeek() == DayOfWeek.SUNDAY) {
+            if (i == 6 && shift.dayOfWeek() == DayOfWeek.SUNDAY && shift.getRank() == filterChar) {
                 dailyShiftsList.add(shift);
             }
         }
@@ -416,34 +520,47 @@ public class ShiftsRecapScreen extends LoggedScreen{
     }
 
     @FXML
-    void clickBack(ActionEvent event) {
-
+    public void clickBack(ActionEvent event) {
+        shiftsRecapHandler.clickedBack();
     }
 
     @FXML
-    void clickNextMonth(ActionEvent event) {
-
+    public void clickNextMonth(ActionEvent event) {
+        currentDate = currentDate.plusMonths(1).with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY));
+        updateAllShiftsPane(currentDate, rankBox.getValue());
     }
 
     @FXML
-    void clickNextWeek(ActionEvent event) {
-
+    public void clickNextWeek(ActionEvent event) {
+        currentDate = currentDate.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        updateAllShiftsPane(currentDate, rankBox.getValue());
     }
 
     @FXML
-    void clickPreviousMonth(ActionEvent event) {
-
+    public void clickPreviousMonth(ActionEvent event) {
+        currentDate = currentDate.minusMonths(1).with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY));
+        updateAllShiftsPane(currentDate, rankBox.getValue());
     }
 
     @FXML
-    void clickPreviousWeek(ActionEvent event) {
-
+    public void clickPreviousWeek(ActionEvent event) {
+        currentDate = currentDate.minusWeeks(1).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        updateAllShiftsPane(currentDate, rankBox.getValue());
+    }
+    @FXML
+    public void clickAuthorizeStrike(ActionEvent event) {
+        //TODO:
+    }
+    @FXML
+    public void clickHolidayInterruption(ActionEvent event) {
+        //TODO:
     }
 
+
     @FXML
-    void clickProfile(MouseEvent event) {
-        //AccountInfoHandler accountInfoHandler = new AccountInfoHandler();
-        //accountInfoHandler.clickedProfile();
+    public void clickProfile(MouseEvent event) {
+        AccountInfoHandler accountInfoHandler = new AccountInfoHandler();
+        accountInfoHandler.clickedProfile();
     }
 
 }

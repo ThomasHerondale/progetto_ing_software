@@ -38,11 +38,18 @@ public class ShiftInfoPopup {
     @FXML
     private Label substitutionLabel;
     private final Shift shiftEntity;
-    public ShiftInfoPopup(Shift shiftEntity) {
+    boolean flag;
+    public ShiftInfoPopup(Shift shiftEntity, boolean flag) {
         this.shiftEntity = shiftEntity;
+        this.flag = flag;
     }
     @FXML
     public void initialize(){
+        if (!flag){
+            recordEntryButton.setVisible(false);
+            recordEntryButton.setDisable(true);
+            backButton.setLayoutX(580);
+        }
         idLabel.setText(shiftEntity.getOwner().getId());
         fullNameLabel.setText(shiftEntity.getOwner().getFullName());
         rankLabel.setText("Livello " + shiftEntity.getRank());

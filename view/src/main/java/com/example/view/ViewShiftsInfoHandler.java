@@ -5,7 +5,7 @@ import database.DBMSException;
 import entities.Shift;
 
 public class ViewShiftsInfoHandler {
-    public void clickedShift(Shift finalShift) {
+    public void clickedShift(Shift finalShift, boolean flag) {
         Shift shiftEntity;
         try {
             shiftEntity = DBMSDaemon.getInstance().getShiftFlags(finalShift);
@@ -14,6 +14,6 @@ public class ViewShiftsInfoHandler {
             throw new RuntimeException(e);
         }
         NavigationManager.getInstance().createPopup("Shift Info",
-                controller -> new ShiftInfoPopup(shiftEntity));
+                controller -> new ShiftInfoPopup(shiftEntity, flag));
     }
 }
