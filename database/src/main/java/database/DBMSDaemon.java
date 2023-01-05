@@ -1742,6 +1742,7 @@ public class DBMSDaemon {
             st.setString(2, id);
             st.setDate(3, Date.valueOf(date));
             st.setTime(4, Time.valueOf(shiftStartTime));
+            st.execute();
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
