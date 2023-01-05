@@ -85,7 +85,7 @@ public class TimerManager {
                 LocalTime.now();
 
         /* Scusate... */
-        DateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         try {
             Date currentDateAgain = DateFormat.getDateInstance().parse(formatter.format(currentDate));
             autoExitTimer.scheduleAtFixedRate(new AutoExitTask(debugMode), currentDateAgain, rate);
