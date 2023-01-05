@@ -14,16 +14,18 @@ import java.util.TimerTask;
  */
 class AutoExitTask extends TimerTask {
     private final String actionLogString;
+    private final LocalDate currentDate;
 
-    public AutoExitTask(boolean debugMode) {
+    public AutoExitTask(boolean debugMode, LocalDate currentDate) {
         this.actionLogString = debugMode ? ": [DEBUG - AUTO_EXIT - ACTION]" : "";
+        this.currentDate = currentDate;
     }
 
     @Override
     public void run() {
         try {
             List<Shift> expiredShifts =
-                    DBMSDaemon.getInstance().getExitMissingShifts(LocalDate.now(), LocalTime.now());
+                    DBMSDaemon.getInstance().getExitMissingShifts(currentDate, LocalTime.now());
             DBMSDaemon.getInstance().recordAutoExit(expiredShifts);
             System.err.println(LocalTime.now() + actionLogString);
         } catch (DBMSException e) {
