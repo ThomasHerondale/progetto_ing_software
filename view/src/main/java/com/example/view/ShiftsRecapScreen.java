@@ -131,36 +131,6 @@ public class ShiftsRecapScreen extends LoggedScreen{
         rankBox.getItems().add("Admin");
         rankBox.setOnAction(this::onRankSelected);
 
-        //prove
-        /*
-        shiftsList = new ArrayList<>();
-        shiftsList.add(new Shift(new Worker("123","Ale","Bor",'A',"123","@bho",
-                "it"),'A',LocalDate.of(2023,1,6),
-                LocalTime.of(8,0),LocalTime.of(13,0)));
-        shiftsList.add(new Shift(new Worker("123","Gio","Van",'A',"123","@bho",
-                "it"),'H',LocalDate.of(2023,1,6),
-                LocalTime.of(11,0),LocalTime.of(16,0)));
-        shiftsList.add(new Shift(new Worker("123","Gio","Van",'A',"123","@bho",
-                "it"),'H',LocalDate.of(2023,1,6),
-                LocalTime.of(14,0),LocalTime.of(19,0)));
-        shiftsList.add(new Shift(new Worker("123","Gio","Van",'A',"123","@bho",
-                "it"),'H',LocalDate.of(2023,1,6),
-                LocalTime.of(17,0),LocalTime.of(18,0)));
-        shiftsList.add(new Shift(new Worker("123","Gio","Van",'A',"123","@bho",
-                "it"),'H',LocalDate.of(2023,1,6),
-                LocalTime.of(17,0),LocalTime.of(18,0)));
-        shiftsList.add(new Shift(new Worker("123","Gio","Van",'A',"123","@bho",
-                "it"),'H',LocalDate.of(2023,1,6),
-                LocalTime.of(17,0),LocalTime.of(18,0)));
-        shiftsList.add(new Shift(new Worker("123","Gio","Van",'A',"123","@bho",
-                "it"),'H',LocalDate.of(2023,1,6),
-                LocalTime.of(16,0),LocalTime.of(17,0)));
-        shiftsList.add(new Shift(new Worker("123","Gio","Van",'A',"123","@bho",
-                "it"),'H',LocalDate.of(2023,1,6),
-                LocalTime.of(16,0),LocalTime.of(17,0)));
-
-         */
-
         currentDate = LocalDate.now();
         updateAllShiftsPane(currentDate, rankBox.getValue());
     }
