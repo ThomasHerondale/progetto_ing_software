@@ -1,16 +1,10 @@
 package com.example.view;
 
-import com.example.control.ShiftProposalHandler;
-import commons.Period;
 import commons.Session;
 import database.DBMSDaemon;
 import database.DBMSException;
 import entities.Shift;
-import entities.Worker;
-
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 public class ShiftHandler {
 
