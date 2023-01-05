@@ -1406,11 +1406,15 @@ public class DBMSDaemon {
             Map<Worker, HoursRecap> data = new HashMap<>();
             for (var worker : workers) {
                 var id = worker.getId();
-                data.put(worker, new HoursRecap(
-                        ordinaryHours.get(id),
-                        overtimeHours.get(id),
-                        parentalLeaveHours.get(id)
-                ));
+                try {
+                    data.put(worker, new HoursRecap(
+                            ordinaryHours.get(id),
+                            overtimeHours.get(id),
+                            parentalLeaveHours.get(id)
+                    ));
+                } catch (NullPointerException e) {
+                    System.err.println("Cannot compute salary for id: " + id);
+                }
             }
 
             return data;
@@ -1568,11 +1572,7 @@ public class DBMSDaemon {
                 /* Query per salvare il contatore usato per il calcolo per usi futuri */
                 var upSt = connection.prepareStatement("""
                 UPDATE counters
-                SET lastParentalLeaveRequest = (
-                                                SELECT consumedParentalLeave
-                                                FROM counters
-                                                WHERE refWorkerID = ?
-                                                )
+                SET lastParentalLeaveRequest = consumedParentalLeave
                 WHERE refWorkerID = ?
                 """)
         ) {
@@ -1580,7 +1580,6 @@ public class DBMSDaemon {
             inSt.setDate(2, Date.valueOf(date));
             inSt.setDouble(3, salary);
             upSt.setString(1, id);
-            upSt.setString(2, id);
 
             inSt.execute();
             upSt.execute();
