@@ -5,6 +5,7 @@ module view {
     requires database;
     requires mail;
     requires ssn;
+    requires time;
 
 
     opens com.example.view to javafx.fxml;
