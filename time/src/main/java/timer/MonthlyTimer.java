@@ -23,7 +23,7 @@ public class MonthlyTimer {
         current.purge();
     }
 
-    private MonthlyTimer(Runnable task, int dayOfMonth, int hourOfDay) {
+    public MonthlyTimer(Runnable task, int dayOfMonth, int hourOfDay) {
         this.task = task;
         this.dayOfMonth = dayOfMonth;
         this.hourOfDay = hourOfDay;
