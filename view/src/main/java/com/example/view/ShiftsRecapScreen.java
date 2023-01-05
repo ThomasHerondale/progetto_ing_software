@@ -291,27 +291,10 @@ public class ShiftsRecapScreen extends LoggedScreen{
         return 0;
     }
 
-    private double computeLayoutX(double thisHeightCard, double thisLayoutY, double layoutX,
-                               double layoutY, double secondHeightCard) {
-        int startCurrentCard = (int) thisLayoutY;
-        int endCurrentCard = (int) (thisLayoutY + thisHeightCard);
-        int startOtherCard = (int) layoutY;
-        int endOtherCard = (int) (layoutY + secondHeightCard);
-        if ((startCurrentCard >= startOtherCard && startCurrentCard <= endOtherCard) ||
-                (endCurrentCard >= startOtherCard && endCurrentCard <= endOtherCard) ||
-                (startOtherCard >= startCurrentCard && startOtherCard <= endCurrentCard) ||
-                (endOtherCard >= startCurrentCard && endOtherCard <= endCurrentCard)){
-            return (15.0 + 227) + layoutX;
-        } else {
-            return 0.0;
-        }
-    }
-
     /**
      * Calcola un colore random e ritorna la stringa esadecimale.
      * @return ritorna la stringa esadecimale di un colore
      */
-
     private String getRandomColor(){
         return switch (RANDOM.nextInt(5)){
             case 0 -> "#8FBA90";
@@ -543,30 +526,34 @@ public class ShiftsRecapScreen extends LoggedScreen{
 
     @FXML
     public void clickNextMonth(ActionEvent event) {
-
+        currentDate = currentDate.plusMonths(1).with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY));
+        updateAllShiftsPane(currentDate, rankBox.getValue());
     }
 
     @FXML
     public void clickNextWeek(ActionEvent event) {
-
+        currentDate = currentDate.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        updateAllShiftsPane(currentDate, rankBox.getValue());
     }
 
     @FXML
     public void clickPreviousMonth(ActionEvent event) {
-
+        currentDate = currentDate.minusMonths(1).with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY));
+        updateAllShiftsPane(currentDate, rankBox.getValue());
     }
 
     @FXML
     public void clickPreviousWeek(ActionEvent event) {
-
+        currentDate = currentDate.minusWeeks(1).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        updateAllShiftsPane(currentDate, rankBox.getValue());
     }
     @FXML
     public void clickAuthorizeStrike(ActionEvent event) {
-
+        //TODO:
     }
     @FXML
     public void clickHolidayInterruption(ActionEvent event) {
-
+        //TODO:
     }
 
 
