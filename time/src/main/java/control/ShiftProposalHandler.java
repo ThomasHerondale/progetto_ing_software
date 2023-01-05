@@ -1,8 +1,11 @@
 package control;
 
 import commons.Period;
+import database.DBMSDaemon;
+import database.DBMSException;
 import entities.Shift;
 import entities.Worker;
+import timer.TimerException;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -154,6 +157,12 @@ public class ShiftProposalHandler {
     public void computeNewShiftsProposal() {
         for (var monday : firstDaysOfWeeks)
             computeNewWeeklyShiftsProposal(monday, new GeneralWeekAvailabilities(monday));
+
+        try {
+            DBMSDaemon.getInstance().uploadShiftProposal(shiftProposal);
+        } catch (DBMSException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
