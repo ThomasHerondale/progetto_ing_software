@@ -26,7 +26,7 @@ class AutoExitTask extends TimerTask {
         try {
             List<Shift> expiredShifts =
                     DBMSDaemon.getInstance().getExitMissingShifts(currentDate, LocalTime.now());
-            System.out.println("Expired shifts :" + expiredShifts);
+            System.out.println("[DEBUG] Expired shifts :" + expiredShifts);
             DBMSDaemon.getInstance().recordAutoExit(expiredShifts);
             System.err.println(LocalTime.now() + actionLogString);
         } catch (DBMSException e) {
