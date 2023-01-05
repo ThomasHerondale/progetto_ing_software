@@ -66,9 +66,11 @@ public class ShiftProposalHandler {
                 int minShiftDuration = 4;
                 int maxShiftDuration = 6;
 
+                List<Period> workerHolidays = holidays.getOrDefault(worker.getId(), Collections.emptyList());
+
                 var availability = new WorkerAvailability(
                         worker,
-                        holidays.get(worker.getId()),
+                        workerHolidays,
                         firstDayOfWeek
                 );
 
