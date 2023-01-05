@@ -26,6 +26,7 @@ public class HomeScreen extends LoggedScreen{
     private final ShiftHandler shiftHandler;
     private final ShowPresencesHandler showPresencesHandler;
     private final WorkersRecapHandler workersRecapHandler;
+    private final ShiftsRecapHandler shiftsRecapHandler;
 
     public HomeScreen(){
         accountInfoHandler = new AccountInfoHandler();
@@ -33,6 +34,7 @@ public class HomeScreen extends LoggedScreen{
         shiftHandler = new ShiftHandler();
         showPresencesHandler = new ShowPresencesHandler();
         workersRecapHandler = new WorkersRecapHandler();
+        shiftsRecapHandler = new ShiftsRecapHandler();
     }
     @Override
     public void initialize(){
@@ -51,7 +53,7 @@ public class HomeScreen extends LoggedScreen{
 
     @FXML
     public void clickShiftsRecap(MouseEvent event) {
-        //TODO:
+        shiftsRecapHandler.clickedShiftsRecap();
     }
 
     @FXML
