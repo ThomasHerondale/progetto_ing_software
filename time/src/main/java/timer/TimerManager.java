@@ -84,6 +84,8 @@ public class TimerManager {
                 :
                 LocalTime.now();
 
+
+
         /* Scusate... */
         DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         try {
