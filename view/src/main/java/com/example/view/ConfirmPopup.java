@@ -25,6 +25,8 @@ public class ConfirmPopup {
     private InsertPresenceHandler insertPresenceHandler;
     private final ConfirmAction confirmAction;
     private Worker presenceWorker;
+
+    private WorkerInfoHandler workerInfoHandler;
     LocalDate date;
     public ConfirmPopup(ConfirmAction confirmAction, AccountInfoHandler accountInfoHandler){
         this.confirmAction = confirmAction;
@@ -35,6 +37,10 @@ public class ConfirmPopup {
         this.insertPresenceHandler = insertPresenceHandler;
         this.presenceWorker = worker;
         this.date = date;
+    }
+    public ConfirmPopup (ConfirmAction confirmAction, WorkerInfoHandler workerInfoHandler){
+        this.confirmAction = confirmAction;
+        this.workerInfoHandler = workerInfoHandler;
     }
     @FXML
     public void initialize(){
@@ -58,6 +64,12 @@ public class ConfirmPopup {
         }
         if (confirmAction == ConfirmAction.PRESENCE){
             insertPresenceHandler.clickedConfirm();
+        }
+        if (confirmAction == ConfirmAction.REMOVE){
+            workerInfoHandler.clickedConfirm(confirmAction);
+        }
+        if (confirmAction == ConfirmAction.PROMOTE){
+            workerInfoHandler.clickedConfirm(confirmAction);
         }
     }
 

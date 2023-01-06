@@ -69,13 +69,15 @@ public class WorkerInfoScreen extends LoggedScreen{
     private Label ssnLabel;
 
     private WorkersRecapHandler workersRecapHandler;
-    Worker viewedWorker;
+    private Worker viewedWorker;
     private Map<String, String> workerInfo;
+    private WorkerInfoHandler workerInfoHandler;
 
     public WorkerInfoScreen(Worker worker, Map<String, String> workerInfo, WorkersRecapHandler workersRecapHandler){
         this.workersRecapHandler = workersRecapHandler;
         this.viewedWorker = worker;
         this.workerInfo = workerInfo;
+        workerInfoHandler = new WorkerInfoHandler();
     }
 
     @FXML
@@ -120,12 +122,12 @@ public class WorkerInfoScreen extends LoggedScreen{
 
     @FXML
     public void clickPromote(ActionEvent event) {
-        //TODO:
+        workerInfoHandler.clickedPromote(viewedWorker);
     }
 
     @FXML
     public void clickRemove(ActionEvent event) {
-        //TODO:
+        workerInfoHandler.clickedRemove(viewedWorker);
     }
 
 }
