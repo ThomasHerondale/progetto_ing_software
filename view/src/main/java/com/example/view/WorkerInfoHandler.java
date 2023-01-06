@@ -40,7 +40,7 @@ public class WorkerInfoHandler {
             NavigationManager.getInstance().createScreen("Workers Recap",
                     controller -> new WorkersRecapScreen(newWorkersList, newWorkersStatus, new WorkersRecapHandler()));
         }
-        if (confirmAction == ConfirmAction.PROMOTE && viewedWorker.getRank() != 'H'){
+        if (confirmAction == ConfirmAction.PROMOTE){
             Map<String, String> workerInfo;
             try {
                 DBMSDaemon.getInstance().promoteWorker(viewedWorker.getId());
@@ -49,7 +49,6 @@ public class WorkerInfoHandler {
             } catch (DBMSException e) {
                 //TODO:
                 throw new RuntimeException(e);
-                //System.out.println("Non puoi promuovere un livello A o un Admin");
             }
             NavigationManager.getInstance().closePopup("Confirm");
             NavigationManager.getInstance().createScreen("Worker Info",

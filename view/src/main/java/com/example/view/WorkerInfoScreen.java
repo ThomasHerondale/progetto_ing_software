@@ -94,6 +94,9 @@ public class WorkerInfoScreen extends LoggedScreen{
         if (viewedWorker.getRank() == 'H'){
             rankLabel.setText("Admin");
         }
+        if (viewedWorker.getRank() == 'H' || viewedWorker.getRank() == 'A'){
+            promoteButton.setDisable(true);
+        }
         IBANLabel.setText(viewedWorker.getIban());
         phoneLabel.setText(viewedWorker.getPhone());
         emailLabel.setText(viewedWorker.getEmail());
