@@ -58,7 +58,19 @@ public class AuthorizeStrikePopup {
     public void initialize(){
         descriptionField.getStylesheets().add(String.valueOf(getClass().getResource(
                 "css/text-area-background.css")));
-        lockDates();
+        dateCalendar.setDayCellFactory(datePicker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate localDate, boolean b) {
+                super.updateItem(localDate, b);
+                if (locks.comprehends(localDate)) {
+                    setDisabled(true);
+                    setMouseTransparent(true);
+                } else {
+                    setDisabled(false);
+                    setMouseTransparent(false);
+                }
+            }
+        });
         rankA.selectedProperty().bindBidirectional(selectionRank.get('A'));
         rankB.selectedProperty().bindBidirectional(selectionRank.get('B'));
         rankC.selectedProperty().bindBidirectional(selectionRank.get('C'));
@@ -75,21 +87,5 @@ public class AuthorizeStrikePopup {
                     selectionRank);
         }
     }
-    private void lockDates(){
-        dateCalendar.setDayCellFactory(datePicker -> new DateCell() {
-            @Override
-            public void updateItem(LocalDate localDate, boolean b) {
-                super.updateItem(localDate, b);
-                if (locks.comprehends(localDate)) {
-                    setDisabled(true);
-                    setMouseTransparent(true);
-                } else {
-                    setDisabled(false);
-                    setMouseTransparent(false);
-                }
-            }
-        });
-    }
-
 }
 
