@@ -19,7 +19,7 @@ public class HolidayInterruptionHandler {
     }
     private List<Period> computeDateLock(){
         List<Period> locksList = new ArrayList<>();
-        locksList.add(new Period(LocalDate.MIN, LocalDate.now()));
+        locksList.add(new Period(LocalDate.MIN, LocalDate.now().minusDays(1)));
         try {
             locksList.addAll(DBMSDaemon.getInstance().getHolidayInterruptions());
         } catch (DBMSException e) {
@@ -37,13 +37,13 @@ public class HolidayInterruptionHandler {
         }
         List<Period> returnLocksList = new ArrayList<>();
         returnLocksList.add(new Period(LocalDate.MIN, startDate));
-        LocalDate y = LocalDate.MAX;
+        LocalDate y = LocalDate.now().plusYears(2);
         LocalDate z = LocalDate.MAX;
         long distance = 100000000;
-        for (int i = 0; i < locksList.size(); i++){
-            if (distance > Math.abs(locksList.get(i).start().toEpochDay() - startDate.toEpochDay())){
-                distance = Math.abs(locksList.get(i).start().toEpochDay() - startDate.toEpochDay());
-                y = locksList.get(i).start();
+        for (Period period : locksList) {
+            if (distance > Math.abs(period.start().toEpochDay() - startDate.toEpochDay())) {
+                distance = Math.abs(period.start().toEpochDay() - startDate.toEpochDay());
+                y = period.start();
             }
         }
         returnLocksList.add(new Period(y, z));
@@ -51,7 +51,7 @@ public class HolidayInterruptionHandler {
     }
     public void selectedStartDate(LocalDate startDate, HolidayInterruptionPopup holidayInterruptionPopup){
         this.startDate = startDate;
-        holidayInterruptionPopup.lockEndDates(computeDateLock(startDate));
+        holidayInterruptionPopup.lockEndDates(computeDateLock(startDate.minusDays(1)));
     }
     public void clickedConfirm(LocalDate endDate){
         try {
