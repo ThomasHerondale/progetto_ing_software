@@ -519,7 +519,7 @@ public class ShiftsRecapScreen extends LoggedScreen{
     }
     @FXML
     public void clickAuthorizeStrike(ActionEvent event) {
-        //TODO:
+        shiftsRecapHandler.clickedAuthorizeStrike();
     }
     @FXML
     public void clickHolidayInterruption(ActionEvent event) {
