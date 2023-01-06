@@ -18,7 +18,7 @@ public class ShiftProposalHandler {
     private final List<Worker> workers;
     private final Map<String, List<Period>> holidays;
 
-    private final List<Shift> shiftProposal;
+    public final List<Shift> shiftProposal;
 
     private static final List<Character> rankList = List.of('A', 'B', 'C', 'D', 'H');
 

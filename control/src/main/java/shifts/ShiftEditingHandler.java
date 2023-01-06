@@ -1,11 +1,12 @@
 package shifts;
 
 import commons.Abstention;
+import control.ShiftProposalHandler;
 import database.DBMSDaemon;
+import database.DBMSException;
 import entities.Shift;
 import entities.Worker;
 
-import java.nio.DoubleBuffer;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -51,8 +52,13 @@ public class ShiftEditingHandler {
         }
     }*/
 
-    public static void main(String[] args) {
-        var handler = new ShiftEditingHandler(S)
+    public static void main(String[] args) throws DBMSException {
+       var shH = new ShiftProposalHandler(
+               LocalDate.of(2023, 1 , 2),
+               DBMSDaemon.getInstance().getWorkersList(), DBMSDaemon.getInstance().getRequestedHolidays(
+                       LocalDate.of(2023, 1, 2)));
+       shH.computeNewShiftsProposal();
+       var w = new Worker("0123456", "", "", ' ', "", "", "");
     }
 
 
