@@ -523,7 +523,8 @@ public class ShiftsRecapScreen extends LoggedScreen{
     }
     @FXML
     public void clickHolidayInterruption(ActionEvent event) {
-        //TODO:
+        HolidayInterruptionHandler holidayInterruptionHandler = new HolidayInterruptionHandler();
+        holidayInterruptionHandler.clickedHolidayInterruption();
     }
 
 
