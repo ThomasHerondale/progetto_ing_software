@@ -32,7 +32,7 @@ public class HolidayInterruptionHandler {
         /* Rimuovo tutti i periodi che iniziano prima di startDate */
         for (int i = 0; i<locksList.size(); i++){
             if (locksList.get(i).start().isBefore(startDate) || locksList.get(i).start().isEqual(startDate)){
-                locksList.remove(locksList.get(i));
+                locksList.set(i, new Period(LocalDate.MAX.minusDays(1), LocalDate.MAX));
             }
         }
         List<Period> returnLocksList = new ArrayList<>();
@@ -41,8 +41,8 @@ public class HolidayInterruptionHandler {
         LocalDate z = LocalDate.MAX;
         long distance = 100000000;
         for (Period period : locksList) {
-            if (distance > Math.abs(period.start().toEpochDay() - startDate.toEpochDay())) {
-                distance = Math.abs(period.start().toEpochDay() - startDate.toEpochDay());
+            if (distance > period.start().toEpochDay() - startDate.toEpochDay()) {
+                distance = period.start().toEpochDay() - startDate.toEpochDay();
                 y = period.start();
             }
         }
