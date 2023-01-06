@@ -6,8 +6,11 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.InputEvent;
+import javafx.scene.input.MouseEvent;
 
 import java.time.LocalDate;
 
@@ -56,6 +59,16 @@ public class AuthorizeStrikePopup {
 
     @FXML
     public void initialize(){
+        confirmButton.setDisable(true);
+        nameField.setOnKeyPressed(this::enableConfirmButton);
+        descriptionField.setOnKeyPressed(this::enableConfirmButton);
+        nameField.setOnMouseClicked(this::enableConfirmButton);
+        descriptionField.setOnMouseClicked(this::enableConfirmButton);
+        rankA.setOnMouseClicked(this::enableConfirmButton);
+        rankB.setOnMouseClicked(this::enableConfirmButton);
+        rankC.setOnMouseClicked(this::enableConfirmButton);
+        rankD.setOnMouseClicked(this::enableConfirmButton);
+        rankH.setOnMouseClicked(this::enableConfirmButton);
         descriptionField.getStylesheets().add(String.valueOf(getClass().getResource(
                 "css/text-area-background.css")));
         dateCalendar.setDayCellFactory(datePicker -> new DateCell() {
@@ -78,14 +91,20 @@ public class AuthorizeStrikePopup {
         rankH.selectedProperty().bindBidirectional(selectionRank.get('H'));
     }
 
-    @FXML
-    public void clickConfirm(ActionEvent event) {
+    private void enableConfirmButton(Event inputEvent) {
         if (!nameField.getText().equals("") && !descriptionField.getText().equals("") &&
                 dateCalendar.getValue() != null && (rankA.isSelected() || rankB.isSelected() ||
                 rankC.isSelected() || rankD.isSelected() || rankH.isSelected())) {
-            shiftsRecapHandler.clickedConfirm(nameField.getText(), descriptionField.getText(), dateCalendar.getValue(),
-                    selectionRank);
+            confirmButton.setDisable(false);
+        } else {
+            confirmButton.setDisable(true);
         }
+    }
+
+    @FXML
+    public void clickConfirm(ActionEvent event) {
+        shiftsRecapHandler.clickedConfirm(nameField.getText(), descriptionField.getText(), dateCalendar.getValue(),
+                selectionRank);
     }
 }
 
