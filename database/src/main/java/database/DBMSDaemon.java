@@ -511,7 +511,7 @@ public class DBMSDaemon {
                 paramCounter++;
             }
 
-            assert paramCounter == 8;
+            assert paramCounter == 9;
 
             st.execute();
         } catch (SQLException e) {
