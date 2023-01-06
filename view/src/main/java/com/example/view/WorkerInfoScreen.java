@@ -111,7 +111,8 @@ public class WorkerInfoScreen extends LoggedScreen{
 
     @FXML
     public void clickEnableParentalLeave(ActionEvent event) {
-        //TODO:
+        EnableParentalLeaveHandler enableParentalLeaveHandler = new EnableParentalLeaveHandler();
+        enableParentalLeaveHandler.clickedEnableParentalLeave(viewedWorker);
     }
 
     @FXML

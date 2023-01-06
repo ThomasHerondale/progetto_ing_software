@@ -27,7 +27,9 @@ public class ConfirmPopup {
     private Worker presenceWorker;
 
     private WorkerInfoHandler workerInfoHandler;
-    LocalDate date;
+    private EnableParentalLeaveHandler enableParentalLeaveHandler;
+    private String hours;
+    private LocalDate date;
     public ConfirmPopup(ConfirmAction confirmAction, AccountInfoHandler accountInfoHandler){
         this.confirmAction = confirmAction;
         this.accountInfoHandler = accountInfoHandler;
@@ -42,6 +44,11 @@ public class ConfirmPopup {
         this.confirmAction = confirmAction;
         this.workerInfoHandler = workerInfoHandler;
     }
+    public ConfirmPopup (ConfirmAction confirmAction, EnableParentalLeaveHandler enableParentalLeaveHandler, int hours){
+        this.confirmAction = confirmAction;
+        this.enableParentalLeaveHandler = enableParentalLeaveHandler;
+        this.hours = String.valueOf(hours);
+    }
     @FXML
     public void initialize(){
         title.setText(confirmAction.getTitleString());
@@ -51,7 +58,7 @@ public class ConfirmPopup {
                     ("$worker", presenceWorker.getFullName()).replace
                     ("$date", date.format(formatter)));
         } else if (confirmAction == ConfirmAction.ENABLE_PARENTAL_LEAVE) {
-            //TODO:
+            description.setText(confirmAction.getDescriptionString().replace("$hours", hours));
         } else {
             description.setText(confirmAction.getDescriptionString());
         }
@@ -70,6 +77,9 @@ public class ConfirmPopup {
         }
         if (confirmAction == ConfirmAction.PROMOTE){
             workerInfoHandler.clickedConfirm(confirmAction);
+        }
+        if (confirmAction == ConfirmAction.ENABLE_PARENTAL_LEAVE){
+            enableParentalLeaveHandler.clickedConfirm();
         }
     }
 
