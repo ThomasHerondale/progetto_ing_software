@@ -63,6 +63,7 @@ public class NavigationManager {
         SCREEN_MAP.put("Shifts Recap", "FXML/ShiftsRecapScreen.fxml");
         SCREEN_MAP.put("Authorize Strike", "FXML/AuthorizeStrikePopup.fxml");
         SCREEN_MAP.put("Holiday Interruption", "FXML/HolidayInterruptionPopup.fxml");
+        SCREEN_MAP.put("Record Presence", "FXML/RecordPresenceScreen.fxml");
         //...
     }
     private HashMap<String, Stage> stagesPopup;
