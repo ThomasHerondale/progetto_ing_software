@@ -4,9 +4,7 @@ import database.DBMSDaemon;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
 import java.time.LocalDate;
@@ -90,6 +88,10 @@ public class StrikeParticipationPopup {
         Label titleLabel = new Label(name);
         Label dateLabel = new Label(date);
         Label descriptionLabel = new Label(description);
+
+        descriptionLabel.setTooltip(new Tooltip(descriptionLabel.getText()));
+        titleLabel.setTooltip(new Tooltip(titleLabel.getText()));
+
         descriptionLabel.setWrapText(false);
         titleLabel.setWrapText(false);
         dateLabel.setWrapText(false);
