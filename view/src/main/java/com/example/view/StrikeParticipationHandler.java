@@ -13,7 +13,8 @@ public class StrikeParticipationHandler {
         List<HashMap<String, String>> authorizedStrikes;
         try {
             authorizedStrikes = DBMSDaemon.getInstance().
-                    getAuthorizedStrikes(Session.getInstance().getWorker().getRank());
+                    getAuthorizedStrikes(Session.getInstance().getWorker().getId(),
+                            Session.getInstance().getWorker().getRank());
         } catch (DBMSException e) {
             //TODO:
             throw new RuntimeException(e);
