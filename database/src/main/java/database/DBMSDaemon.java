@@ -1774,7 +1774,16 @@ public class DBMSDaemon {
         }
     }
 
-    private LocalTime getLastShiftStart(String id, LocalDate date) throws DBMSException {
+    /**
+     * Ottiene dal database l'orario di inizio del primo turno del dipendente specificato che non presenta registrato
+     * un ingresso nella data specificata.
+     * @param id la matricola del dipendente
+     * @param date la data di riferimento
+     * @return un {@link Optional} contenente l'orario di inizio del primo turno senza ingresso del dipendente, se esso
+     * esiste, altrimenti un {@link Optional} vuoto
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public Optional<LocalTime> getShiftStart(String id, LocalDate date) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
                 SELECT MIN(shiftStart) AS shiftStart
@@ -1796,7 +1805,46 @@ public class DBMSDaemon {
             var maps = extractResults(resultSet);
             assert maps.size() <= 1; /* Dovrebbe esserci al più un solo minimo */
 
-            return LocalTime.parse(maps.get(0).get("shiftStart"));
+            if (maps.isEmpty())
+                return Optional.empty();
+            else
+                return Optional.ofNullable(LocalTime.parse(maps.get(0).get("shiftStart")));
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
+     * Ottiene dal database l'orario di fine del primo turno del dipendente specificato che presenta registrato un
+     * ingresso ma non un'uscita nella data specificata.
+     * @param id la matricola del dipendente
+     * @param date la data di riferimento
+     * @return un {@link Optional} contenente l'orario di fine del primo turno senza uscita del dipendente, se esso
+     * esiste, altrimenti un {@link Optional} vuoto
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public Optional<LocalTime> getShiftEnd(String id, LocalDate date) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT S.shiftEnd
+                FROM Shift S join Presence P
+                    on (S.refWorkerID = P.refShiftID and S.shiftDate = P.refShiftDate
+                    and S.shiftStart = P.refShiftStart)
+                    JOIN worker w ON w.ID = S.refWorkerID
+                WHERE S.refWorkerID = ? AND P.refShiftDate = ? AND P.exitTime IS NULL;
+                """)
+        ) {
+            st.setString(1, id);
+            st.setDate(2, Date.valueOf(date));
+            var resultSet = st.executeQuery();
+
+            var maps = extractResults(resultSet);
+            assert maps.size() <= 1; /* In teoria non dovrebbero esserci più di un turno senza uscita... */
+
+            if (maps.isEmpty())
+                return Optional.empty();
+            else
+                return Optional.ofNullable(LocalTime.parse(maps.get(0).get("shiftEnd")));
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
@@ -1826,13 +1874,13 @@ public class DBMSDaemon {
        ) {
            st.setString(1, id);
            st.setDate(2, Date.valueOf(date));
-           st.setTime(3, Time.valueOf(getLastShiftStart(id, date)));
+           st.setTime(3, Time.valueOf(getShiftStart(id, date)));
            st.setString(4, id);
            st.setDate(5, Date.valueOf(date));
-           st.setTime(6, Time.valueOf(getLastShiftStart(id, date)));
+           st.setTime(6, Time.valueOf(getShiftStart(id, date)));
            st.setString(7, id);
            st.setDate(8, Date.valueOf(date));
-           st.setTime(9, Time.valueOf(getLastShiftStart(id, date)));
+           st.setTime(9, Time.valueOf(getShiftStart(id, date)));
            st.execute();
        } catch (SQLException e) {
            throw new DBMSException(e);
