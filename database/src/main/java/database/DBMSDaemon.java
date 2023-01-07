@@ -956,12 +956,12 @@ public class DBMSDaemon {
         queryStr = queryStr + "where Strike." + rank + " = true " +
                 "and (strikeName, strikeDate) NOT IN (SELECT refStrikeName, refStrikeDate\n" +
                 "                                       FROM strikeparticipation\n" +
-                "                                       WHERE refWorkerID = ?);";
+                "                                       WHERE refWorkerID = ?)";
         try (
                 var st = connection.prepareStatement(queryStr)
         ) {
             st.setString(1, id);
-            var resultSet = st.executeQuery(queryStr);
+            var resultSet = st.executeQuery();
 
             return extractResults(resultSet);
         } catch (SQLException e) {
