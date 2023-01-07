@@ -1664,8 +1664,9 @@ public class DBMSDaemon {
                 """)
         ) {
             /* Ottieni l'orario di inizio del primo turno */
-            // var startTime = getLastShiftStart(id, date);
-            var startTime = LocalTime.of(time.getHour(), 0);
+            Optional<LocalTime> startTimeOpt = getShiftStartTime(id, date);
+            assert startTimeOpt.isPresent();
+            var startTime = startTimeOpt.get();
 
             st.setString(1, id);
             st.setDate(2, Date.valueOf(date));
