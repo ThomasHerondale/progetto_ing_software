@@ -16,8 +16,20 @@ public class AbstentionCommunicationHandler {
     public void clickedCommunicate(Abstention abstention){
         locksList = new ArrayList<>();
         if (abstention == Abstention.HOLIDAY) {
+            long distance = 100000000;
+            LocalDate start = LocalDate.MIN;
+            LocalDate end = LocalDate.MAX;
+            for (int i=0; i<firstDaysOfQuarters.size(); i++){
+                if (!LocalDate.now().isBefore(firstDaysOfQuarters.get(i))){
+                    if (firstDaysOfQuarters.get(i).toEpochDay() - LocalDate.now().toEpochDay() < distance){
+                        distance = firstDaysOfQuarters.get(i).toEpochDay() - LocalDate.now().toEpochDay();
+                        end = firstDaysOfQuarters.get(i).plusDays(1);
+                    }
+                }
+            }
             try {
                 locksList = DBMSDaemon.getInstance().getHolidayInterruptions();
+                locksList.add(new Period(start, end));
             } catch (DBMSException e) {
                 //TODO:
                 throw new RuntimeException(e);
@@ -28,6 +40,12 @@ public class AbstentionCommunicationHandler {
         NavigationManager.getInstance().createPopup("Abstention Communication",
                     controller -> new AbstentionCommunicationPopup(abstention, finalLocksList, this));
     }
+    private static final List<LocalDate> firstDaysOfQuarters = List.of(
+            LocalDate.of(2023, 1, 2),
+            LocalDate.of(2023, 4, 3),
+            LocalDate.of(2023, 7, 3),
+            LocalDate.of(2023, 10, 2)
+    );
 
     public void selectedStartDate(LocalDate startDate, AbstentionCommunicationPopup abstentionCommunicationPopup) {
         abstentionCommunicationPopup.lockEndDates(computeDateLock(startDate.minusDays(1)));
