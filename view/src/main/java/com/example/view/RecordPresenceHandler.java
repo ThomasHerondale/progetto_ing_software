@@ -5,26 +5,29 @@ import database.DBMSException;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Optional;
 
 public class RecordPresenceHandler {
     public void clickedRecordEntrance(String name, String surname, String id) {
-        LocalDate entranceDay = LocalDate.now();
+        LocalDate entranceDate = LocalDate.now();
         LocalTime entranceTime = LocalTime.now();
         try {
             if (DBMSDaemon.getInstance().checkCredentials(id, name, surname)){
-                LocalTime shiftStartTime = DBMSDaemon.getInstance().getShiftStartTime(id,
-                        entranceDay, entranceTime);
-                if (checkTime(shiftStartTime)){
-                    DBMSDaemon.getInstance().recordEntrance(id, entranceDay, entranceTime);
-                    NavigationManager.getInstance().createPopup("Entrance Recorded",
-                            controller -> new EntranceRecordedPopup(entranceDay, entranceTime, this));
-                }
-                else {
-                    NavigationManager.getInstance().createPopup("Delay Notice",
-                            controller -> new DelayNoticePopup(entranceDay, entranceTime, this));
+                Optional<LocalTime> shiftStartTime = DBMSDaemon.getInstance().getShiftStartTime(id,
+                        entranceDate);
+                if (shiftStartTime.isPresent()){
+                    if (checkTime(shiftStartTime.get())){
+                        DBMSDaemon.getInstance().recordEntrance(id, entranceDate, entranceTime);
+                        NavigationManager.getInstance().createPopup("Entrance Recorded",
+                                controller -> new EntranceRecordedPopup(entranceDate, entranceTime, this));
+                    }
+                    else {
+                        NavigationManager.getInstance().createPopup("Delay Notice",
+                                controller -> new DelayNoticePopup(entranceDate, entranceTime, this));
+                    }
                 }
             } else {
-                NavigationManager.getInstance().createPopup("Error",
+                NavigationManager.getInstance().createPopup("Error Message",
                         controller -> new ErrorMessage("Credenziali errate."));
             }
         } catch (DBMSException e) {
@@ -45,18 +48,21 @@ public class RecordPresenceHandler {
         LocalTime exitTime = LocalTime.now();
         try {
             if (DBMSDaemon.getInstance().checkCredentials(id, name, surname)){
-                LocalTime shiftEndTime = DBMSDaemon.getInstance().getShiftEndTime(id, exitDate, exitTime);
-                if (checkTime(shiftEndTime)){
-                    DBMSDaemon.getInstance().recordExit(id, exitDate, exitTime);
-                    NavigationManager.getInstance().createPopup("Exit Recorded",
-                            controller -> new ExitRecordedPopup(exitDate, exitTime, this));
-                } else {
-                    NavigationManager.getInstance().createPopup("Error",
-                            controller -> new ErrorMessage("Non è possibile registrare un'uscita."));
+                Optional<LocalTime> shiftEndTime = DBMSDaemon.getInstance().getShiftEndTime(id, exitDate);
+                if (shiftEndTime.isPresent()){
+                    if (checkTime(shiftEndTime.get())){
+                        DBMSDaemon.getInstance().recordExit(id, exitDate, exitTime);
+                        NavigationManager.getInstance().createPopup("Exit Recorded",
+                                controller -> new ExitRecordedPopup(exitDate, exitTime, this));
+                    } else {
+                        NavigationManager.getInstance().createPopup("Error Message",
+                                controller -> new ErrorMessage("Non è possibile registrare un'uscita."));
+                    }
                 }
+
             }
             else {
-                NavigationManager.getInstance().createPopup("Error",
+                NavigationManager.getInstance().createPopup("Error Message",
                         controller -> new ErrorMessage("Credenziali errate."));
             }
         } catch (DBMSException e) {
