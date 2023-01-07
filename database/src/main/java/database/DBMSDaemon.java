@@ -484,7 +484,7 @@ public class DBMSDaemon {
             throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
-                insert into Strike(strikeName, strikeDate, descriptionStrike, A, B, C, D, Adm)
+                insert into Strike(strikeName, strikeDate, descriptionStrike, A, B, C, D, H)
                 values (?, ?, ?, ?, ?, ?, ?, ?)
                 """)
         ) {
