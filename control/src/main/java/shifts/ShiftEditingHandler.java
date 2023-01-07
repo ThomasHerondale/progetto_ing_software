@@ -1,6 +1,7 @@
 package shifts;
 
 import commons.Abstention;
+import commons.Period;
 import control.ShiftProposalHandler;
 import database.DBMSDaemon;
 import database.DBMSException;
@@ -14,14 +15,19 @@ import java.util.Collections;
 import java.util.List;
 
 public class ShiftEditingHandler {
-    private List<Shift> shiftProposal;
+    private final List<Shift> shiftProposal;
     private final Abstention requestedAbstention;
     private final List<Character> checkOrder;
 
     public ShiftEditingHandler(List<Shift> shiftProposal, Abstention requestedAbstention) {
         this.shiftProposal = shiftProposal;
         this.requestedAbstention = requestedAbstention;
-        this.checkOrder = getCheckOrder(requestedAbstention.worker().getRank());
+        //this.checkOrder = getCheckOrder(requestedAbstention.worker().getRank());
+        checkOrder = null;
+    }
+
+    private ShiftEditingHandler(List<Shift> shiftProposal) {
+        this(shiftProposal, null);
     }
 
     private void editShiftProposal() {
@@ -34,23 +40,29 @@ public class ShiftEditingHandler {
         }
     }
 
- /*   private boolean computeSubstitution(Shift shift) {
-        *//* Trova i turni fuori dal periodo di astensione *//*
+    private boolean computeSubstitution(Shift shift) {
+        /* Trova i turni fuori dal periodo di astensione */
         var shifts = shiftProposal
                 .stream()
                 .filter(sh -> !requestedAbstention.period().comprehends(sh.getDate()))
                 .filter(sh -> sh.getHours() == shift.getHours())
                 .toList();
         for (var sh : shifts) {
-            *//* Controlla che il proprietario del turno sia disponibile nell'arco del turno di riferimento *//*
-            if (checkAvailability(sh.getOwner(), shift.getDate(), shift.getStartTime(), shift.getEndTime()))
+            System.out.println("Cheking " + sh);
+            /* Controlla che il proprietario del turno sia disponibile nell'arco del turno dell'assente */
+            if (!checkAvailability(sh.getOwner(), shift.getDate(), shift.getStartTime(), shift.getEndTime())) {
+                System.out.println("Sostituente non disponibile");
                 continue;
-            *//* Controlla che l'assente sia disponibile nell'arco del turno di chi lo sostituirà *//*
-            if (checkAvailability(shift.getOwner(), sh.getDate(), sh.getStartTime(), sh.getEndTime()))
+            }
+            /* Controlla che l'assente sia disponibile nell'arco del turno di chi lo sostituirà */
+            if (!checkAvailability(shift.getOwner(), sh.getDate(), sh.getStartTime(), sh.getEndTime())) {
+                System.out.println("Sostituito non disponibile");
                 continue;
-
+            }
+            System.out.println("Disponibilità");
         }
-    }*/
+        return false;
+    }
 
     public static void main(String[] args) throws DBMSException {
        var shH = new ShiftProposalHandler(
@@ -58,7 +70,16 @@ public class ShiftEditingHandler {
                DBMSDaemon.getInstance().getWorkersList(), DBMSDaemon.getInstance().getRequestedHolidays(
                        LocalDate.of(2023, 1, 2)));
        shH.computeNewShiftsProposal();
-       var w = new Worker("0123456", "", "", ' ', "", "", "");
+       var shiftProposal = DBMSDaemon.getInstance().getShiftsList();
+       var w = new Worker("0123456", "", "", 'H', "", "", "");
+       var editor = new ShiftEditingHandler(shiftProposal, new Abstention(w, new Period(
+               LocalDate.of(2023, 1, 2), LocalDate.of(2023, 1, 2)
+       ), false));
+       editor.computeSubstitution(new Shift(w, 'H', LocalDate.of(2023, 1, 2),
+               LocalTime.of(16, 0), LocalTime.of(18, 0)));
+        System.out.println(editor.checkAvailability(new Worker("0266723", "", "", 'H', "", "", ""),
+                LocalDate.of(2023, 1, 2),
+                LocalTime.of(16, 0), LocalTime.of(18, 0)));
     }
 
 
@@ -76,10 +97,8 @@ public class ShiftEditingHandler {
             var shiftEndOffset = shift.getEndTime().plusHours(3);
 
             /* Verifica se gli orari si sovrappongono o sono comunque più vicini di tre ore */
-            if ((start.isBefore(shiftEndOffset) || start.equals(shiftEndOffset)) &&
-                    (end.isAfter(shiftStartOffset) || end.equals(shiftStartOffset))) {
+            if (start.isBefore(shiftEndOffset) && end.isAfter(shiftStartOffset))
                 return false;
-            }
         }
 
         return true;
