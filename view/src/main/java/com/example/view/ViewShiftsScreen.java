@@ -1,5 +1,6 @@
 package com.example.view;
 
+import commons.Abstention;
 import commons.Period;
 import commons.Session;
 import database.DBMSDaemon;
@@ -356,15 +357,18 @@ public class ViewShiftsScreen extends LoggedScreen {
     }
     @FXML
     public void clickParentalLeave(ActionEvent event){
-        //TODO:
+        AbstentionCommunicationHandler abstentionCommunicationHandler = new AbstentionCommunicationHandler();
+        abstentionCommunicationHandler.clickedCommunicate(Abstention.PARENTAL_LEAVE);
     }
     @FXML
     public void clickHoliday(ActionEvent event){
-        //TODO:
+        AbstentionCommunicationHandler abstentionCommunicationHandler = new AbstentionCommunicationHandler();
+        abstentionCommunicationHandler.clickedCommunicate(Abstention.HOLIDAY);
     }
     @FXML
     public void clickIllness(ActionEvent event){
-        //TODO:
+        AbstentionCommunicationHandler abstentionCommunicationHandler = new AbstentionCommunicationHandler();
+        abstentionCommunicationHandler.clickedCommunicate(Abstention.ILLNESS);
     }
     @FXML
     public void clickLeave(ActionEvent event){
