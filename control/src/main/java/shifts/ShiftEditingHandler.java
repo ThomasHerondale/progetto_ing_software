@@ -7,12 +7,14 @@ import database.DBMSDaemon;
 import database.DBMSException;
 import entities.Shift;
 import entities.Worker;
+import mail.MailManager;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class ShiftEditingHandler {
     private final List<Shift> shiftProposal;
@@ -22,30 +24,34 @@ public class ShiftEditingHandler {
     public ShiftEditingHandler(List<Shift> shiftProposal, Abstention requestedAbstention) {
         this.shiftProposal = shiftProposal;
         this.requestedAbstention = requestedAbstention;
-        //this.checkOrder = getCheckOrder(requestedAbstention.worker().getRank());
-        checkOrder = null;
-    }
-
-    private ShiftEditingHandler(List<Shift> shiftProposal) {
-        this(shiftProposal, null);
+        this.checkOrder = getCheckOrder(requestedAbstention.worker().getRank());
     }
 
     private void editShiftProposal() {
-        var abstentionShifts = shiftProposal.stream().filter(
-                shift -> requestedAbstention.period().comprehends(shift.getDate())).toList();
+        var abstentionShifts = shiftProposal
+                .stream()
+                .filter(shift -> requestedAbstention.period().comprehends(shift.getDate()))
+                .filter(shift -> requestedAbstention.worker().equals(shift.getOwner()))
+                .toList();
         for (var shift : abstentionShifts) {
             for (var rank : checkOrder) {
-
+                /* Calcola l'eventuale sostituzione */
+                var substituonOpt = computeSubstitution(shift, rank);
+                /* Se il calcolo è andato a buon fine */
+                substituonOpt.ifPresent(value -> setSubstitution(shift, value));
+                /* Altrimenti calcola l'eventuale straordinario */
             }
         }
     }
 
-    private boolean computeSubstitution(Shift shift) {
+    /* Ritorna il turno con cui far cambio */
+    private Optional<Shift> computeSubstitution(Shift shift, char rank) {
         /* Trova i turni fuori dal periodo di astensione */
         var shifts = shiftProposal
                 .stream()
                 .filter(sh -> !requestedAbstention.period().comprehends(sh.getDate()))
                 .filter(sh -> sh.getHours() == shift.getHours())
+                .filter(sh -> sh.getRank() == rank)
                 .toList();
         for (var sh : shifts) {
             System.out.println("Cheking " + sh);
@@ -59,27 +65,36 @@ public class ShiftEditingHandler {
                 System.out.println("Sostituito non disponibile");
                 continue;
             }
+            /* Giunti qui, abbiamo trovato il sostituto */
             System.out.println("Disponibilità");
+            return Optional.of(sh);
         }
-        return false;
+        return Optional.empty();
+    }
+
+    private void setSubstitution(Shift absentShift, Shift substituteShift) {
+        // TODO: DBMSDaemon.getInstance().setSubstitution
+        var absent = absentShift.getOwner();
+        var substitute = substituteShift.getOwner();
+        // Cambiare anche la proposta di turnazione
+        /*MailManager.getInstance().notifySubstitution(substituteShift.getOwner(), absentShift.getOwner(),
+                absentShift);*/
     }
 
     public static void main(String[] args) throws DBMSException {
-       var shH = new ShiftProposalHandler(
+       /*var shH = new ShiftProposalHandler(
                LocalDate.of(2023, 1 , 2),
                DBMSDaemon.getInstance().getWorkersList(), DBMSDaemon.getInstance().getRequestedHolidays(
                        LocalDate.of(2023, 1, 2)));
-       shH.computeNewShiftsProposal();
+       shH.computeNewShiftsProposal();*/
        var shiftProposal = DBMSDaemon.getInstance().getShiftsList();
        var w = new Worker("0123456", "", "", 'H', "", "", "");
        var editor = new ShiftEditingHandler(shiftProposal, new Abstention(w, new Period(
                LocalDate.of(2023, 1, 2), LocalDate.of(2023, 1, 2)
        ), false));
-       editor.computeSubstitution(new Shift(w, 'H', LocalDate.of(2023, 1, 2),
-               LocalTime.of(16, 0), LocalTime.of(18, 0)));
-        System.out.println(editor.checkAvailability(new Worker("0266723", "", "", 'H', "", "", ""),
-                LocalDate.of(2023, 1, 2),
-                LocalTime.of(16, 0), LocalTime.of(18, 0)));
+        /*System.out.println(editor.computeSubstitution(new Shift(w, 'H', LocalDate.of(2023, 1, 2),
+                LocalTime.of(16, 0), LocalTime.of(18, 0)), 'D'));*/
+        editor.editShiftProposal();
     }
 
 
