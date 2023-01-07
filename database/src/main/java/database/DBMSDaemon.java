@@ -1051,7 +1051,50 @@ public class DBMSDaemon {
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
+    }
 
+    /** Ottiene la lista di turni in un periodo. */
+    private List<Shift> getShiftsList(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                select W.ID, W.workerName, W.workerSurname, W.workerRank, W.telNumber, W.email, W.IBAN,
+                S.shiftRank, S.shiftDate, S.shiftStart, S.shiftEnd
+                from Worker W join Shift S on (W.ID = S.refWorkerID)
+                where refWorkerID = ? AND shiftDate BETWEEN ? AND ?
+                """)
+        ) {
+            st.setString(1, id);
+            st.setDate(2, Date.valueOf(startDate));
+            st.setDate(3, Date.valueOf(endDate));
+
+            var resultSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+
+            List<Shift> shifts = new ArrayList<>(maps.size());
+            for (var map : maps) {
+                /* Crea un turno coi dati estratti dal database */
+                shifts.add(new Shift(
+                        new Worker(
+                                map.get("ID"),
+                                map.get("workerName"),
+                                map.get("workerSurname"),
+                                map.get("workerRank").charAt(0),
+                                map.get("telNumber"),
+                                map.get("email"),
+                                map.get("IBAN")
+                        ),
+                        map.get("shiftRank").charAt(0),
+                        LocalDate.parse(map.get("shiftDate")),
+                        LocalTime.parse(map.get("shiftStart")),
+                        LocalTime.parse(map.get("shiftEnd"))
+                ));
+            }
+
+            return shifts;
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     /**
@@ -1085,7 +1128,12 @@ public class DBMSDaemon {
             inSt.setDate(3, Date.valueOf(endDate));
 
             /* Calcola le ore di congedo parentale */
-            var hourCount = Period.dayCount(startDate, endDate) * 24;
+            var shifts = getShiftsList(id, startDate, endDate);
+
+            var hourCount = 0;
+            for (var shift : shifts) {
+                hourCount += shift.getHours();
+            }
 
             /* Riempi gli update */
             upSt1.setInt(1, hourCount);
