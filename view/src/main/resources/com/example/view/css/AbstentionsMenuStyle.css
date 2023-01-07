@@ -4,13 +4,12 @@
     -fx-font-size: 15;
     -fx-background-radius: 6;
 }
-.abstentionsMenu :hover {
+.abstentionsMenu:hover {
     /* Vorrei che si apra il menu */
 }
 .menu-item {
     -fx-background-color: #d9d9d9;
     -fx-pref-height: 46px;
-    -fx-pref-width: 112px;
     -fx-background-radius: 6px;
     -fx-text-fill: black;
 }
