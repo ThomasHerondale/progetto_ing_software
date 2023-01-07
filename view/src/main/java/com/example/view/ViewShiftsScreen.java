@@ -351,7 +351,8 @@ public class ViewShiftsScreen extends LoggedScreen {
 
     @FXML
     public void clickStrikes(ActionEvent event){
-        //TODO:
+        StrikeParticipationHandler strikeParticipationHandler = new StrikeParticipationHandler();
+        strikeParticipationHandler.clickedStrikes();
     }
     @FXML
     public void clickParentalLeave(ActionEvent event){

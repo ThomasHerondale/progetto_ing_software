@@ -67,7 +67,7 @@ public class NavigationManager {
         SCREEN_MAP.put("Entrance Recorded", "FXML/EntranceRecordedPopup.fxml");
         SCREEN_MAP.put("Exit Recorded", "FXML/ExitRecordedPopup.fxml");
         SCREEN_MAP.put("Delay Notice", "FXML/DelayNoticePopup.fxml");
-        //...
+        SCREEN_MAP.put("Strike Participation", "FXML/StrikeParticipationPopup.fxml");
     }
     private HashMap<String, Stage> stagesPopup;
 
