@@ -1,0 +1,9 @@
+.strikeCard {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 16;
+    -fx-background-radius: 4;
+    -fx-background-color: #313146;
+}
+.label {
+    -fx-text-fill: white;
+}
