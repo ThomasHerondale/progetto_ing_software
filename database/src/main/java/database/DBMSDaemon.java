@@ -1872,15 +1872,19 @@ public class DBMSDaemon {
                      )
                """)
        ) {
+           Optional<LocalTime> shiftStartOpt = getShiftStart(id, date);
+           assert shiftStartOpt.isPresent();
+           var shiftStart = shiftStartOpt.get();
+
            st.setString(1, id);
            st.setDate(2, Date.valueOf(date));
-           st.setTime(3, Time.valueOf(getShiftStart(id, date)));
+           st.setTime(3, Time.valueOf(shiftStart));
            st.setString(4, id);
            st.setDate(5, Date.valueOf(date));
-           st.setTime(6, Time.valueOf(getShiftStart(id, date)));
+           st.setTime(6, Time.valueOf(shiftStart));
            st.setString(7, id);
            st.setDate(8, Date.valueOf(date));
-           st.setTime(9, Time.valueOf(getShiftStart(id, date)));
+           st.setTime(9, Time.valueOf(shiftStart));
            st.execute();
        } catch (SQLException e) {
            throw new DBMSException(e);
