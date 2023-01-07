@@ -2,12 +2,10 @@ package shifts;
 
 import commons.Abstention;
 import commons.Period;
-import control.ShiftProposalHandler;
 import database.DBMSDaemon;
 import database.DBMSException;
 import entities.Shift;
 import entities.Worker;
-import mail.MailManager;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -38,8 +36,13 @@ public class ShiftEditingHandler {
                 /* Calcola l'eventuale sostituzione */
                 var substituonOpt = computeSubstitution(shift, rank);
                 /* Se il calcolo è andato a buon fine */
-                substituonOpt.ifPresent(value -> setSubstitution(shift, value));
+                if (substituonOpt.isPresent()) {
+                    setSubstitution(shift, substituonOpt.get());
+                    break;
+                }
                 /* Altrimenti calcola l'eventuale straordinario */
+                if (computeOvertime(shift, rank))
+                    break;
             }
         }
     }
@@ -52,6 +55,7 @@ public class ShiftEditingHandler {
                 .filter(sh -> !requestedAbstention.period().comprehends(sh.getDate()))
                 .filter(sh -> sh.getHours() == shift.getHours())
                 .filter(sh -> sh.getRank() == rank)
+                .filter(sh -> !sh.isSubstitution() && !sh.isOvertime()) // Non devono essere già struppiati!
                 .toList();
         for (var sh : shifts) {
             System.out.println("Cheking " + sh);
@@ -72,15 +76,95 @@ public class ShiftEditingHandler {
         return Optional.empty();
     }
 
+    private boolean computeOvertime(Shift shift, char rank) {
+        var shifts = shiftProposal
+                .stream()
+                .filter(sh -> sh.getRank() == rank)
+                .filter(sh -> !sh.isSubstitution() && !sh.isOvertime())
+                .toList();
+
+        /* Ottieni i turni adiacenti a questo */
+        Shift previousSh = null;
+        Shift nextSh = null;
+        for (var sh : shifts) {
+            if (sh.getEndTime().equals(shift.getStartTime()))
+                previousSh = sh;
+            if (sh.getStartTime().equals(shift.getEndTime()))
+                nextSh = sh;
+        }
+
+        if (previousSh != null) {
+            /* Controlla se il dipendente precedente potrebbe coprirlo intero */
+            if (previousSh.getHours() + shift.getHours() <= 10) {
+                setOvertime(shift, previousSh.getOwner());
+                return true;
+            } else if (nextSh != null && /* Controlla se potrebbe coprirne metà lui e metà quello di dopo */
+                    previousSh.getHours() + (shift.getHours() / 2) <= 10 &&
+                    nextSh.getHours() + (shift.getHours() / 2) <= 10) {
+                setSplitOvertime(shift, previousSh.getOwner(), nextSh.getOwner());
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void setSubstitution(Shift absentShift, Shift substituteShift) {
         // TODO: DBMSDaemon.getInstance().setSubstitution
         var absent = absentShift.getOwner();
         var substitute = substituteShift.getOwner();
-        // Cambiare anche la proposta di turnazione
+        // TODO: Cambiare anche la proposta di turnazione
         /*MailManager.getInstance().notifySubstitution(substituteShift.getOwner(), absentShift.getOwner(),
                 absentShift);*/
     }
 
+    private void setOvertime(Shift shift, Worker w) {
+        var newShift = new Shift(w,
+                shift.getRank(),
+                shift.getDate(),
+                shift.getStartTime(),
+                shift.getEndTime(),
+                true,
+                false);
+        shiftProposal.remove(shift);
+        shiftProposal.add(newShift);
+        // TODO: set
+    }
+
+    private void setSplitOvertime(Shift shift, Worker w1, Worker w2) {
+        if (shift.getHours() % 2 == 0) {
+            var middleTime = shift.getStartTime().plusHours(shift.getHours() / 2);
+            var newShift1 = new Shift(w1,
+                    shift.getRank(),
+                    shift.getDate(),
+                    shift.getStartTime(),
+                    middleTime);
+            var newShift2 = new Shift(w2,
+                    shift.getRank(),
+                    shift.getDate(),
+                    middleTime,
+                    shift.getEndTime());
+            shiftProposal.remove(shift);
+            shiftProposal.add(newShift1);
+            shiftProposal.add(newShift2);
+            // TODO: set
+        } else {
+            int duration1 = shift.getHours() - shift.getHours() / 2;
+            var newShift1 = new Shift(w1,
+                    shift.getRank(),
+                    shift.getDate(),
+                    shift.getStartTime(),
+                    shift.getStartTime().plusHours(duration1));
+            var newShift2 = new Shift(w2,
+                    shift.getRank(),
+                    shift.getDate(),
+                    newShift1.getEndTime(),
+                    shift.getEndTime());
+            shiftProposal.remove(shift);
+            shiftProposal.add(newShift1);
+            shiftProposal.add(newShift2);
+            // TODO: set
+        }
+    }
     public static void main(String[] args) throws DBMSException {
        /*var shH = new ShiftProposalHandler(
                LocalDate.of(2023, 1 , 2),
