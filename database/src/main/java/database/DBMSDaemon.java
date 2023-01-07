@@ -1783,7 +1783,7 @@ public class DBMSDaemon {
      * esiste, altrimenti un {@link Optional} vuoto
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
-    public Optional<LocalTime> getShiftStart(String id, LocalDate date) throws DBMSException {
+    public Optional<LocalTime> getShiftStartTime(String id, LocalDate date) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
                 SELECT MIN(shiftStart) AS shiftStart
@@ -1823,7 +1823,7 @@ public class DBMSDaemon {
      * esiste, altrimenti un {@link Optional} vuoto
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
-    public Optional<LocalTime> getShiftEnd(String id, LocalDate date) throws DBMSException {
+    public Optional<LocalTime> getShiftEndTime(String id, LocalDate date) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
                 SELECT S.shiftEnd
@@ -1872,7 +1872,7 @@ public class DBMSDaemon {
                      )
                """)
        ) {
-           Optional<LocalTime> shiftStartOpt = getShiftStart(id, date);
+           Optional<LocalTime> shiftStartOpt = getShiftStartTime(id, date);
            assert shiftStartOpt.isPresent();
            var shiftStart = shiftStartOpt.get();
 
