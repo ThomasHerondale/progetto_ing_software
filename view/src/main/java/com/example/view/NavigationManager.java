@@ -64,6 +64,9 @@ public class NavigationManager {
         SCREEN_MAP.put("Authorize Strike", "FXML/AuthorizeStrikePopup.fxml");
         SCREEN_MAP.put("Holiday Interruption", "FXML/HolidayInterruptionPopup.fxml");
         SCREEN_MAP.put("Record Presence", "FXML/RecordPresenceScreen.fxml");
+        SCREEN_MAP.put("Entrance Recorded", "FXML/EntranceRecordedPopup.fxml");
+        SCREEN_MAP.put("Exit Recorded", "FXML/ExitRecordedPopup.fxml");
+        SCREEN_MAP.put("Delay Notice", "FXML/DelayNoticePopup.fxml");
         //...
     }
     private HashMap<String, Stage> stagesPopup;
