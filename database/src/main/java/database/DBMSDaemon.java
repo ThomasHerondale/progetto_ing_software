@@ -940,21 +940,27 @@ public class DBMSDaemon {
     }
 
     /**
-     * Ottiene la lista degli scioperi autorizzati presenti nel database per il livello specificato.
+     * Ottiene la lista degli scioperi autorizzati presenti nel database per il livello specificato, a cui il
+     * dipendente specificato non ha già prestato adesione.
+     * @param id la matricola del dipendente
      * @param rank il livello di cui ottenere gli scioperi
      * @return una lista di mappe, ognuna rappresentante un singolo sciopero. Ogni mappa è formata da coppie
      * (nome_attributo, valore_attributo)
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
-    public List<HashMap<String, String>> getAuthorizedStrikes(char rank) throws DBMSException {
+    public List<HashMap<String, String>> getAuthorizedStrikes(String id, char rank) throws DBMSException {
         var queryStr = """
                 select strikeName, strikeDate, descriptionStrike
                 from Strike
                 """;
-        queryStr = queryStr + "where Strike." + rank + " = true";
+        queryStr = queryStr + "where Strike." + rank + " = true " +
+                "and (strikeName, strikeDate) NOT IN (SELECT refStrikeName, refStrikeDate\n" +
+                "                                       FROM strikeparticipation\n" +
+                "                                       WHERE refWorkerID = ?);";
         try (
-                var st = connection.createStatement()
+                var st = connection.prepareStatement(queryStr)
         ) {
+            st.setString(1, id);
             var resultSet = st.executeQuery(queryStr);
 
             return extractResults(resultSet);
