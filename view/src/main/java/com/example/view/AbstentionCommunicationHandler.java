@@ -20,13 +20,15 @@ public class AbstentionCommunicationHandler {
             LocalDate start = LocalDate.MIN;
             LocalDate end = LocalDate.MAX;
             for (int i=0; i<firstDaysOfQuarters.size(); i++){
-                if (!LocalDate.now().isBefore(firstDaysOfQuarters.get(i))){
+                if (LocalDate.now().isBefore(firstDaysOfQuarters.get(i))){
                     if (firstDaysOfQuarters.get(i).toEpochDay() - LocalDate.now().toEpochDay() < distance){
                         distance = firstDaysOfQuarters.get(i).toEpochDay() - LocalDate.now().toEpochDay();
                         end = firstDaysOfQuarters.get(i).plusDays(1);
                     }
                 }
             }
+            System.out.println(end);
+            System.out.println(distance);
             try {
                 locksList = DBMSDaemon.getInstance().getHolidayInterruptions();
                 locksList.add(new Period(start, end));
