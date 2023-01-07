@@ -118,7 +118,6 @@ public class ViewShiftsScreen extends LoggedScreen {
      * @return ritorna una stringa in numero romano
      */
     private String getWeekNumber(LocalDate date) {
-        //TODO:
         LocalDate firstMonday = date.with(TemporalAdjusters.firstInMonth(DayOfWeek.MONDAY));
         int weeksBetween = (int) ChronoUnit.WEEKS.between(firstMonday, date);
         return intToRoman(weeksBetween + 1);
