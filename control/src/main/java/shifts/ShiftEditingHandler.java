@@ -1,11 +1,12 @@
 package shifts;
 
-import commons.Abstention;
 import commons.Period;
+import control.ShiftProposalHandler;
 import database.DBMSDaemon;
 import database.DBMSException;
 import entities.Shift;
 import entities.Worker;
+import mail.MailManager;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -16,10 +17,10 @@ import java.util.Optional;
 
 public class ShiftEditingHandler {
     private final List<Shift> shiftProposal;
-    private final Abstention requestedAbstention;
+    private final AbstentionData requestedAbstention;
     private final List<Character> checkOrder;
 
-    public ShiftEditingHandler(List<Shift> shiftProposal, Abstention requestedAbstention) {
+    public ShiftEditingHandler(List<Shift> shiftProposal, AbstentionData requestedAbstention) {
         this.shiftProposal = shiftProposal;
         this.requestedAbstention = requestedAbstention;
         this.checkOrder = getCheckOrder(requestedAbstention.worker().getRank());
@@ -31,46 +32,55 @@ public class ShiftEditingHandler {
                 .filter(shift -> requestedAbstention.period().comprehends(shift.getDate()))
                 .filter(shift -> requestedAbstention.worker().equals(shift.getOwner()))
                 .toList();
+        System.out.println("TURNI IN PERIODO: " + abstentionShifts);
         for (var shift : abstentionShifts) {
+            var solutionFlag = false;
             for (var rank : checkOrder) {
                 /* Calcola l'eventuale sostituzione */
                 var substituonOpt = computeSubstitution(shift, rank);
                 /* Se il calcolo è andato a buon fine */
                 if (substituonOpt.isPresent()) {
                     setSubstitution(shift, substituonOpt.get());
+                    solutionFlag = true;
                     break;
                 }
                 /* Altrimenti calcola l'eventuale straordinario */
-                if (computeOvertime(shift, rank))
+                if (computeOvertime(shift, rank)) {
+                    solutionFlag = true;
                     break;
+                }
             }
+            if (!solutionFlag)
+                /* Non si è trovata soluzione */
+                System.err.println("Il turno " + shift + "non è stato coperto.");
         }
     }
 
     /* Ritorna il turno con cui far cambio */
     private Optional<Shift> computeSubstitution(Shift shift, char rank) {
-        /* Trova i turni fuori dal periodo di astensione */
+        /* Trova i turni fuori dal periodo di astensione di altri dipendenti */
         var shifts = shiftProposal
                 .stream()
                 .filter(sh -> !requestedAbstention.period().comprehends(sh.getDate()))
                 .filter(sh -> sh.getHours() == shift.getHours())
                 .filter(sh -> sh.getRank() == rank)
+                .filter(sh -> !sh.getOwner().equals(shift.getOwner()))
                 .filter(sh -> !sh.isSubstitution() && !sh.isOvertime()) // Non devono essere già struppiati!
                 .toList();
         for (var sh : shifts) {
-            System.out.println("Cheking " + sh);
+            // System.out.println("Cheking " + sh);
             /* Controlla che il proprietario del turno sia disponibile nell'arco del turno dell'assente */
             if (!checkAvailability(sh.getOwner(), shift.getDate(), shift.getStartTime(), shift.getEndTime())) {
-                System.out.println("Sostituente non disponibile");
+                //System.out.println("Sostituente non disponibile");
                 continue;
             }
             /* Controlla che l'assente sia disponibile nell'arco del turno di chi lo sostituirà */
             if (!checkAvailability(shift.getOwner(), sh.getDate(), sh.getStartTime(), sh.getEndTime())) {
-                System.out.println("Sostituito non disponibile");
+                //System.out.println("Sostituito non disponibile");
                 continue;
             }
             /* Giunti qui, abbiamo trovato il sostituto */
-            System.out.println("Disponibilità");
+            //System.out.println("Disponibilità");
             return Optional.of(sh);
         }
         return Optional.empty();
@@ -79,6 +89,7 @@ public class ShiftEditingHandler {
     private boolean computeOvertime(Shift shift, char rank) {
         var shifts = shiftProposal
                 .stream()
+                .filter(sh -> !sh.getOwner().equals(shift.getOwner()))
                 .filter(sh -> sh.getRank() == rank)
                 .filter(sh -> !sh.isSubstitution() && !sh.isOvertime())
                 .toList();
@@ -110,14 +121,22 @@ public class ShiftEditingHandler {
 
     private void setSubstitution(Shift absentShift, Shift substituteShift) {
         try {
+            System.err.println("Prova " + absentShift + " ------ " + substituteShift);
             DBMSDaemon.getInstance().setSubstitution(absentShift, substituteShift);
+            var absent = absentShift.getOwner();
+            var substitute = substituteShift.getOwner();
+            var newShift1 = absentShift.copyWithSubstitution(substitute);
+            var newShift2 = substituteShift.copyWithSubstitution(absent);
+            shiftProposal.remove(absentShift);
+            shiftProposal.remove(substituteShift);
+            shiftProposal.add(newShift1);
+            shiftProposal.add(newShift2);
+            MailManager.getInstance().notifySubstitution(substituteShift.getOwner(), absentShift.getOwner(),
+                    absentShift);
         } catch (DBMSException e) {
+            System.err.println("Problem in shift editing: " + e.getMessage());
             throw new RuntimeException(e);
         }
-        var absent = absentShift.getOwner();
-        var substitute = substituteShift.getOwner();
-        /*MailManager.getInstance().notifySubstitution(substituteShift.getOwner(), absentShift.getOwner(),
-                absentShift);*/
     }
 
     private void setOvertime(Shift shift, Worker w) {
@@ -169,18 +188,16 @@ public class ShiftEditingHandler {
         }
     }
     public static void main(String[] args) throws DBMSException {
-       /*var shH = new ShiftProposalHandler(
+       var shH = new ShiftProposalHandler(
                LocalDate.of(2023, 1 , 2),
                DBMSDaemon.getInstance().getWorkersList(), DBMSDaemon.getInstance().getRequestedHolidays(
                        LocalDate.of(2023, 1, 2)));
-       shH.computeNewShiftsProposal();*/
+       shH.computeNewShiftsProposal();
        var shiftProposal = DBMSDaemon.getInstance().getShiftsList();
        var w = new Worker("0123456", "", "", 'H', "", "", "");
-       var editor = new ShiftEditingHandler(shiftProposal, new Abstention(w, new Period(
+       var editor = new ShiftEditingHandler(shiftProposal, new AbstentionData(w, new Period(
                LocalDate.of(2023, 1, 2), LocalDate.of(2023, 1, 2)
        ), false));
-        /*System.out.println(editor.computeSubstitution(new Shift(w, 'H', LocalDate.of(2023, 1, 2),
-                LocalTime.of(16, 0), LocalTime.of(18, 0)), 'D'));*/
         editor.editShiftProposal();
     }
 
@@ -196,7 +213,11 @@ public class ShiftEditingHandler {
             var shiftStartOffset = shift.getStartTime().minusHours(3);
             var shiftEndOffset = shift.getEndTime().plusHours(3);
 
-            /* Verifica se gli orari si sovrappongono o sono comunque più vicini di tre ore */
+            /* Verifica se gli orari si sovrappongono */
+            if (start.isBefore(shift.getEndTime()) && end.isAfter(shift.getStartTime()))
+                return false;
+
+            /* Verifica se gli orari sono comunque più vicini di tre ore */
             if (start.isBefore(shiftEndOffset) && end.isAfter(shiftStartOffset))
                 return false;
         }
@@ -217,4 +238,8 @@ public class ShiftEditingHandler {
         System.out.println(order);
         return order;
     }
+}
+
+record AbstentionData(Worker worker, Period period, boolean isLeave) {
+
 }
