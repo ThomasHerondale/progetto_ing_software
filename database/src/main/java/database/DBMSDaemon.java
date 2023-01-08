@@ -2058,8 +2058,8 @@ public class DBMSDaemon {
      * @param toRemove
      * @implNote <b> - Solo per uso interno- </b>
      */
-    public void setOvertime(List<Shift> toInsert, Shift toRemove) throws DBMSException {
-        if (toInsert.size() > 2) throw new AssertionError();
+    public void setOvertime(Shift toRemove, Shift ...toInsert) throws DBMSException {
+        if (toInsert.length <= 2) throw new AssertionError("Troppi turni da inserire!");
 
         for (var shift : toInsert) {
             try (
