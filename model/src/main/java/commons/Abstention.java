@@ -1,6 +1,17 @@
 package commons;
 
-import entities.Worker;
+public enum Abstention {
+    ILLNESS("Malattia"),
+    HOLIDAY("Ferie"),
+    PARENTAL_LEAVE("Congedo Parentale");
 
-public record Abstention(Worker worker, Period period, boolean isLeave) {
+    private final String stringValue;
+
+    Abstention(String stringValue) {
+        this.stringValue = stringValue;
+    }
+
+    public String getStringValue() {
+        return stringValue;
+    }
 }
