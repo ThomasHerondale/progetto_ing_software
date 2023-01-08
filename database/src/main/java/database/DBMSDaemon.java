@@ -1188,8 +1188,8 @@ public class DBMSDaemon {
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public boolean checkHolidayCounter(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
-         /*  Ottiene i giorni e moltiplica per 24 per le ore */
-        var dayCount = Period.dayCount(startDate, endDate) * 24;
+         /*  Ottiene i giorni di ferie */
+        var dayCount = Period.dayCount(startDate, endDate);
 
         try (
                 var st = connection.prepareStatement("""
@@ -1236,8 +1236,8 @@ public class DBMSDaemon {
             inSt.setDate(2, Date.valueOf(startDate));
             inSt.setDate(3, Date.valueOf(endDate));
 
-            /* Calcola le ore di ferie */
-            var dayCount = Period.dayCount(startDate, endDate) * 24;
+            /* Calcola i giorni di ferie */
+            var dayCount = Period.dayCount(startDate, endDate);
 
             /* Riempi l'update */
             upSt.setInt(1, dayCount);
