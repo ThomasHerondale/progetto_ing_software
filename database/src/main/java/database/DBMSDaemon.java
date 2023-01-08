@@ -2064,8 +2064,8 @@ public class DBMSDaemon {
         for (var shift : toInsert) {
             try (
                     var st = connection.prepareStatement("""
-                    INSERT INTO shift(refWorkerID, shiftRank, shiftDate, shiftStart, shiftEnd)
-                    VALUES (?, ?, ?, ?, ?)
+                    INSERT INTO shift(refWorkerID, shiftRank, shiftDate, shiftStart, shiftEnd, overTimeFlag)
+                    VALUES (?, ?, ?, ?, ?, ?)
                     """)
             ) {
                 st.setString(1, shift.getOwner().getId());
@@ -2073,6 +2073,7 @@ public class DBMSDaemon {
                 st.setDate(3, Date.valueOf(shift.getDate()));
                 st.setTime(4, Time.valueOf(shift.getStartTime()));
                 st.setTime(5, Time.valueOf(shift.getEndTime()));
+                st.setInt(6, 1);
                 st.execute();
             } catch (SQLException e) {
                 throw new DBMSException(e);
