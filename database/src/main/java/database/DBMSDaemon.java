@@ -1188,8 +1188,8 @@ public class DBMSDaemon {
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public boolean checkHolidayCounter(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
-         /*  Ottiene i giorni e moltiplica per 24 per le ore */
-        var dayCount = Period.dayCount(startDate, endDate) * 24;
+         /*  Ottiene i giorni di ferie */
+        var dayCount = Period.dayCount(startDate, endDate);
 
         try (
                 var st = connection.prepareStatement("""
@@ -1236,8 +1236,8 @@ public class DBMSDaemon {
             inSt.setDate(2, Date.valueOf(startDate));
             inSt.setDate(3, Date.valueOf(endDate));
 
-            /* Calcola le ore di ferie */
-            var dayCount = Period.dayCount(startDate, endDate) * 24;
+            /* Calcola i giorni di ferie */
+            var dayCount = Period.dayCount(startDate, endDate);
 
             /* Riempi l'update */
             upSt.setInt(1, dayCount);
@@ -2012,6 +2012,41 @@ public class DBMSDaemon {
             }
 
             return workers;
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
+     * Memorizza nel database la sostituzione dei proprietari dei due turni specificati.
+     * @param absent il turno ricaduto nel periodo di astensione
+     * @param substitute il turno del sostituto
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void setSubstitution(Shift absent, Shift substitute) throws DBMSException {
+        try (
+                var st1 = connection.prepareStatement("""
+                UPDATE shift
+                SET refWorkerID = ?, subFlag = TRUE
+                WHERE refWorkerID = ? AND shiftDate = ? AND shiftStart = ?
+                """);
+                var st2 = connection.prepareStatement("""
+                UPDATE shift
+                SET refWorkerID = ?, subFlag = TRUE
+                WHERE refWorkerID = ? AND shiftDate = ? AND shiftStart = ?
+                """)
+        ) {
+            st1.setString(1, substitute.getOwner().getId());
+            st1.setString(2, absent.getOwner().getId());
+            st1.setDate(3, Date.valueOf(absent.getDate()));
+            st1.setTime(4, Time.valueOf(absent.getStartTime()));
+            st2.setString(1, absent.getOwner().getId());
+            st2.setString(2, substitute.getOwner().getId());
+            st2.setDate(3, Date.valueOf(substitute.getDate()));
+            st2.setTime(4, Time.valueOf(substitute.getStartTime()));
+
+            st1.execute();
+            st2.execute();
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
