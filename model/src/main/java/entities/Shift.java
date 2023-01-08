@@ -62,6 +62,17 @@ public class Shift {
         this.isSubstitution = isSubstitution;
     }
 
+    public Shift copyWithSubstitution(Worker newOwner) {
+        return new Shift(
+                newOwner,
+                this.rank,
+                this.date,
+                this.startTime,
+                this.endTime,
+                false,
+                true);
+    }
+
     public Worker getOwner() {
         return owner;
     }
