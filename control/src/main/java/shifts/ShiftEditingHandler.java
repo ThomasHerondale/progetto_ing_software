@@ -109,10 +109,13 @@ public class ShiftEditingHandler {
     }
 
     private void setSubstitution(Shift absentShift, Shift substituteShift) {
-        // TODO: DBMSDaemon.getInstance().setSubstitution
+        try {
+            DBMSDaemon.getInstance().setSubstitution(absentShift, substituteShift);
+        } catch (DBMSException e) {
+            throw new RuntimeException(e);
+        }
         var absent = absentShift.getOwner();
         var substitute = substituteShift.getOwner();
-        // TODO: Cambiare anche la proposta di turnazione
         /*MailManager.getInstance().notifySubstitution(substituteShift.getOwner(), absentShift.getOwner(),
                 absentShift);*/
     }
@@ -180,8 +183,6 @@ public class ShiftEditingHandler {
                 LocalTime.of(16, 0), LocalTime.of(18, 0)), 'D'));*/
         editor.editShiftProposal();
     }
-
-
 
     private boolean checkAvailability(Worker worker, LocalDate date, LocalTime start, LocalTime end) {
         var shifts = shiftProposal
