@@ -2053,9 +2053,6 @@ public class DBMSDaemon {
     }
 
     /**
-     *
-     * @param toInsert
-     * @param toRemove
      * @implNote <b> - Solo per uso interno- </b>
      */
     public void setOvertime(Shift toRemove, Shift ...toInsert) throws DBMSException {
@@ -2075,11 +2072,18 @@ public class DBMSDaemon {
                 st.setTime(5, Time.valueOf(shift.getEndTime()));
                 st.setInt(6, 1);
                 st.execute();
+
+                removeShift(toRemove);
             } catch (SQLException e) {
                 throw new DBMSException(e);
             }
         }
+    }
 
+    /**
+     * @implNote <b> - Solo per uso interno- </b>
+     */
+    public void removeShift(Shift toRemove) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
                 DELETE FROM shift
