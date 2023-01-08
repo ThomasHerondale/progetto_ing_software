@@ -2114,6 +2114,7 @@ public class DBMSDaemon {
             st.setDate(3, Date.valueOf(toInsert.getDate()));
             st.setTime(4, Time.valueOf(toInsert.getStartTime()));
             st.setTime(5, Time.valueOf(toInsert.getEndTime()));
+            st.execute();
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
