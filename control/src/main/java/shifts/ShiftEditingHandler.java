@@ -149,18 +149,25 @@ public class ShiftEditingHandler {
                 false);
         shiftProposal.remove(shift);
         shiftProposal.add(newShift);
-        // TODO: set
+        try {
+            DBMSDaemon.getInstance().setOvertime(shift, newShift);
+        } catch (DBMSException e) {
+            System.err.println("Problem in shift editing: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
     private void setSplitOvertime(Shift shift, Worker w1, Worker w2) {
+        Shift newShift1;
+        Shift newShift2;
         if (shift.getHours() % 2 == 0) {
             var middleTime = shift.getStartTime().plusHours(shift.getHours() / 2);
-            var newShift1 = new Shift(w1,
+            newShift1 = new Shift(w1,
                     shift.getRank(),
                     shift.getDate(),
                     shift.getStartTime(),
                     middleTime);
-            var newShift2 = new Shift(w2,
+            newShift2 = new Shift(w2,
                     shift.getRank(),
                     shift.getDate(),
                     middleTime,
@@ -168,15 +175,14 @@ public class ShiftEditingHandler {
             shiftProposal.remove(shift);
             shiftProposal.add(newShift1);
             shiftProposal.add(newShift2);
-            // TODO: set
         } else {
             int duration1 = shift.getHours() - shift.getHours() / 2;
-            var newShift1 = new Shift(w1,
+            newShift1 = new Shift(w1,
                     shift.getRank(),
                     shift.getDate(),
                     shift.getStartTime(),
                     shift.getStartTime().plusHours(duration1));
-            var newShift2 = new Shift(w2,
+            newShift2 = new Shift(w2,
                     shift.getRank(),
                     shift.getDate(),
                     newShift1.getEndTime(),
@@ -184,7 +190,12 @@ public class ShiftEditingHandler {
             shiftProposal.remove(shift);
             shiftProposal.add(newShift1);
             shiftProposal.add(newShift2);
-            // TODO: set
+        }
+        try {
+            DBMSDaemon.getInstance().setOvertime(shift, newShift1, newShift2);
+        } catch (DBMSException e) {
+            System.err.println("Problem in shift editing: " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
     public static void main(String[] args) throws DBMSException {
