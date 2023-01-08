@@ -207,7 +207,7 @@ public class ShiftEditingHandler {
        var shiftProposal = DBMSDaemon.getInstance().getShiftsList();
        var w = new Worker("0123456", "", "", 'H', "", "", "");
        var editor = new ShiftEditingHandler(shiftProposal, new AbstentionData(w, new Period(
-               LocalDate.of(2023, 1, 2), LocalDate.of(2023, 1, 2)
+               LocalDate.of(2023, 1, 2), LocalDate.of(2023, 1, 4)
        ), false));
         editor.editShiftProposal();
     }
