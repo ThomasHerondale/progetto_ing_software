@@ -18,7 +18,7 @@ public class ShiftProposalHandler {
     private final List<Worker> workers;
     private final Map<String, List<Period>> holidays;
 
-    private final List<Shift> shiftProposal;
+    public final List<Shift> shiftProposal;
 
     private static final List<Character> rankList = List.of('A', 'B', 'C', 'D', 'H');
 
@@ -60,7 +60,7 @@ public class ShiftProposalHandler {
             );
 
             for (var worker : filteredWorkers) {
-                System.out.println("***" + worker.getId() + " - " + worker.getRank() + "***");
+                //System.out.println("***" + worker.getId() + " - " + worker.getRank() + "***");
 
                 int startTime = 8;
                 int minShiftDuration = 4;
@@ -77,19 +77,19 @@ public class ShiftProposalHandler {
                 var currentDay = firstDayOfWeek;
                 var lastDayOfWeek = firstDayOfWeek.plusDays(6);
                 while (availability.totalHours < 18) {
-                    System.out.println("Checking " + currentDay);
+                    //System.out.println("Checking " + currentDay);
                     int shiftDuration = rng.nextInt(maxShiftDuration - minShiftDuration + 1) + minShiftDuration;
                     int endTime = Math.min(startTime + shiftDuration, 22);
 
                     if (currentDay.equals(lastDayOfWeek)) {
-                        System.out.println("\t End of week -> retrying smaller shifts");
+                        //System.out.println("\t End of week -> retrying smaller shifts");
                         currentDay = firstDayOfWeek;
                         minShiftDuration = minShiftDuration / 2;
                         continue;
                     }
 
                     if (startTime >= 22 - minShiftDuration) {
-                        System.out.println("\t Too little time remaining -> retrying next day");
+                        //System.out.println("\t Too little time remaining -> retrying next day");
                         currentDay = currentDay.plusDays(1);
                         startTime = 8;
                         continue;
@@ -107,7 +107,7 @@ public class ShiftProposalHandler {
 
                     if (availability.totalHours + shiftDuration > 18) {
                         // TODO: che cazzo è?
-                        System.out.println("\tToo late to find a shift -> retrying next day");
+                        //System.out.println("\tToo late to find a shift -> retrying next day");
                         currentDay = currentDay.plusDays(1);
                         startTime = 8;
                         continue;
@@ -115,15 +115,15 @@ public class ShiftProposalHandler {
 
                     if (availability.totalHours + shiftDuration < minShiftDuration) {
                         // TODO: che cazzo è?
-                        System.out.println("\tToo little space remaining -> retrying next day");
+                        //System.out.println("\tToo little space remaining -> retrying next day");
                         currentDay = currentDay.plusDays(1);
                         startTime = 8;
                         continue;
                     }
 
                     if (startTime == endTime) {
-                        System.out.println("\t Start time can't be equal to end time -> retrying next" +
-                                " day");
+                        //System.out.println("\t Start time can't be equal to end time -> retrying next" +
+                                //" day");
                         currentDay = currentDay.plusDays(1);
                         startTime = 8;
                         continue;
@@ -145,13 +145,11 @@ public class ShiftProposalHandler {
 
                     startTime = endTime;
 
-                    for (var s : shiftProposal) {
+                    /*for (var s : shiftProposal) {
                         System.out.println(s.getOwner().getId() + " : " + s.getDate() + "  " + s.getStartTime() + "   " +
                                 s.getEndTime() + "  r: " + s.getRank());
-                    }
+                    }*/
                 }
-
-                System.out.println(worker.getId() + " tot. hours: " + availability.totalHours);
             }
         }
     }
@@ -280,11 +278,11 @@ public class ShiftProposalHandler {
         }
 
         public boolean isUnavailable(LocalDate date, int startTime, int endTime, int minimumGap) {
-            System.out.println("[" + worker.getId() + "] Checking for availability" +
-                    " of " + date + " (" + startTime + "-" + endTime + ")");
+            //System.out.println("[" + worker.getId() + "] Checking for availability" +
+                   // " of " + date + " (" + startTime + "-" + endTime + ")");
             for (var holidayPeriod : holidays) {
                 if (holidayPeriod.comprehends(date)) {
-                    System.out.println("\t Holiday");
+                    //System.out.println("\t Holiday");
                     return true;
                 }
             }
@@ -295,7 +293,7 @@ public class ShiftProposalHandler {
                 /* Normalizza l'indice */
                 int idx = i - 8;
                 if (Boolean.FALSE.equals(dayPlan[idx])) {
-                    System.out.println("\t Already busy");
+                    //System.out.println("\t Already busy");
                     return true;
                 }
             }
@@ -303,7 +301,7 @@ public class ShiftProposalHandler {
             for (var i = Math.max(8, startTime - minimumGap); i < startTime; i++) {
                 int idx = i - 8;
                 if (Boolean.FALSE.equals(dayPlan[idx])) {
-                    System.out.println("\t Too near to another shift");
+                    //System.out.println("\t Too near to another shift");
                     return true;
                 }
             }

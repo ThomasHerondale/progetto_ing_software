@@ -2053,6 +2053,74 @@ public class DBMSDaemon {
     }
 
     /**
+     * @implNote <b> - Solo per uso interno- </b>
+     */
+    public void setOvertime(Shift toRemove, Shift ...toInsert) throws DBMSException {
+        if (toInsert.length >= 2) throw new AssertionError("Troppi turni da inserire!");
+
+        for (var shift : toInsert) {
+            try (
+                    var st = connection.prepareStatement("""
+                    INSERT INTO shift(refWorkerID, shiftRank, shiftDate, shiftStart, shiftEnd, overTimeFlag)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """)
+            ) {
+                st.setString(1, shift.getOwner().getId());
+                st.setString(2, String.valueOf(shift.getRank()));
+                st.setDate(3, Date.valueOf(shift.getDate()));
+                st.setTime(4, Time.valueOf(shift.getStartTime()));
+                st.setTime(5, Time.valueOf(shift.getEndTime()));
+                st.setInt(6, 1);
+                st.execute();
+
+                removeShift(toRemove);
+            } catch (SQLException e) {
+                throw new DBMSException(e);
+            }
+        }
+    }
+
+    /**
+     * @implNote <b> - Solo per uso interno- </b>
+     */
+    public void removeShift(Shift toRemove) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                DELETE FROM shift
+                WHERE refWorkerID = ? AND shiftDate = ? AND shiftStart = ?
+                """)
+        ) {
+            st.setString(1, toRemove.getOwner().getId());
+            st.setDate(2, Date.valueOf(toRemove.getDate()));
+            st.setTime(3, Time.valueOf(toRemove.getStartTime()));
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
+     * @implNote <b> - Solo per uso interno- </b>
+     */
+    public void insertShift(Shift toInsert) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                INSERT INTO shift(refWorkerID, shiftRank, shiftDate, shiftStart, shiftEnd)
+                VALUES (?, ?, ?, ?, ?)
+                """)
+        ) {
+            st.setString(1, toInsert.getOwner().getId());
+            st.setString(2, String.valueOf(toInsert.getRank()));
+            st.setDate(3, Date.valueOf(toInsert.getDate()));
+            st.setTime(4, Time.valueOf(toInsert.getStartTime()));
+            st.setTime(5, Time.valueOf(toInsert.getEndTime()));
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
      * Estrae tutte le righe del resultSet specificato, convertendole in mappe (nome_colonna, valore_colonna).
      */
     private List<HashMap<String, String>> extractResults(ResultSet resultSet) throws SQLException {

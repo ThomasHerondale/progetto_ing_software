@@ -51,7 +51,7 @@ public class MailManager {
             }
         });
 
-        session.setDebug(true);
+        //TODO: session.setDebug(true);
     }
 
     /**
