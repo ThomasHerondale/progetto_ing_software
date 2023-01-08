@@ -49,6 +49,7 @@ public class ShiftEditingHandler {
                 var toCover = split.get(0);
                 var toKeep = split.get(1);
                 var handler = new ShiftEditingHandler(shiftProposal, absentWorker.getRank());
+                System.out.println("Shift to cover: " + toCover);
                 /* Permesso non possibile */
                 if (!handler.coverShift(toCover, true)) {
                     // TODO: metodo in mailmanager
@@ -57,6 +58,7 @@ public class ShiftEditingHandler {
                 } else {
                     /* Permesso possibile */
                     DBMSDaemon.getInstance().removeShift(leaveShift.get());
+                    DBMSDaemon.getInstance().insertShift(toKeep);
                 }
             }
             leaveShift = shiftProposal
@@ -80,6 +82,7 @@ public class ShiftEditingHandler {
                 } else {
                     /* Permesso possibile */
                     DBMSDaemon.getInstance().removeShift(leaveShift.get());
+                    DBMSDaemon.getInstance().insertShift(toKeep);
                 }
             }
         } catch (DBMSException e) {
@@ -279,20 +282,20 @@ public class ShiftEditingHandler {
         }
     }
     public static void main(String[] args) throws DBMSException {
-/*       var shH = new ShiftProposalHandler(
+       var shH = new ShiftProposalHandler(
                LocalDate.of(2023, 1 , 2),
                DBMSDaemon.getInstance().getWorkersList(), DBMSDaemon.getInstance().getRequestedHolidays(
                        LocalDate.of(2023, 1, 2)));
-       shH.computeNewShiftsProposal();*/
-        var w = new Worker("1234573", "", "", 'A', "", "thomasherondale@gmail.com",
+       shH.computeNewShiftsProposal();
+        var w = new Worker("0266723", "", "", 'A', "", "thomasherondale@gmail.com",
                 "");
        /*var shiftProposal = DBMSDaemon.getInstance().getShiftsList();
        var editor = new ShiftEditingHandler(shiftProposal, new AbstentionData(w, new Period(
                LocalDate.of(2023, 1, 2), LocalDate.of(2023, 1, 4)
        ), false));
         editor.editShiftProposal();*/
-        ShiftEditingHandler.editShiftProposalForLeave(w, LocalDate.of(2023, 1, 3),
-                LocalTime.of(10, 0), LocalTime.of(14, 0));
+        ShiftEditingHandler.editShiftProposalForLeave(w, LocalDate.of(2023, 1, 4),
+                LocalTime.of(8, 0), LocalTime.of(10, 0));
     }
 
     private boolean checkAvailability(Worker worker, LocalDate date, LocalTime start, LocalTime end) {
