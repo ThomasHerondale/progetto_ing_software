@@ -372,7 +372,8 @@ public class ViewShiftsScreen extends LoggedScreen {
     }
     @FXML
     public void clickLeave(ActionEvent event){
-        //TODO:
+        LeaveRequestHandler leaveRequestHandler = new LeaveRequestHandler();
+        leaveRequestHandler.clickedLeave();
     }
 
 }
