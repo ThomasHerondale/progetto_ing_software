@@ -1,23 +1,20 @@
 package timer;
 
-<<<<<<<<< Temporary merge branch 1
-=========
 import commons.Period;
 import control.SalaryHandler;
 import control.ShiftProposalHandler;
->>>>>>>>> Temporary merge branch 2
 import database.DBMSDaemon;
 import database.DBMSException;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.*;
 import java.time.Instant;
-<<<<<<<<< Temporary merge branch 1
-import java.util.Date;
-=========
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
->>>>>>>>> Temporary merge branch 2
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -26,20 +23,6 @@ public class TimerManager {
      * Il timer che si occupa delle uscite automatiche.
      */
     private final Timer autoExitTimer;
-<<<<<<<<< Temporary merge branch 1
-    /**
-     * Il timer che si occupa del reset dei contatori dei dipendenti.
-     */
-    private MonthlyTimer resetCountersTimer;
-    /**
-     * Il timer che si occupa del calcolo degli stipendi.
-     */
-    private MonthlyTimer newSalariesTimer;
-    /**
-     * Il timer che si occupa del calcolo della nuova proposta di turnazione.
-     */
-    private MonthlyTimer shiftProposalTimer;
-=========
 
     /**
      * La data di inizio di ogni trimestre.
@@ -51,7 +34,6 @@ public class TimerManager {
             LocalDate.of(2023, 10, 2)
     );
 
->>>>>>>>> Temporary merge branch 2
     /**
      * L'intervallo tra una registrazione di uscite automatiche e un'altra.
      */
@@ -66,7 +48,7 @@ public class TimerManager {
     private static TimerManager instance;
 
     private TimerManager() {
-        this.autoExitTimer = new Timer(false);
+        this.autoExitTimer = new Timer(true);
     }
 
     /**
@@ -91,23 +73,11 @@ public class TimerManager {
      * Inizializza il manager avviando tutti task.
      */
     public void initialize() {
-<<<<<<<<< Temporary merge branch 1
-        var rate = debugMode ? 10_000 : AUTO_EXIT_RATE;
-        autoExitTimer.scheduleAtFixedRate(new AutoExitTask(debugMode), Date.from(Instant.now()), rate);
-        this.resetCountersTimer = MonthlyTimer.schedule(
-                () -> {
-                    try {
-                        DBMSDaemon.getInstance().resetCounters();
-                    } catch (DBMSException e) {
-                        if (debugMode)
-                            System.err.println("[DEBUG - RESET_COUNTERS - DBMS ERROR]");
-                    }
-                }, 27, 23);
-=========
         /* Programma il timer delle uscite automatiche ogni mezz'ora */
         var rate = debugMode ? 10_000 : AUTO_EXIT_RATE;
         var currentDate = debugMode ?
-                LocalDate.of(2023, 1, 27)
+                // LocalDate.of(2023, 1, 27)
+                firstDaysOfQuarters.get(0).minusWeeks(1)
                 :
                 LocalDate.now();
         var currentTime = debugMode ?
@@ -115,8 +85,8 @@ public class TimerManager {
                 :
                 LocalTime.now();
 
-        autoExitTimer.scheduleAtFixedRate(new AutoExitTask(debugMode), Date.from(Instant.now()), rate);
->>>>>>>>> Temporary merge branch 2
+        autoExitTimer.scheduleAtFixedRate(new AutoExitTask(
+                debugMode, LocalDate.now()), Date.from(Instant.now()), rate);
 
         /* Task di debug */
         if (debugMode) {
@@ -127,8 +97,6 @@ public class TimerManager {
                 }
             }, Date.from(Instant.now()), 5_000);
         }
-<<<<<<<<< Temporary merge branch 1
-=========
 
         /* Controlla la data per proporre una nuova turnazione */
         for (var firstDay : firstDaysOfQuarters) {
@@ -161,6 +129,8 @@ public class TimerManager {
     }
 
     private void newShiftProposal(LocalDate firstDayOfQuarter) {
+        if (debugMode)
+            System.err.println("[DEBUG - SHIFT_PROPOSAL - ACTION]...");
         try {
             var workers = DBMSDaemon.getInstance().getWorkersList();
             var holidays = DBMSDaemon.getInstance().getRequestedHolidays(firstDayOfQuarter);
@@ -169,6 +139,8 @@ public class TimerManager {
         } catch (DBMSException e) {
             throw new TimerException(e.getMessage());
         }
+        if (debugMode)
+            System.err.println("[DEBUG - SHIFT_PROPOSAL - ACTION]");
     }
 
     private void newSalaries(LocalDate endDate) {
@@ -183,7 +155,6 @@ public class TimerManager {
             e.printStackTrace();
             throw new TimerException(e.getMessage());
         }
->>>>>>>>> Temporary merge branch 2
     }
 
     /**
@@ -192,10 +163,6 @@ public class TimerManager {
     public void cancel() {
         autoExitTimer.cancel();
         autoExitTimer.purge();
-<<<<<<<<< Temporary merge branch 1
-        resetCountersTimer.cancelCurrent();
-=========
->>>>>>>>> Temporary merge branch 2
         invalidate();
     }
 

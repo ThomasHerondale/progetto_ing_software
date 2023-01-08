@@ -4,7 +4,9 @@ import commons.Session;
 import database.DBMSDaemon;
 import database.DBMSException;
 import entities.Shift;
+import shifts.ShiftEditingHandler;
 
+import java.lang.reflect.GenericDeclaration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -39,8 +41,9 @@ public class LeaveRequestHandler {
         return returnList;
     }
 
-    public void clickedConfirm(String startTime, String endTime) {
-        //TODO: invoca il caso d'uso modifica turnazione
+    public void clickedConfirm(LocalDate date, String startTime, String endTime) {
+        ShiftEditingHandler.editShiftProposalForLeave(Session.getInstance().getWorker(),
+                date, LocalTime.parse(startTime), LocalTime.parse(endTime));
         NavigationManager.getInstance().closePopup("Leave Request");
     }
 }

@@ -77,7 +77,7 @@ public class LeaveRequestPopup {
 
     @FXML
     public void clickConfirm(ActionEvent event) {
-        leaveRequestHandler.clickedConfirm(startTimeBox.getValue(), endTimeBox.getValue());
+        leaveRequestHandler.clickedConfirm(shiftSelected.getDate(), startTimeBox.getValue(), endTimeBox.getValue());
     }
 
 }

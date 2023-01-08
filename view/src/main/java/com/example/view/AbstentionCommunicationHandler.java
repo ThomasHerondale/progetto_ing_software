@@ -5,6 +5,7 @@ import commons.Period;
 import commons.Session;
 import database.DBMSDaemon;
 import database.DBMSException;
+import shifts.ShiftEditingHandler;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -84,7 +85,7 @@ public class AbstentionCommunicationHandler {
                 //TODO:
                 throw new RuntimeException(e);
             }
-            //TODO: invoca modifica turnazione
+            ShiftEditingHandler.editShiftProposal(Session.getInstance().getWorker(), abstentionPeriod);
         }
         if (abstention == Abstention.HOLIDAY){
             try {
@@ -107,7 +108,7 @@ public class AbstentionCommunicationHandler {
                         abstentionPeriod.start(), abstentionPeriod.end())){
                     DBMSDaemon.getInstance().setParentalLeavePeriod(Session.getInstance().getWorker().getId(),
                             abstentionPeriod.start(), abstentionPeriod.end());
-                    //TODO: invoca modifica turnazione
+                    ShiftEditingHandler.editShiftProposal(Session.getInstance().getWorker(), abstentionPeriod);
                 } else {
                     NavigationManager.getInstance().createPopup("Error Message",
                             controller -> new ErrorMessage("Limite ore congedo parentale raggiunto."));
