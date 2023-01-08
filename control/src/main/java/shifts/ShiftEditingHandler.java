@@ -281,22 +281,6 @@ public class ShiftEditingHandler {
             throw new RuntimeException(e);
         }
     }
-    public static void main(String[] args) throws DBMSException {
-       var shH = new ShiftProposalHandler(
-               LocalDate.of(2023, 1 , 2),
-               DBMSDaemon.getInstance().getWorkersList(), DBMSDaemon.getInstance().getRequestedHolidays(
-                       LocalDate.of(2023, 1, 2)));
-       shH.computeNewShiftsProposal();
-        var w = new Worker("0266723", "", "", 'A', "", "thomasherondale@gmail.com",
-                "");
-       /*var shiftProposal = DBMSDaemon.getInstance().getShiftsList();
-       var editor = new ShiftEditingHandler(shiftProposal, new AbstentionData(w, new Period(
-               LocalDate.of(2023, 1, 2), LocalDate.of(2023, 1, 4)
-       ), false));
-        editor.editShiftProposal();*/
-        ShiftEditingHandler.editShiftProposalForLeave(w, LocalDate.of(2023, 1, 4),
-                LocalTime.of(8, 0), LocalTime.of(10, 0));
-    }
 
     private boolean checkAvailability(Worker worker, LocalDate date, LocalTime start, LocalTime end) {
         var shifts = shiftProposal
