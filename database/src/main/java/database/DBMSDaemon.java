@@ -484,7 +484,7 @@ public class DBMSDaemon {
             throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
-                insert into Strike(strikeName, strikeDate, descriptionStrike, A, B, C, D, Adm)
+                insert into Strike(strikeName, strikeDate, descriptionStrike, A, B, C, D, H)
                 values (?, ?, ?, ?, ?, ?, ?, ?)
                 """)
         ) {
@@ -511,7 +511,7 @@ public class DBMSDaemon {
                 paramCounter++;
             }
 
-            assert paramCounter == 8;
+            assert paramCounter == 9;
 
             st.execute();
         } catch (SQLException e) {
@@ -940,22 +940,28 @@ public class DBMSDaemon {
     }
 
     /**
-     * Ottiene la lista degli scioperi autorizzati presenti nel database per il livello specificato.
+     * Ottiene la lista degli scioperi autorizzati presenti nel database per il livello specificato, a cui il
+     * dipendente specificato non ha già prestato adesione.
+     * @param id la matricola del dipendente
      * @param rank il livello di cui ottenere gli scioperi
      * @return una lista di mappe, ognuna rappresentante un singolo sciopero. Ogni mappa è formata da coppie
      * (nome_attributo, valore_attributo)
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
-    public List<HashMap<String, String>> getAuthorizedStrikes(char rank) throws DBMSException {
+    public List<HashMap<String, String>> getAuthorizedStrikes(String id, char rank) throws DBMSException {
         var queryStr = """
                 select strikeName, strikeDate, descriptionStrike
                 from Strike
                 """;
-        queryStr = queryStr + "where Strike." + rank + " = true";
+        queryStr = queryStr + "where Strike." + rank + " = true " +
+                "and (strikeName, strikeDate) NOT IN (SELECT refStrikeName, refStrikeDate\n" +
+                "                                       FROM strikeparticipation\n" +
+                "                                       WHERE refWorkerID = ?)";
         try (
-                var st = connection.createStatement()
+                var st = connection.prepareStatement(queryStr)
         ) {
-            var resultSet = st.executeQuery(queryStr);
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
 
             return extractResults(resultSet);
         } catch (SQLException e) {
@@ -1045,7 +1051,50 @@ public class DBMSDaemon {
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
+    }
 
+    /** Ottiene la lista di turni in un periodo. */
+    private List<Shift> getShiftsList(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                select W.ID, W.workerName, W.workerSurname, W.workerRank, W.telNumber, W.email, W.IBAN,
+                S.shiftRank, S.shiftDate, S.shiftStart, S.shiftEnd
+                from Worker W join Shift S on (W.ID = S.refWorkerID)
+                where refWorkerID = ? AND shiftDate BETWEEN ? AND ?
+                """)
+        ) {
+            st.setString(1, id);
+            st.setDate(2, Date.valueOf(startDate));
+            st.setDate(3, Date.valueOf(endDate));
+
+            var resultSet = st.executeQuery();
+
+            List<HashMap<String, String>> maps = extractResults(resultSet);
+
+            List<Shift> shifts = new ArrayList<>(maps.size());
+            for (var map : maps) {
+                /* Crea un turno coi dati estratti dal database */
+                shifts.add(new Shift(
+                        new Worker(
+                                map.get("ID"),
+                                map.get("workerName"),
+                                map.get("workerSurname"),
+                                map.get("workerRank").charAt(0),
+                                map.get("telNumber"),
+                                map.get("email"),
+                                map.get("IBAN")
+                        ),
+                        map.get("shiftRank").charAt(0),
+                        LocalDate.parse(map.get("shiftDate")),
+                        LocalTime.parse(map.get("shiftStart")),
+                        LocalTime.parse(map.get("shiftEnd"))
+                ));
+            }
+
+            return shifts;
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
     }
 
     /**
@@ -1079,7 +1128,12 @@ public class DBMSDaemon {
             inSt.setDate(3, Date.valueOf(endDate));
 
             /* Calcola le ore di congedo parentale */
-            var hourCount = Period.dayCount(startDate, endDate) * 24;
+            var shifts = getShiftsList(id, startDate, endDate);
+
+            var hourCount = 0;
+            for (var shift : shifts) {
+                hourCount += shift.getHours();
+            }
 
             /* Riempi gli update */
             upSt1.setInt(1, hourCount);
@@ -1134,8 +1188,8 @@ public class DBMSDaemon {
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      */
     public boolean checkHolidayCounter(String id, LocalDate startDate, LocalDate endDate) throws DBMSException {
-         /*  Ottiene i giorni e moltiplica per 24 per le ore */
-        var dayCount = Period.dayCount(startDate, endDate) * 24;
+         /*  Ottiene i giorni di ferie */
+        var dayCount = Period.dayCount(startDate, endDate);
 
         try (
                 var st = connection.prepareStatement("""
@@ -1182,8 +1236,8 @@ public class DBMSDaemon {
             inSt.setDate(2, Date.valueOf(startDate));
             inSt.setDate(3, Date.valueOf(endDate));
 
-            /* Calcola le ore di ferie */
-            var dayCount = Period.dayCount(startDate, endDate) * 24;
+            /* Calcola i giorni di ferie */
+            var dayCount = Period.dayCount(startDate, endDate);
 
             /* Riempi l'update */
             upSt.setInt(1, dayCount);
@@ -1664,8 +1718,9 @@ public class DBMSDaemon {
                 """)
         ) {
             /* Ottieni l'orario di inizio del primo turno */
-            // var startTime = getLastShiftStart(id, date);
-            var startTime = LocalTime.of(time.getHour(), 0);
+            Optional<LocalTime> startTimeOpt = getShiftStartTime(id, date);
+            assert startTimeOpt.isPresent();
+            var startTime = startTimeOpt.get();
 
             st.setString(1, id);
             st.setDate(2, Date.valueOf(date));
@@ -1774,7 +1829,16 @@ public class DBMSDaemon {
         }
     }
 
-    private LocalTime getLastShiftStart(String id, LocalDate date) throws DBMSException {
+    /**
+     * Ottiene dal database l'orario di inizio del primo turno del dipendente specificato che non presenta registrato
+     * un ingresso nella data specificata.
+     * @param id la matricola del dipendente
+     * @param date la data di riferimento
+     * @return un {@link Optional} contenente l'orario di inizio del primo turno senza ingresso del dipendente, se esso
+     * esiste, altrimenti un {@link Optional} vuoto
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public Optional<LocalTime> getShiftStartTime(String id, LocalDate date) throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
                 SELECT MIN(shiftStart) AS shiftStart
@@ -1796,7 +1860,46 @@ public class DBMSDaemon {
             var maps = extractResults(resultSet);
             assert maps.size() <= 1; /* Dovrebbe esserci al più un solo minimo */
 
-            return LocalTime.parse(maps.get(0).get("shiftStart"));
+            if (maps.isEmpty())
+                return Optional.empty();
+            else
+                return Optional.ofNullable(LocalTime.parse(maps.get(0).get("shiftStart")));
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
+     * Ottiene dal database l'orario di fine del primo turno del dipendente specificato che presenta registrato un
+     * ingresso ma non un'uscita nella data specificata.
+     * @param id la matricola del dipendente
+     * @param date la data di riferimento
+     * @return un {@link Optional} contenente l'orario di fine del primo turno senza uscita del dipendente, se esso
+     * esiste, altrimenti un {@link Optional} vuoto
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public Optional<LocalTime> getShiftEndTime(String id, LocalDate date) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT S.shiftEnd
+                FROM Shift S join Presence P
+                    on (S.refWorkerID = P.refShiftID and S.shiftDate = P.refShiftDate
+                    and S.shiftStart = P.refShiftStart)
+                    JOIN worker w ON w.ID = S.refWorkerID
+                WHERE S.refWorkerID = ? AND P.refShiftDate = ? AND P.exitTime IS NULL;
+                """)
+        ) {
+            st.setString(1, id);
+            st.setDate(2, Date.valueOf(date));
+            var resultSet = st.executeQuery();
+
+            var maps = extractResults(resultSet);
+            assert maps.size() <= 1; /* In teoria non dovrebbero esserci più di un turno senza uscita... */
+
+            if (maps.isEmpty())
+                return Optional.empty();
+            else
+                return Optional.ofNullable(LocalTime.parse(maps.get(0).get("shiftEnd")));
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
@@ -1824,15 +1927,19 @@ public class DBMSDaemon {
                      )
                """)
        ) {
+           Optional<LocalTime> shiftStartOpt = getShiftStartTime(id, date);
+           assert shiftStartOpt.isPresent();
+           var shiftStart = shiftStartOpt.get();
+
            st.setString(1, id);
            st.setDate(2, Date.valueOf(date));
-           st.setTime(3, Time.valueOf(getLastShiftStart(id, date)));
+           st.setTime(3, Time.valueOf(shiftStart));
            st.setString(4, id);
            st.setDate(5, Date.valueOf(date));
-           st.setTime(6, Time.valueOf(getLastShiftStart(id, date)));
+           st.setTime(6, Time.valueOf(shiftStart));
            st.setString(7, id);
            st.setDate(8, Date.valueOf(date));
-           st.setTime(9, Time.valueOf(getLastShiftStart(id, date)));
+           st.setTime(9, Time.valueOf(shiftStart));
            st.execute();
        } catch (SQLException e) {
            throw new DBMSException(e);
@@ -1905,6 +2012,41 @@ public class DBMSDaemon {
             }
 
             return workers;
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
+     * Memorizza nel database la sostituzione dei proprietari dei due turni specificati.
+     * @param absent il turno ricaduto nel periodo di astensione
+     * @param substitute il turno del sostituto
+     * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
+     */
+    public void setSubstitution(Shift absent, Shift substitute) throws DBMSException {
+        try (
+                var st1 = connection.prepareStatement("""
+                UPDATE shift
+                SET refWorkerID = ?, subFlag = TRUE
+                WHERE refWorkerID = ? AND shiftDate = ? AND shiftStart = ?
+                """);
+                var st2 = connection.prepareStatement("""
+                UPDATE shift
+                SET refWorkerID = ?, subFlag = TRUE
+                WHERE refWorkerID = ? AND shiftDate = ? AND shiftStart = ?
+                """)
+        ) {
+            st1.setString(1, substitute.getOwner().getId());
+            st1.setString(2, absent.getOwner().getId());
+            st1.setDate(3, Date.valueOf(absent.getDate()));
+            st1.setTime(4, Time.valueOf(absent.getStartTime()));
+            st2.setString(1, absent.getOwner().getId());
+            st2.setString(2, substitute.getOwner().getId());
+            st2.setDate(3, Date.valueOf(substitute.getDate()));
+            st2.setTime(4, Time.valueOf(substitute.getStartTime()));
+
+            st1.execute();
+            st2.execute();
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
