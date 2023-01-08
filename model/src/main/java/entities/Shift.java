@@ -4,8 +4,8 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalField;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -71,6 +71,13 @@ public class Shift {
                 this.endTime,
                 false,
                 true);
+    }
+
+    public List<Shift> splitForLeave(LocalTime pivotTime) {
+        var firstHalf = new Shift(owner, rank, date, startTime, pivotTime);
+        var secondHalf = new Shift(owner, rank, date, pivotTime, endTime);
+
+        return new ArrayList<>(List.of(firstHalf, secondHalf));
     }
 
     public Worker getOwner() {
