@@ -1,6 +1,5 @@
 package shifts;
 
-import commons.Abstention;
 import commons.Period;
 import control.ShiftProposalHandler;
 import database.DBMSDaemon;
@@ -15,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public class ShiftEditingHandler {
     private final List<Shift> shiftProposal;
@@ -38,12 +38,50 @@ public class ShiftEditingHandler {
             List<Shift> shiftProposal = DBMSDaemon.getInstance().getShiftsList();
             Optional<Shift> leaveShift = shiftProposal
                     .stream()
+                    .filter(shift -> shift.getOwner().equals(absentWorker))
+                    .filter(shift -> shift.getDate().equals(date))
                     .filter(shift -> shift.getStartTime().equals(startTime))
                     .findFirst();
             if (leaveShift.isPresent()) {
+                System.out.println("All'inizio");
                 /* Permesso richiesto all'inizio del turno */
+                var split = leaveShift.get().splitForLeave(endTime);
+                var toCover = split.get(0);
+                var toKeep = split.get(1);
+                var handler = new ShiftEditingHandler(shiftProposal, absentWorker.getRank());
+                /* Permesso non possibile */
+                if (!handler.coverShift(toCover, true)) {
+                    // TODO: metodo in mailmanager
+                    MailManager.getInstance().notifyHiring(absentWorker.getEmail(), absentWorker.getFullName(),
+                            "");
+                } else {
+                    /* Permesso possibile */
+                    DBMSDaemon.getInstance().removeShift(leaveShift.get());
+                }
             }
-
+            leaveShift = shiftProposal
+                    .stream()
+                    .filter(shift -> shift.getOwner().equals(absentWorker))
+                    .filter(shift -> shift.getDate().equals(date))
+                    .filter(shift -> shift.getEndTime().equals(endTime))
+                    .findFirst();
+            if (leaveShift.isPresent()) {
+                System.out.println("Alla fine");
+                /* Permesso richiesto alla fine del turno */
+                var split = leaveShift.get().splitForLeave(startTime);
+                var toCover = split.get(1);
+                var toKeep = split.get(0);
+                var handler = new ShiftEditingHandler(shiftProposal, absentWorker.getRank());
+                /* Permesso non possibile */
+                if (!handler.coverShift(toCover, true)) {
+                    // TODO: metodo in mailmanager
+                    MailManager.getInstance().notifyHiring(absentWorker.getEmail(), absentWorker.getFullName(),
+                            "");
+                } else {
+                    /* Permesso possibile */
+                    DBMSDaemon.getInstance().removeShift(leaveShift.get());
+                }
+            }
         } catch (DBMSException e) {
             throw new RuntimeException(e);
         }
@@ -55,6 +93,12 @@ public class ShiftEditingHandler {
         this.checkOrder = getCheckOrder(requestedAbstention.worker().getRank());
     }
 
+    private ShiftEditingHandler(List<Shift> shiftProposal, char absentWorkerRank) {
+        this.shiftProposal = shiftProposal;
+        this.requestedAbstention = null;
+        this.checkOrder = getCheckOrder(absentWorkerRank);
+    }
+
     private void editShiftProposal() {
         var abstentionShifts = shiftProposal
                 .stream()
@@ -63,39 +107,41 @@ public class ShiftEditingHandler {
                 .toList();
         System.out.println("TURNI IN PERIODO: " + abstentionShifts);
         for (var shift : abstentionShifts) {
-            var solutionFlag = false;
-            for (var rank : checkOrder) {
-                if (requestedAbstention.isLeave() &&
-                rank != requestedAbstention.worker().getRank()) {
-                    // TODO: deny
-                    break;
-                }
-                /* Calcola l'eventuale sostituzione */
-                var substituonOpt = computeSubstitution(shift, rank);
-                /* Se il calcolo è andato a buon fine */
-                if (substituonOpt.isPresent()) {
-                    setSubstitution(shift, substituonOpt.get());
-                    solutionFlag = true;
-                    break;
-                }
-                /* Altrimenti calcola l'eventuale straordinario */
-                if (computeOvertime(shift, rank)) {
-                    solutionFlag = true;
-                    break;
-                }
-            }
-            if (!solutionFlag)
-                /* Non si è trovata soluzione */
-                System.err.println("Il turno " + shift + "non è stato coperto.");
+            coverShift(shift, requestedAbstention.isLeave());
         }
+    }
+
+    private boolean coverShift(Shift shift, boolean isLeave) {
+        for (var rank : checkOrder) {
+            if (isLeave && rank != shift.getOwner().getRank())
+                return false;
+            /* Calcola l'eventuale sostituzione */
+            var substituonOpt = computeSubstitution(shift, rank);
+            /* Se il calcolo è andato a buon fine */
+            if (substituonOpt.isPresent()) {
+                setSubstitution(shift, substituonOpt.get());
+                return true;
+            }
+            /* Altrimenti calcola l'eventuale straordinario */
+            if (computeOvertime(shift, rank)) {
+                return true;
+            }
+        }
+        /* Non si è trovata soluzione */
+        System.err.println("Il turno " + shift + "non è stato coperto.");
+        return false;
     }
 
     /* Ritorna il turno con cui far cambio */
     private Optional<Shift> computeSubstitution(Shift shift, char rank) {
+        Predicate<Shift> periodFilter = requestedAbstention == null ?
+                sh -> true
+                :
+                sh -> !requestedAbstention.period().comprehends(sh.getDate());
         /* Trova i turni fuori dal periodo di astensione di altri dipendenti */
         var shifts = shiftProposal
                 .stream()
-                .filter(sh -> !requestedAbstention.period().comprehends(sh.getDate()))
+                .filter(periodFilter)
                 .filter(sh -> sh.getHours() == shift.getHours())
                 .filter(sh -> sh.getRank() == rank)
                 .filter(sh -> !sh.getOwner().equals(shift.getOwner()))
@@ -233,17 +279,20 @@ public class ShiftEditingHandler {
         }
     }
     public static void main(String[] args) throws DBMSException {
-       var shH = new ShiftProposalHandler(
+/*       var shH = new ShiftProposalHandler(
                LocalDate.of(2023, 1 , 2),
                DBMSDaemon.getInstance().getWorkersList(), DBMSDaemon.getInstance().getRequestedHolidays(
                        LocalDate.of(2023, 1, 2)));
-       shH.computeNewShiftsProposal();
-       var shiftProposal = DBMSDaemon.getInstance().getShiftsList();
-       var w = new Worker("0123456", "", "", 'H', "", "", "");
+       shH.computeNewShiftsProposal();*/
+        var w = new Worker("1234573", "", "", 'A', "", "thomasherondale@gmail.com",
+                "");
+       /*var shiftProposal = DBMSDaemon.getInstance().getShiftsList();
        var editor = new ShiftEditingHandler(shiftProposal, new AbstentionData(w, new Period(
                LocalDate.of(2023, 1, 2), LocalDate.of(2023, 1, 4)
        ), false));
-        editor.editShiftProposal();
+        editor.editShiftProposal();*/
+        ShiftEditingHandler.editShiftProposalForLeave(w, LocalDate.of(2023, 1, 3),
+                LocalTime.of(10, 0), LocalTime.of(14, 0));
     }
 
     private boolean checkAvailability(Worker worker, LocalDate date, LocalTime start, LocalTime end) {
