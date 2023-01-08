@@ -2100,6 +2100,26 @@ public class DBMSDaemon {
     }
 
     /**
+     * @implNote <b> - Solo per uso interno- </b>
+     */
+    public void insertShift(Shift toInsert) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                INSERT INTO shift(refWorkerID, shiftRank, shiftDate, shiftStart, shiftEnd)
+                VALUES (?, ?, ?, ?, ?)
+                """)
+        ) {
+            st.setString(1, toInsert.getOwner().getId());
+            st.setString(2, String.valueOf(toInsert.getRank()));
+            st.setDate(3, Date.valueOf(toInsert.getDate()));
+            st.setTime(4, Time.valueOf(toInsert.getStartTime()));
+            st.setTime(5, Time.valueOf(toInsert.getEndTime()));
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
      * Estrae tutte le righe del resultSet specificato, convertendole in mappe (nome_colonna, valore_colonna).
      */
     private List<HashMap<String, String>> extractResults(ResultSet resultSet) throws SQLException {
