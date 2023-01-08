@@ -2053,6 +2053,48 @@ public class DBMSDaemon {
     }
 
     /**
+     *
+     * @param toInsert
+     * @param toRemove
+     * @implNote <b> - Solo per uso interno- </b>
+     */
+    public void setOvertime(List<Shift> toInsert, Shift toRemove) throws DBMSException {
+        if (toInsert.size() > 2) throw new AssertionError();
+
+        for (var shift : toInsert) {
+            try (
+                    var st = connection.prepareStatement("""
+                    INSERT INTO shift(refWorkerID, shiftRank, shiftDate, shiftStart, shiftEnd)
+                    VALUES (?, ?, ?, ?, ?)
+                    """)
+            ) {
+                st.setString(1, shift.getOwner().getId());
+                st.setString(2, String.valueOf(shift.getRank()));
+                st.setDate(3, Date.valueOf(shift.getDate()));
+                st.setTime(4, Time.valueOf(shift.getStartTime()));
+                st.setTime(5, Time.valueOf(shift.getEndTime()));
+                st.execute();
+            } catch (SQLException e) {
+                throw new DBMSException(e);
+            }
+        }
+
+        try (
+                var st = connection.prepareStatement("""
+                DELETE FROM shift
+                WHERE refWorkerID = ? AND shiftDate = ? AND shiftStart = ?
+                """)
+        ) {
+            st.setString(1, toRemove.getOwner().getId());
+            st.setDate(2, Date.valueOf(toRemove.getDate()));
+            st.setTime(3, Time.valueOf(toRemove.getStartTime()));
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
      * Estrae tutte le righe del resultSet specificato, convertendole in mappe (nome_colonna, valore_colonna).
      */
     private List<HashMap<String, String>> extractResults(ResultSet resultSet) throws SQLException {
