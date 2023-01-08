@@ -1,5 +1,6 @@
 package shifts;
 
+import commons.Abstention;
 import commons.Period;
 import control.ShiftProposalHandler;
 import database.DBMSDaemon;
@@ -20,7 +21,35 @@ public class ShiftEditingHandler {
     private final AbstentionData requestedAbstention;
     private final List<Character> checkOrder;
 
-    public ShiftEditingHandler(List<Shift> shiftProposal, AbstentionData requestedAbstention) {
+    public static void editShiftProposal(Worker absentWorker, Period abstentionPeriod) {
+        try {
+            List<Shift> shiftProposal = DBMSDaemon.getInstance().getShiftsList();
+            var abstentionData = new AbstentionData(absentWorker, abstentionPeriod, false);
+            var handler = new ShiftEditingHandler(shiftProposal, abstentionData);
+            handler.editShiftProposal();
+        } catch (DBMSException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void editShiftProposalForLeave(Worker absentWorker, LocalDate date,
+                                                 LocalTime startTime, LocalTime endTime) {
+        try {
+            List<Shift> shiftProposal = DBMSDaemon.getInstance().getShiftsList();
+            Optional<Shift> leaveShift = shiftProposal
+                    .stream()
+                    .filter(shift -> shift.getStartTime().equals(startTime))
+                    .findFirst();
+            if (leaveShift.isPresent()) {
+                /* Permesso richiesto all'inizio del turno */
+            }
+
+        } catch (DBMSException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private ShiftEditingHandler(List<Shift> shiftProposal, AbstentionData requestedAbstention) {
         this.shiftProposal = shiftProposal;
         this.requestedAbstention = requestedAbstention;
         this.checkOrder = getCheckOrder(requestedAbstention.worker().getRank());
@@ -36,6 +65,11 @@ public class ShiftEditingHandler {
         for (var shift : abstentionShifts) {
             var solutionFlag = false;
             for (var rank : checkOrder) {
+                if (requestedAbstention.isLeave() &&
+                rank != requestedAbstention.worker().getRank()) {
+                    // TODO: deny
+                    break;
+                }
                 /* Calcola l'eventuale sostituzione */
                 var substituonOpt = computeSubstitution(shift, rank);
                 /* Se il calcolo è andato a buon fine */
