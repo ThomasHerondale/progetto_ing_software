@@ -2029,6 +2029,8 @@ public class DBMSDaemon {
                 UPDATE shift
                 SET refWorkerID = ?, subFlag = TRUE
                 WHERE refWorkerID = ? AND shiftDate = ? AND shiftStart = ?
+/*                INSERT INTO shift(refWorkerID, shiftRank, shiftDate, shiftStart, shiftEnd)
+                VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE refWorkerID = ?*/
                 """);
                 var st2 = connection.prepareStatement("""
                 UPDATE shift
