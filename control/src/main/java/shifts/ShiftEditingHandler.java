@@ -1,7 +1,6 @@
 package shifts;
 
 import commons.Period;
-import control.ShiftProposalHandler;
 import database.DBMSDaemon;
 import database.DBMSException;
 import entities.Shift;
@@ -28,7 +27,7 @@ public class ShiftEditingHandler {
             var handler = new ShiftEditingHandler(shiftProposal, abstentionData);
             handler.editShiftProposal();
         } catch (DBMSException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 
@@ -46,6 +45,7 @@ public class ShiftEditingHandler {
                 /* Permesso richiesto all'inizio del turno */
                 var split = leaveShift.get().splitForLeave(endTime);
                 var toCover = split.get(0);
+                DBMSDaemon.getInstance().insertShift(toCover);
                 var toKeep = split.get(1);
                 System.out.println("Turno da coprire: " + toCover);
                 System.out.println("Turno rimasto dal permesso: " + toKeep);
@@ -201,7 +201,6 @@ public class ShiftEditingHandler {
 
     private void setSubstitution(Shift absentShift, Shift substituteShift) {
         try {
-            System.err.println("Prova " + absentShift + " ------ " + substituteShift);
             DBMSDaemon.getInstance().setSubstitution(absentShift, substituteShift);
             var absent = absentShift.getOwner();
             var substitute = substituteShift.getOwner();
