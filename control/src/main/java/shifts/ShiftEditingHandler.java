@@ -70,6 +70,8 @@ public class ShiftEditingHandler {
                 /* Permesso richiesto alla fine del turno */
                 var split = leaveShift.get().splitForLeave(startTime);
                 var toCover = split.get(1);
+                DBMSDaemon.getInstance().removeShift(leaveShift.get());
+                DBMSDaemon.getInstance().insertShift(toCover);
                 var toKeep = split.get(0);
                 System.out.println("Turno da coprire: " + toCover);
                 System.out.println("Turno rimasto dal permesso: " + toKeep);
@@ -79,7 +81,6 @@ public class ShiftEditingHandler {
                     MailManager.getInstance().notifyLeaveDenial(absentWorker, date, startTime, endTime);
                 } else {
                     /* Permesso possibile */
-                    DBMSDaemon.getInstance().removeShift(leaveShift.get());
                     DBMSDaemon.getInstance().insertShift(toKeep);
                 }
             }
