@@ -6,6 +6,8 @@ import entities.Worker;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -183,6 +185,19 @@ public class MailManager {
                         shift.getDate(), shift.getStartTime(), shift.getEndTime(), shift.getRank()
                 ));
         sendCoverageMail(absent, shift);
+    }
+
+    /**
+     * Notifica il dipendente che ha richiesto un permesso del rifiuto dell'inserimento dello stesso da parte del
+     * sistema.
+     * @param absent il dipendente richiedente il permesso
+     * @param leaveDate la data del permesso
+     * @param leaveStart l'ora di inizio del permesso
+     * @param leaveEnd l'ora di fine del permesso
+     */
+    public void notifyLeaveDenial(Worker absent, LocalDate leaveDate, LocalTime leaveStart, LocalTime leaveEnd) {
+        sendEmail(absent.getEmail(), "Permesso rifiutato",
+                leaveDenialNotice(absent.getFullName(), leaveDate, leaveStart, leaveEnd, absent.getRank()));
     }
 
     /**
