@@ -43,18 +43,16 @@ public class ShiftEditingHandler {
                     .filter(shift -> shift.getStartTime().equals(startTime))
                     .findFirst();
             if (leaveShift.isPresent()) {
-                System.out.println("All'inizio");
                 /* Permesso richiesto all'inizio del turno */
                 var split = leaveShift.get().splitForLeave(endTime);
                 var toCover = split.get(0);
                 var toKeep = split.get(1);
+                System.out.println("Turno da coprire: " + toCover);
+                System.out.println("Turno rimasto dal permesso: " + toKeep);
                 var handler = new ShiftEditingHandler(shiftProposal, absentWorker.getRank());
-                System.out.println("Shift to cover: " + toCover);
                 /* Permesso non possibile */
                 if (!handler.coverShift(toCover, true)) {
-                    // TODO: metodo in mailmanager
-                    MailManager.getInstance().notifyHiring(absentWorker.getEmail(), absentWorker.getFullName(),
-                            "");
+                   MailManager.getInstance().notifyLeaveDenial(absentWorker, date, startTime, endTime);
                 } else {
                     /* Permesso possibile */
                     DBMSDaemon.getInstance().removeShift(leaveShift.get());
@@ -68,17 +66,16 @@ public class ShiftEditingHandler {
                     .filter(shift -> shift.getEndTime().equals(endTime))
                     .findFirst();
             if (leaveShift.isPresent()) {
-                System.out.println("Alla fine");
                 /* Permesso richiesto alla fine del turno */
                 var split = leaveShift.get().splitForLeave(startTime);
                 var toCover = split.get(1);
                 var toKeep = split.get(0);
+                System.out.println("Turno da coprire: " + toCover);
+                System.out.println("Turno rimasto dal permesso: " + toKeep);
                 var handler = new ShiftEditingHandler(shiftProposal, absentWorker.getRank());
                 /* Permesso non possibile */
                 if (!handler.coverShift(toCover, true)) {
-                    // TODO: metodo in mailmanager
-                    MailManager.getInstance().notifyHiring(absentWorker.getEmail(), absentWorker.getFullName(),
-                            "");
+                    MailManager.getInstance().notifyLeaveDenial(absentWorker, date, startTime, endTime);
                 } else {
                     /* Permesso possibile */
                     DBMSDaemon.getInstance().removeShift(leaveShift.get());
@@ -86,7 +83,7 @@ public class ShiftEditingHandler {
                 }
             }
         } catch (DBMSException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 
