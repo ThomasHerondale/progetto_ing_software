@@ -34,8 +34,9 @@ public class AbstentionCommunicationHandler {
                 locksList = DBMSDaemon.getInstance().getHolidayInterruptions();
                 locksList.add(new Period(start, end));
             } catch (DBMSException e) {
-                //TODO:
-                throw new RuntimeException(e);
+                e.printStackTrace();
+                NavigationManager.getInstance().createPopup("Error Message",
+                        controller -> new ErrorMessage(true));
             }
         }
         locksList.add(new Period(LocalDate.MIN, LocalDate.now()));
@@ -82,8 +83,9 @@ public class AbstentionCommunicationHandler {
                 DBMSDaemon.getInstance().setIllnessPeriod(Session.getInstance().getWorker().getId(),
                         abstentionPeriod.start(), abstentionPeriod.end());
             } catch (DBMSException e) {
-                //TODO:
-                throw new RuntimeException(e);
+                e.printStackTrace();
+                NavigationManager.getInstance().createPopup("Error Message",
+                        controller -> new ErrorMessage(true));
             }
             ShiftEditingHandler.editShiftProposal(Session.getInstance().getWorker(), abstentionPeriod);
         }
@@ -98,8 +100,9 @@ public class AbstentionCommunicationHandler {
                             controller -> new ErrorMessage("Ferie insufficienti."));
                 }
             } catch (DBMSException e) {
-                //TODO:
-                throw new RuntimeException(e);
+                e.printStackTrace();
+                NavigationManager.getInstance().createPopup("Error Message",
+                        controller -> new ErrorMessage(true));
             }
         }
         if (abstention == Abstention.PARENTAL_LEAVE){
@@ -115,8 +118,9 @@ public class AbstentionCommunicationHandler {
                 }
 
             } catch (DBMSException e) {
-                //TODO:
-                throw new RuntimeException(e);
+                e.printStackTrace();
+                NavigationManager.getInstance().createPopup("Error Message",
+                        controller -> new ErrorMessage(true));
             }
         }
         NavigationManager.getInstance().closePopup("Abstention Communication");

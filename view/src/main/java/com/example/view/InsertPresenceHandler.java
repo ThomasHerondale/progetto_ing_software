@@ -18,14 +18,13 @@ public class InsertPresenceHandler {
         List<Worker> abstents;
         try {
             abstents = DBMSDaemon.getInstance().getAbsentWorkersList(currentDate);
+            NavigationManager.getInstance().createPopup("Insert Presence",
+                    controller -> new InsertPresencePopup(abstents, currentDate, this));
         } catch (DBMSException e){
-            //TODO:
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            NavigationManager.getInstance().createPopup("Error Message",
+                    controller -> new ErrorMessage(true));
         }
-        NavigationManager.getInstance().createPopup("Insert Presence",
-                controller -> new InsertPresencePopup(abstents, currentDate, this));
-
-
     }
     public void clickedConfirm(Worker worker){
         this.worker = worker;
@@ -35,10 +34,12 @@ public class InsertPresenceHandler {
     public void clickedConfirm(){
         try {
             DBMSDaemon.getInstance().recordPresence(worker.getId(), currentDate);
+            NavigationManager.getInstance().closePopup("Confirm");
+            NavigationManager.getInstance().closePopup("Insert Presence");
         } catch (DBMSException e){
-            //TODO:
+            e.printStackTrace();
+            NavigationManager.getInstance().createPopup("Error Message",
+                    controller -> new ErrorMessage(true));
         }
-        NavigationManager.getInstance().closePopup("Confirm");
-        NavigationManager.getInstance().closePopup("Insert Presence");
     }
 }

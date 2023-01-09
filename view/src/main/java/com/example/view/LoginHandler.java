@@ -29,7 +29,9 @@ public class LoginHandler {
                         controller -> new ErrorMessage("Impossibile effettuare il login."));
             }
         } catch (DBMSException e) {
-            //TODO:
+            e.printStackTrace();
+            NavigationManager.getInstance().createPopup("Error Message",
+                    controller -> new ErrorMessage(true));
         }
     }
     private void chooseHomeScreen(){
@@ -52,7 +54,9 @@ public class LoginHandler {
             chooseHomeScreen();
 
         } catch (DBMSException e) {
-            //TODO:
+            e.printStackTrace();
+            NavigationManager.getInstance().createPopup("Error Message",
+                    controller -> new ErrorMessage(true));
         }
     }
 }

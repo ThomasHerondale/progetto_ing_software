@@ -14,12 +14,14 @@ public class ShowPresencesHandler {
         List<HashMap<String, String>> presences;
         try {
             presences = DBMSDaemon.getInstance().getPresencesList(currentDate);
+            NavigationManager.getInstance().createScreen("Presence",
+                    controller -> new PresenceScreen(presences, this));
         } catch (DBMSException e) {
-            //TODO:
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            NavigationManager.getInstance().createPopup("Error Message",
+                    controller -> new ErrorMessage(true));
         }
-        NavigationManager.getInstance().createScreen("Presence",
-                controller -> new PresenceScreen(presences, this));
+
     }
     public void clickedBack() {
         NavigationManager.getInstance().createScreen("Home (Admin)",

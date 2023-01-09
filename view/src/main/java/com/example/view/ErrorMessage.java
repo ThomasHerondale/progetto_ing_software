@@ -17,6 +17,10 @@ public class ErrorMessage {
     public ErrorMessage(String message){
         this.description = message;
     }
+    public ErrorMessage(boolean isConnectionLost){
+        this.description = "Errore di connessione con il database, riprovare o, se il problema persiste," +
+                " riavviare il software.";
+    }
     @FXML
     public void initialize(){
         messageLabel.setText(description);

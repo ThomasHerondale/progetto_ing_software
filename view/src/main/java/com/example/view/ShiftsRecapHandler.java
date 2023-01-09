@@ -17,12 +17,14 @@ public class ShiftsRecapHandler {
         List<Shift> shiftsList;
         try {
             shiftsList = DBMSDaemon.getInstance().getShiftsList();
+            NavigationManager.getInstance().createScreen("Shifts Recap",
+                    controller -> new ShiftsRecapScreen(shiftsList, this));
         } catch (DBMSException e) {
-            //TODO:
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            NavigationManager.getInstance().createPopup("Error Message",
+                    controller -> new ErrorMessage(true));
         }
-        NavigationManager.getInstance().createScreen("Shifts Recap",
-                controller -> new ShiftsRecapScreen(shiftsList, this));
+
     }
     public void clickedBack(){
         NavigationManager.getInstance().createScreen("Home (Admin)",
@@ -48,10 +50,11 @@ public class ShiftsRecapHandler {
         mapRanks.put('H', String.valueOf(selectionRank.get('H').get()));
         try {
             DBMSDaemon.getInstance().createStrike(name, description, date, mapRanks);
+            NavigationManager.getInstance().closePopup("Authorize Strike");
         } catch (DBMSException e) {
-            //TODO:
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            NavigationManager.getInstance().createPopup("Error Message",
+                    controller -> new ErrorMessage(true));
         }
-        NavigationManager.getInstance().closePopup("Authorize Strike");
     }
 }

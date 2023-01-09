@@ -20,13 +20,14 @@ public class AddWorkerHandler {
         long lastID;
         try {
             lastID = (DBMSDaemon.getInstance().getLastid());
+            String newID = computeLastID(lastID);
+            NavigationManager.getInstance().createScreen("Add Worker",
+                    controller -> new AddWorkerScreen(newID, this));
         } catch (DBMSException e) {
-            //TODO:
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            NavigationManager.getInstance().createPopup("Error Message",
+                    controller -> new ErrorMessage(true));
         }
-        String newID = computeLastID(lastID);
-        NavigationManager.getInstance().createScreen("Add Worker",
-                controller -> new AddWorkerScreen(newID, this));
     }
 
     private String computeLastID(long lastID) {
@@ -54,25 +55,22 @@ public class AddWorkerHandler {
 
     public void clickedConfirm(Worker worker, LocalDate birthDate, String birthPlace, char sex, String ssn) {
         String password = computePassword();
-        try {
-            DBMSDaemon.getInstance().createWorker(worker, birthDate, birthPlace, sex, ssn, worker.getRank());
-            DBMSDaemon.getInstance().registerPassword(worker.getId(), password);
-        } catch (DBMSException e) {
-            //TODO:
-            throw new RuntimeException(e);
-        }
         List<Worker> workersList;
         Map<String, WorkerStatus> workersStatus;
         try {
+            DBMSDaemon.getInstance().createWorker(worker, birthDate, birthPlace, sex, ssn, worker.getRank());
+            DBMSDaemon.getInstance().registerPassword(worker.getId(), password);
+
             workersList = DBMSDaemon.getInstance().getWorkersList();
             workersStatus = DBMSDaemon.getInstance().getWorkersStatus(LocalDate.now());
+            MailManager.getInstance().notifyHiring(worker.getEmail(), worker.getFullName(), password);
+            NavigationManager.getInstance().createScreen("Workers Recap",
+                    controller -> new WorkersRecapScreen(workersList, workersStatus, new WorkersRecapHandler()));
         } catch (DBMSException e) {
-            //TODO:
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            NavigationManager.getInstance().createPopup("Error Message",
+                    controller -> new ErrorMessage(true));
         }
-        MailManager.getInstance().notifyHiring(worker.getEmail(), worker.getFullName(), password);
-        NavigationManager.getInstance().createScreen("Workers Recap",
-                controller -> new WorkersRecapScreen(workersList, workersStatus, new WorkersRecapHandler()));
     }
 
     private String computePassword() {

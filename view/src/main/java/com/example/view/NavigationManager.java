@@ -38,7 +38,6 @@ public class NavigationManager {
     }
     private static final Map<String, String> SCREEN_MAP = new HashMap<>();
     static {
-        //TODO:
         SCREEN_MAP.put("Login", "FXML/LoginScreen.fxml");
         SCREEN_MAP.put("Home (Admin)", "FXML/HomeScreen_Admin.fxml");
         SCREEN_MAP.put("First Access", "FXML/FirstAccessPopup.fxml");

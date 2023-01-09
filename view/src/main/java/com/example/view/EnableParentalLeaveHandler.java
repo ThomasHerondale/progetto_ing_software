@@ -28,12 +28,13 @@ public class EnableParentalLeaveHandler {
             DBMSDaemon.getInstance().enableParentalLeave(viewedWorker.getId(), hours);
             viewedWorker = DBMSDaemon.getInstance().getWorkerData(viewedWorker.getId());
             workerInfo = DBMSDaemon.getInstance().getWorkerInfo(viewedWorker.getId());
+            NavigationManager.getInstance().closePopup("Confirm");
+            NavigationManager.getInstance().createScreen("Worker Info",
+                    controller -> new WorkerInfoScreen(viewedWorker, workerInfo, new WorkersRecapHandler()));
         } catch (DBMSException e) {
-            //TODO:
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            NavigationManager.getInstance().createPopup("Error Message",
+                    controller -> new ErrorMessage(true));
         }
-        NavigationManager.getInstance().closePopup("Confirm");
-        NavigationManager.getInstance().createScreen("Worker Info",
-                controller -> new WorkerInfoScreen(viewedWorker, workerInfo, new WorkersRecapHandler()));
     }
 }

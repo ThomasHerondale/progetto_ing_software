@@ -9,11 +9,12 @@ public class ViewShiftsInfoHandler {
         Shift shiftEntity;
         try {
             shiftEntity = DBMSDaemon.getInstance().getShiftFlags(finalShift);
+            NavigationManager.getInstance().createPopup("Shift Info",
+                    controller -> new ShiftInfoPopup(shiftEntity, flag));
         } catch (DBMSException e) {
-            //TODO:
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            NavigationManager.getInstance().createPopup("Error Message",
+                    controller -> new ErrorMessage(true));
         }
-        NavigationManager.getInstance().createPopup("Shift Info",
-                controller -> new ShiftInfoPopup(shiftEntity, flag));
     }
 }

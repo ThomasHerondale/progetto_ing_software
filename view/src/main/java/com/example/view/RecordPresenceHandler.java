@@ -31,16 +31,14 @@ public class RecordPresenceHandler {
                         controller -> new ErrorMessage("Credenziali errate."));
             }
         } catch (DBMSException e) {
-            //TODO:
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            NavigationManager.getInstance().createPopup("Error Message",
+                    controller -> new ErrorMessage(true));
         }
     }
 
     private boolean checkTime(LocalTime shiftTime) {
-        if (Math.abs(LocalTime.now().toSecondOfDay() - shiftTime.toSecondOfDay()) < 600){
-                return true;
-            }
-        return false;
+        return Math.abs(LocalTime.now().toSecondOfDay() - shiftTime.toSecondOfDay()) < 600;
     }
 
     public void clickedRecordExit(String name, String surname, String id) {
@@ -66,8 +64,9 @@ public class RecordPresenceHandler {
                         controller -> new ErrorMessage("Credenziali errate."));
             }
         } catch (DBMSException e) {
-            //TODO:
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            NavigationManager.getInstance().createPopup("Error Message",
+                    controller -> new ErrorMessage(true));
         }
     }
 

@@ -35,8 +35,9 @@ public class RecordEntryHandler {
             NavigationManager.getInstance().closePopup("Remote Record Entry");
             NavigationManager.getInstance().closePopup("Shift Info");
         } catch (DBMSException e){
-            //TODO:
-            System.out.println("Presenza per questo turno già registrata.");
+            e.printStackTrace();
+            NavigationManager.getInstance().createPopup("Error Message",
+                    controller -> new ErrorMessage(true));
         }
     }
 }
