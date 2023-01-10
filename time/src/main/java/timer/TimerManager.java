@@ -6,6 +6,10 @@ import control.ShiftProposalHandler;
 import database.DBMSDaemon;
 import database.DBMSException;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.*;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -44,7 +48,7 @@ public class TimerManager {
     private static TimerManager instance;
 
     private TimerManager() {
-        this.autoExitTimer = new Timer(false);
+        this.autoExitTimer = new Timer(true);
     }
 
     /**
@@ -72,7 +76,8 @@ public class TimerManager {
         /* Programma il timer delle uscite automatiche ogni mezz'ora */
         var rate = debugMode ? 10_000 : AUTO_EXIT_RATE;
         var currentDate = debugMode ?
-                LocalDate.of(2023, 1, 27)
+                // LocalDate.of(2023, 1, 27)
+                firstDaysOfQuarters.get(0).minusWeeks(1)
                 :
                 LocalDate.now();
         var currentTime = debugMode ?
@@ -80,7 +85,8 @@ public class TimerManager {
                 :
                 LocalTime.now();
 
-        autoExitTimer.scheduleAtFixedRate(new AutoExitTask(debugMode), Date.from(Instant.now()), rate);
+            autoExitTimer.scheduleAtFixedRate(new AutoExitTask(
+                    debugMode, LocalDate.now()), Date.from(Instant.now()), rate);
 
         /* Task di debug */
         if (debugMode) {
@@ -123,6 +129,8 @@ public class TimerManager {
     }
 
     private void newShiftProposal(LocalDate firstDayOfQuarter) {
+        if (debugMode)
+            System.err.println("[DEBUG - SHIFT_PROPOSAL - ACTION]...");
         try {
             var workers = DBMSDaemon.getInstance().getWorkersList();
             var holidays = DBMSDaemon.getInstance().getRequestedHolidays(firstDayOfQuarter);
@@ -131,6 +139,8 @@ public class TimerManager {
         } catch (DBMSException e) {
             throw new TimerException(e.getMessage());
         }
+        if (debugMode)
+            System.err.println("[DEBUG - SHIFT_PROPOSAL - ACTION]");
     }
 
     private void newSalaries(LocalDate endDate) {

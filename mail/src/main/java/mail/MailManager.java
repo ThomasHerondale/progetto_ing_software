@@ -6,6 +6,8 @@ import entities.Worker;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -26,20 +28,16 @@ public class MailManager {
     /**
      * L'istanza di questa classe, secondo il pattern <i>Singleton</i>.
      */
-    MailManager instance;
-    /**
-     * Le variabili di sistema e del protoccolo SMTP.
-     */
-    Properties properties;
+    private static MailManager instance;
     /**
      * La sessione di SMTP che la classe useerà per inviare le mail.
      */
-    Session session;
+    private final Session session;
 
     /* Costruttore privato per impedire l'istanziazione di questa classe. */
     private MailManager() {
         /* Imposta le variabili relative al protocollo SMTP */
-        this.properties = System.getProperties();
+        Properties properties = System.getProperties();
         properties.put("mail.smtp.host", "smtp.gmail.com");
         properties.put("mail.smtp.port", "465");
         properties.put("mail.smtp.ssl.enable", "true");
@@ -55,14 +53,14 @@ public class MailManager {
             }
         });
 
-        session.setDebug(true);
+        //TODO: session.setDebug(true);
     }
 
     /**
      * Ritorna l'unica istanza possibile di {@link MailManager}, creandola se questa non è mai stata creata.
      * @return l'istanza di {@link MailManager}
      */
-    public MailManager getInstance() {
+    public static MailManager getInstance() {
         /* Se instance è null ritorna una nuova instanza, altrimenti ritorna instance */
         return Objects.requireNonNullElseGet(instance, MailManager::new);
     }
@@ -187,6 +185,19 @@ public class MailManager {
                         shift.getDate(), shift.getStartTime(), shift.getEndTime(), shift.getRank()
                 ));
         sendCoverageMail(absent, shift);
+    }
+
+    /**
+     * Notifica il dipendente che ha richiesto un permesso del rifiuto dell'inserimento dello stesso da parte del
+     * sistema.
+     * @param absent il dipendente richiedente il permesso
+     * @param leaveDate la data del permesso
+     * @param leaveStart l'ora di inizio del permesso
+     * @param leaveEnd l'ora di fine del permesso
+     */
+    public void notifyLeaveDenial(Worker absent, LocalDate leaveDate, LocalTime leaveStart, LocalTime leaveEnd) {
+        sendEmail(absent.getEmail(), "Permesso rifiutato",
+                leaveDenialNotice(absent.getFullName(), leaveDate, leaveStart, leaveEnd, absent.getRank()));
     }
 
     /**

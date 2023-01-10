@@ -221,6 +221,20 @@ public class MailWriter {
                 SALUTE;
     }
 
+    static String leaveDenialNotice(
+            String fullName,
+            LocalDate date,
+            LocalTime startTime,
+            LocalTime endTime,
+            char rank
+    ) {
+        return composeHeader(fullName) +
+                "Ti scriviamo per comunicarti che il permesso da te richiesto in data " + date.format(DATE_FORMATTER) +
+                ", dalle " + startTime.format(TIME_FORMATTER) + " alle " + endTime.format(TIME_FORMATTER) +
+                " presso l'ufficio " + parseRankChar(rank) + ", è stato rifiutato per mancanza di possibilità" +
+                " di coprire la tua assenza.";
+    }
+
     /**
      * Converte il carattere che rappresenta il livello dell'impiegato in una stringa. Usato per scrivere
      * "amministrativo" al posto della semplice "H".

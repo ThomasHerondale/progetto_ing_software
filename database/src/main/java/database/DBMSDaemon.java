@@ -1273,8 +1273,6 @@ public class DBMSDaemon {
         }
     }
 
-    // TODO: getData chi cazzu è?
-
     /**
      * Inserisce nel database i turni contenuti nella proposta di turnazione specificata.
      * @param shiftProposal la proposta di turnazione
@@ -1950,7 +1948,7 @@ public class DBMSDaemon {
      * Ottiene dal database la lista dei lavoratori presenti al lavoro (i.e. entrati ma non usciti)
      * nella data specificata.
      * @param currentDate la data di riferimento
-     * @return una mappa del tipo {("ID", string), ("workerName", string), ("workerSurname", string),
+     * @return una lista di mappe del tipo {("ID", string), ("workerName", string), ("workerSurname", string),
      * "shiftRank", char), ("entryTime", time)}
      * @throws DBMSException se si verifica un errore di qualunque tipo, in relazione al database
      * @apiNote essendo la mappa {@code <String, String>} i <i>char</i> e <i>time</i> ai valori della mappa
@@ -2029,6 +2027,8 @@ public class DBMSDaemon {
                 UPDATE shift
                 SET refWorkerID = ?, subFlag = TRUE
                 WHERE refWorkerID = ? AND shiftDate = ? AND shiftStart = ?
+/*                INSERT INTO shift(refWorkerID, shiftRank, shiftDate, shiftStart, shiftEnd)
+                VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE refWorkerID = ?*/
                 """);
                 var st2 = connection.prepareStatement("""
                 UPDATE shift
