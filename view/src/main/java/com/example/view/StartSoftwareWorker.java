@@ -16,9 +16,9 @@ public class StartSoftwareWorker extends Application{
      */
     @Override
     public void start(Stage primaryStage){
-        //var manager = TimerManager.getInstance();
-        //manager.setDebugMode();
-        //manager.initialize();
+        var manager = TimerManager.getInstance();
+        manager.setDebugMode();
+        manager.initialize();
         NavigationManager.getInstance().setPrimaryStage(primaryStage);
         NavigationManager.getInstance().createScreen("Login", controllerClass -> new LoginScreen());
     }

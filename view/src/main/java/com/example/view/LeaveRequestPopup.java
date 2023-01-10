@@ -53,9 +53,14 @@ public class LeaveRequestPopup {
         confirmButton.setDisable(true);
         endTimeBox.getItems().clear();
         endTimeBox.setPromptText("Orario di fine");
-        endTimeBox.getItems().addAll(leaveRequestHandler.computeTimeLock
-                (LocalTime.parse(startTimeBox.getValue()).plusHours(1),
-                        shiftSelected.getEndTime().plusHours(1)));
+        if (LocalTime.parse(startTimeBox.getValue()) == shiftSelected.getStartTime()){
+            endTimeBox.getItems().addAll(leaveRequestHandler.computeTimeLock
+                    (LocalTime.parse(startTimeBox.getValue()).plusHours(1),
+                            shiftSelected.getEndTime()));
+        } else {
+            endTimeBox.getItems().add(shiftSelected.getEndTime().
+                    format(DateTimeFormatter.ofPattern("HH:mm")));
+        }
         endTimeBox.setDisable(false);
     }
 
