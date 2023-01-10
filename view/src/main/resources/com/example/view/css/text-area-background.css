@@ -1,0 +1,7 @@
+.text-area {
+    text-area-background:  rgba(217, 217, 217, 0.6) ;
+}
+
+.text-area .content {
+    -fx-background-color: text-area-background ;
+}

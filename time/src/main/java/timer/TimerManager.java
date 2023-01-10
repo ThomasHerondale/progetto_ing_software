@@ -85,8 +85,8 @@ public class TimerManager {
                 :
                 LocalTime.now();
 
-            autoExitTimer.scheduleAtFixedRate(new AutoExitTask(
-                    debugMode, LocalDate.now()), Date.from(Instant.now()), rate);
+        autoExitTimer.scheduleAtFixedRate(new AutoExitTask(
+                debugMode, LocalDate.now()), Date.from(Instant.now()), rate);
 
         /* Task di debug */
         if (debugMode) {
