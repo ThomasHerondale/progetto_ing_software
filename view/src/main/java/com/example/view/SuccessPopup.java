@@ -16,10 +16,6 @@ public class SuccessPopup {
         this.accountInfoHandler = accountInfoHandler;
     }
 
-    public void setClose(Stage stage) {
-        stage.setOnCloseRequest(event -> accountInfoHandler.clickedOkay());
-    }
-
     @FXML
     void clickOkay(ActionEvent event) {
         accountInfoHandler.clickedOkay();
