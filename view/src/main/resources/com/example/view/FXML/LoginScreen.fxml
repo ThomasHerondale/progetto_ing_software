@@ -5,14 +5,18 @@
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1440.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.view.LoginScreen">
    <children>
-      <ImageView fx:id="logo" fitHeight="279.0" fitWidth="897.0" pickOnBounds="true" AnchorPane.leftAnchor="271.0" AnchorPane.topAnchor="46.0" />
-      <TextField fx:id="idField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="400.0" promptText="Matricola" style="-fx-background-color: rgba(217, 217, 217, 0.6); -fx-background-radius: 6px; -fx-prompt-text-fill: derive(-fx-control-inner-background, -30%);" AnchorPane.leftAnchor="520.0" AnchorPane.topAnchor="437.0">
+      <ImageView fx:id="logo" fitHeight="279.0" fitWidth="897.0" layoutX="458.0" layoutY="71.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="458.0" AnchorPane.rightAnchor="486.0" AnchorPane.topAnchor="71.0">
+         <image>
+            <Image url="@../img/finalLogo.png" />
+         </image></ImageView>
+      <TextField fx:id="idField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="400.0" promptText="Matricola" style="-fx-background-color: rgba(217, 217, 217, 0.6); -fx-background-radius: 6px; -fx-prompt-text-fill: derive(-fx-control-inner-background, -30%);" AnchorPane.leftAnchor="520.0" AnchorPane.rightAnchor="520.0" AnchorPane.topAnchor="437.0">
          <font>
             <Font size="18.0" />
          </font>

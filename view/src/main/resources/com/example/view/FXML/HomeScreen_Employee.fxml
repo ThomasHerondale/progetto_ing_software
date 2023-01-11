@@ -11,7 +11,10 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1440.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.view.HomeScreen">
    <children>
-      <ImageView fitHeight="150.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="38.0" AnchorPane.topAnchor="28.0" />
+      <ImageView fitHeight="215.0" fitWidth="373.0" layoutX="58.0" layoutY="28.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="58.0" AnchorPane.topAnchor="28.0">
+         <image>
+            <Image url="@../img/finalLogo.png" />
+         </image></ImageView>
       <AnchorPane prefHeight="250.0" prefWidth="1324.0" style="-fx-background-color: rgba(217, 217, 217, 0.2);" AnchorPane.leftAnchor="58.0" AnchorPane.topAnchor="270.0">
          <children>
             <Group fx:id="salaryCard" layoutX="282.0" layoutY="20.0" onMouseClicked="#clickViewSalary" AnchorPane.leftAnchor="282.0" AnchorPane.topAnchor="20.0">
