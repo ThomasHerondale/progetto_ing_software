@@ -4,13 +4,17 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1440.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.view.RecordPresenceScreen">
    <children>
-      <ImageView fx:id="logo" fitHeight="279.0" fitWidth="897.0" pickOnBounds="true" AnchorPane.leftAnchor="271.0" AnchorPane.topAnchor="46.0" />
+      <ImageView fx:id="logo" fitHeight="279.0" fitWidth="897.0" layoutX="472.0" layoutY="50.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="472.0" AnchorPane.rightAnchor="472.0" AnchorPane.topAnchor="50.0">
+         <image>
+            <Image url="@../img/finalLogo.png" />
+         </image></ImageView>
       <TextField fx:id="surnameField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="400.0" promptText="Cognome" style="-fx-background-color: rgba(217, 217, 217, 0.6); -fx-background-radius: 6px; -fx-prompt-text-fill: derive(-fx-control-inner-background, -30%);" AnchorPane.leftAnchor="520.0" AnchorPane.topAnchor="459.0">
          <font>
             <Font size="18.0" />
@@ -37,7 +41,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </Button>
-      <TextField fx:id="nameField" layoutX="521.0" layoutY="360.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="400.0" promptText="Nome" style="-fx-background-color: rgba(217, 217, 217, 0.6); -fx-background-radius: 6px; -fx-prompt-text-fill: derive(-fx-control-inner-background, -30%);" AnchorPane.leftAnchor="520.0" AnchorPane.topAnchor="375.0">
+      <TextField fx:id="nameField" layoutX="521.0" layoutY="360.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="400.0" promptText="Nome" style="-fx-background-color: rgba(217, 217, 217, 0.6); -fx-background-radius: 6px; -fx-prompt-text-fill: derive(-fx-control-inner-background, -30%);" AnchorPane.leftAnchor="520.0" AnchorPane.rightAnchor="520.0" AnchorPane.topAnchor="375.0">
          <font>
             <Font size="18.0" />
          </font>

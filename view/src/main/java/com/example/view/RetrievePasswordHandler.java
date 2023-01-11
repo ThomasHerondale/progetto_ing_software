@@ -31,7 +31,9 @@ public class RetrievePasswordHandler {
                         controller -> new ErrorMessage("La matricola inserita non esiste."));
             }
         } catch (DBMSException e) {
-            //TODO:
+            e.printStackTrace();
+            NavigationManager.getInstance().createPopup("Error Message",
+                    controller -> new ErrorMessage(true));
         }
     }
     public void clickedSend(String answer){
@@ -49,7 +51,9 @@ public class RetrievePasswordHandler {
                         controller -> new ErrorMessage("La risposta inserita è errata."));
             }
         } catch (DBMSException e) {
-            //TODO:
+            e.printStackTrace();
+            NavigationManager.getInstance().createPopup("Error Message",
+                    controller -> new ErrorMessage(true));
         }
     }
     private String generatePassword(){

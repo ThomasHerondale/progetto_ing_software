@@ -24,7 +24,7 @@ public class RetrievePasswordPopup {
         IDField.setText("");
     }
     @FXML
-    void clickConfirm(ActionEvent event) {
+    public void clickConfirm(ActionEvent event) {
         retrievePasswordHandler.clickedConfirm(IDField.getText());
     }
 
