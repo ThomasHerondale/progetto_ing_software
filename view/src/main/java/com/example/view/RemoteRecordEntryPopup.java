@@ -41,7 +41,7 @@ public class RemoteRecordEntryPopup {
     }
 
     @FXML
-    void clickConfirm(ActionEvent event) {
+    public void clickConfirm(ActionEvent event) {
         if (entryTimeBox.getValue() != null){
             recordEntryHandler.clickedConfirm(LocalTime.parse(entryTimeBox.getValue()));
         }

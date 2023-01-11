@@ -67,7 +67,9 @@ public class AccountInfoHandler {
             NavigationManager.getInstance().createPopup("Success",
                     controller -> new SuccessPopup(this));
         } catch (DBMSException e){
-            //TODO:
+            e.printStackTrace();
+            NavigationManager.getInstance().createPopup("Error Message",
+                    controller -> new ErrorMessage(true));
         }
 
     }

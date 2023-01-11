@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -74,6 +75,7 @@ public class NavigationManager {
 
     private void showScene(String title, Scene scene, boolean isScene, Stage stage){
         stage.setTitle(title);
+        stage.getIcons().add(new Image(String.valueOf(getClass().getResource("img/squaredLogo.png"))));
         stage.setResizable(false);
         stage.centerOnScreen();
         stage.setScene(scene);

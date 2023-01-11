@@ -52,7 +52,7 @@ public class InsertPresencePopup {
     }
 
     @FXML
-    void clickConfirm(ActionEvent event) {
+    public void clickConfirm(ActionEvent event) {
         if (worker != null){
             insertPresenceHandler.clickedConfirm(worker);
         }
