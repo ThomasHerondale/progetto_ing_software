@@ -24,7 +24,7 @@ public class MailManager {
     /**
      * L'indirizzo da cui saranno inviate tutte le e-mail.
      */
-    private static final String COMPANY_ADDRESS = "thomasherondale@gmail.com";
+    private static final String COMPANY_ADDRESS = "spa.ingenium@gmail.com";
     /**
      * L'istanza di questa classe, secondo il pattern <i>Singleton</i>.
      */
@@ -48,12 +48,12 @@ public class MailManager {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(
-                        COMPANY_ADDRESS, "cobapheqjhhlcsij"
+                        COMPANY_ADDRESS, "plnefxjnhjumbcbu"
                 );
             }
         });
 
-        //TODO: session.setDebug(true);
+        TODO: session.setDebug(true);
     }
 
     /**
