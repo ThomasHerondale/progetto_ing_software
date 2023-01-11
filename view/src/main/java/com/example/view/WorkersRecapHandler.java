@@ -19,12 +19,13 @@ public class WorkersRecapHandler {
         try {
             workersList = DBMSDaemon.getInstance().getWorkersList();
             workersStatus = DBMSDaemon.getInstance().getWorkersStatus(currentDate);
+            NavigationManager.getInstance().createScreen("Workers Recap",
+                    controller -> new WorkersRecapScreen(workersList, workersStatus, this));
         } catch (DBMSException e) {
-            //TODO:
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            NavigationManager.getInstance().createPopup("Error Message",
+                    controller -> new ErrorMessage(true));
         }
-        NavigationManager.getInstance().createScreen("Workers Recap",
-                controller -> new WorkersRecapScreen(workersList, workersStatus, this));
     }
     public void clickedBack(Boolean flag){
         if (flag){
@@ -36,12 +37,13 @@ public class WorkersRecapHandler {
             try {
                 updatedWorkersList = DBMSDaemon.getInstance().getWorkersList();
                updatedWorkersStatus = DBMSDaemon.getInstance().getWorkersStatus(LocalDate.now());
+                NavigationManager.getInstance().createScreen("Workers Recap",
+                        controller -> new WorkersRecapScreen(updatedWorkersList, updatedWorkersStatus, this));
             } catch (DBMSException e) {
-                //TODO:
-                throw new RuntimeException(e);
+                e.printStackTrace();
+                NavigationManager.getInstance().createPopup("Error Message",
+                        controller -> new ErrorMessage(true));
             }
-            NavigationManager.getInstance().createScreen("Workers Recap",
-                    controller -> new WorkersRecapScreen(updatedWorkersList, updatedWorkersStatus, this));
         }
 
     }
@@ -50,12 +52,13 @@ public class WorkersRecapHandler {
         Map<String, String> workerInfo;
         try {
             workerInfo = DBMSDaemon.getInstance().getWorkerInfo(worker.getId());
+            NavigationManager.getInstance().createScreen("Worker Info",
+                    controller -> new WorkerInfoScreen(worker, workerInfo, this));
         } catch (DBMSException e) {
-            //TODO:
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            NavigationManager.getInstance().createPopup("Error Message",
+                    controller -> new ErrorMessage(true));
         }
-        NavigationManager.getInstance().createScreen("Worker Info",
-                controller -> new WorkerInfoScreen(worker, workerInfo, this));
     }
 
     public List<Worker> clickedSearch(String digitedText, List<Worker> workersList,
