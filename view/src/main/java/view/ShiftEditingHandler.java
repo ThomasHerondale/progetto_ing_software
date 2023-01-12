@@ -1,4 +1,4 @@
-package shifts;
+package view;
 
 import commons.Period;
 import database.DBMSDaemon;

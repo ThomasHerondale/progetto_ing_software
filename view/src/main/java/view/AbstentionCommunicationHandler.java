@@ -5,7 +5,6 @@ import commons.Period;
 import commons.Session;
 import database.DBMSDaemon;
 import database.DBMSException;
-import shifts.ShiftEditingHandler;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

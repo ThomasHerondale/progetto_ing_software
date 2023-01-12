@@ -4,7 +4,6 @@ import commons.Session;
 import database.DBMSDaemon;
 import database.DBMSException;
 import entities.Shift;
-import shifts.ShiftEditingHandler;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
