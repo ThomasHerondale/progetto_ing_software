@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="360.0" prefWidth="720.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.SafetyQuestionPopup">
+   <children>
+      <TextField fx:id="answerField" layoutX="10.0" layoutY="10.0" prefHeight="50.0" prefWidth="400.0" promptText="Risposta" style="-fx-background-color: rgba(217, 217, 217, 0.6); -fx-background-radius: 6; -fx-prompt-text-fill: derive(-fx-control-inner-background, -30%);" AnchorPane.leftAnchor="160.0" AnchorPane.topAnchor="174.0">
+         <font>
+            <Font size="18.0" />
+         </font></TextField>
+      <Button fx:id="sendButton" mnemonicParsing="false" onAction="#clickSend" prefHeight="55.0" prefWidth="200.0" style="-fx-background-color: #d9d9d9; -fx-background-radius: 12;" text="Conferma" AnchorPane.leftAnchor="260.0" AnchorPane.topAnchor="264.0">
+         <font>
+            <Font size="20.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></Button>
+      <Label fx:id="questionLabel" alignment="CENTER" contentDisplay="CENTER" layoutY="101.0" prefWidth="720.0" text="Question Label" textAlignment="CENTER" textOverrun="CENTER_ELLIPSIS" wrapText="true" AnchorPane.topAnchor="94.0">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <TextFlow prefHeight="17.0" prefWidth="442.0" AnchorPane.leftAnchor="18.0" AnchorPane.topAnchor="19.0">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Rispondi alla domanda di sicurezza ">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Text>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="per recuperare la tua password.">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Text>
+         </children>
+      </TextFlow>
+   </children>
+</AnchorPane>

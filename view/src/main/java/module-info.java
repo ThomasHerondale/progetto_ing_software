@@ -9,6 +9,6 @@ module view {
     requires control;
 
 
-    opens com.example.view to javafx.fxml;
-    exports com.example.view;
+    opens view to javafx.fxml;
+    exports view;
 }
