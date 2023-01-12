@@ -1,5 +1,7 @@
 package view;
 
+import database.DBMSDaemon;
+import database.DBMSException;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import timer.TimerManager;
@@ -15,7 +17,8 @@ public class StartSoftwareWorker extends Application{
      * @param primaryStage è lo stage principale dell'applicazione in cui viene caricata una scena.
      */
     @Override
-    public void start(Stage primaryStage){
+    public void start(Stage primaryStage) throws DBMSException {
+        DBMSDaemon.getInstance().dumpShifts();
         var manager = TimerManager.getInstance();
         manager.setDebugMode();
         manager.initialize();

@@ -2121,6 +2121,22 @@ public class DBMSDaemon {
     }
 
     /**
+     * @implNote <b> - Solo per uso interno- </b>
+     */
+    @SuppressWarnings("SqlWithoutWhere")
+    public void dumpShifts() throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                DELETE FROM shift
+                """)
+        ) {
+            st.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    /**
      * Estrae tutte le righe del resultSet specificato, convertendole in mappe (nome_colonna, valore_colonna).
      */
     private List<HashMap<String, String>> extractResults(ResultSet resultSet) throws SQLException {
