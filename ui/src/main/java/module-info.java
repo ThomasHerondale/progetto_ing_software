@@ -8,8 +8,14 @@ module ui {
     requires time;
 
 
-    opens view to javafx.fxml;
-    exports view;
-    exports controller;
-    opens controller to javafx.fxml;
+    exports view.presences;
+    opens view.presences to javafx.fxml;
+    exports view.workers;
+    opens view.workers to javafx.fxml;
+    exports view.navigation;
+    opens view.navigation to javafx.fxml;
+    exports controller.presences;
+    opens controller.presences to javafx.fxml;
+    exports controller.workers;
+    opens controller.workers to javafx.fxml;
 }

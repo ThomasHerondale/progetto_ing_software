@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="800.0" prefWidth="1440.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.workers.ViewShiftsScreen">
+   <children>
+      <Label fx:id="weekLabel" alignment="CENTER" layoutY="42.0" prefHeight="0.0" prefWidth="1440.0" text="IV Sett. Maggio 2022" AnchorPane.topAnchor="42.0">
+         <font>
+            <Font name="System Bold" size="32.0" />
+         </font>
+      </Label>
+      <Button fx:id="previousMonthButton" alignment="CENTER" contentDisplay="CENTER" layoutX="439.0" layoutY="47.0" mnemonicParsing="false" onAction="#clickPreviousMonth" prefHeight="40.0" prefWidth="40.0" style="-fx-background-radius: 100; -fx-background-color: #D9D9D9;" text="&lt;&lt;" wrapText="true" AnchorPane.leftAnchor="439.0" AnchorPane.topAnchor="47.0">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="previousWeekButton" alignment="CENTER" contentDisplay="CENTER" layoutX="499.0" layoutY="47.0" mnemonicParsing="false" onAction="#clickPreviousWeek" prefHeight="40.0" prefWidth="40.0" style="-fx-background-radius: 100; -fx-background-color: #D9D9D9;" text="&lt;" wrapText="true" AnchorPane.leftAnchor="499.0" AnchorPane.topAnchor="47.0">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <ScrollBar fx:id="verticalBar" layoutX="1417.0" layoutY="154.0" max="1.0" orientation="VERTICAL" prefHeight="617.0" prefWidth="18.0" style="-fx-background-color: #ABABAB; -fx-background-radius: 12;" unitIncrement="0.1" visibleAmount="0.5" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="155.0" />
+      <ScrollBar fx:id="horizontalBar" layoutX="22.0" layoutY="25.0" max="1.0" prefHeight="18.0" prefWidth="1319.0" style="-fx-background-color: grey; -fx-background-radius: 12;" unitIncrement="0.1" visibleAmount="0.5" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="28.0" />
+      <ScrollPane fx:id="verticalPane" hbarPolicy="NEVER" prefHeight="617.0" prefWidth="92.0" style="-fx-background-color: transparent;" vbarPolicy="NEVER" AnchorPane.topAnchor="155.0">
+         <content>
+            <AnchorPane prefHeight="1485.0" prefWidth="92.0">
+               <children>
+                  <Group autoSizeChildren="false">
+                     <children>
+                        <AnchorPane prefHeight="114.0" prefWidth="74.0">
+                           <children>
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d9d9d9" height="87.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="40.0" AnchorPane.leftAnchor="26.0" AnchorPane.topAnchor="5.0" />
+                              <Label text="08:00" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="35.0">
+                                 <font>
+                                    <Font name="System Bold" size="20.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </Group>
+                  <Group autoSizeChildren="false" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="99.0">
+                     <children>
+                        <AnchorPane prefHeight="114.0" prefWidth="74.0">
+                           <children>
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d9d9d9" height="87.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="40.0" AnchorPane.leftAnchor="26.0" AnchorPane.topAnchor="5.0" />
+                              <Label text="09:00" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="35.0">
+                                 <font>
+                                    <Font name="System Bold" size="20.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </Group>
+                  <Group autoSizeChildren="false" layoutX="10.0" layoutY="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="198.0">
+                     <children>
+                        <AnchorPane prefHeight="114.0" prefWidth="74.0">
+                           <children>
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d9d9d9" height="87.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="40.0" AnchorPane.leftAnchor="26.0" AnchorPane.topAnchor="5.0" />
+                              <Label text="10:00" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="35.0">
+                                 <font>
+                                    <Font name="System Bold" size="20.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </Group>
+                  <Group autoSizeChildren="false" layoutX="10.0" layoutY="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="297.0">
+                     <children>
+                        <AnchorPane prefHeight="114.0" prefWidth="74.0">
+                           <children>
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d9d9d9" height="87.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="40.0" AnchorPane.leftAnchor="26.0" AnchorPane.topAnchor="5.0" />
+                              <Label text="11:00" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="35.0">
+                                 <font>
+                                    <Font name="System Bold" size="20.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </Group>
+                  <Group autoSizeChildren="false" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="396.0">
+                     <children>
+                        <AnchorPane prefHeight="114.0" prefWidth="74.0">
+                           <children>
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d9d9d9" height="87.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="40.0" AnchorPane.leftAnchor="26.0" AnchorPane.topAnchor="5.0" />
+                              <Label text="12:00" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="35.0">
+                                 <font>
+                                    <Font name="System Bold" size="20.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </Group>
+                  <Group autoSizeChildren="false" layoutX="20.0" layoutY="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="495.0">
+                     <children>
+                        <AnchorPane prefHeight="114.0" prefWidth="74.0">
+                           <children>
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d9d9d9" height="87.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="40.0" AnchorPane.leftAnchor="26.0" AnchorPane.topAnchor="5.0" />
+                              <Label text="13:00" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="35.0">
+                                 <font>
+                                    <Font name="System Bold" size="20.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </Group>
+                  <Group autoSizeChildren="false" layoutX="20.0" layoutY="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="594.0">
+                     <children>
+                        <AnchorPane prefHeight="114.0" prefWidth="74.0">
+                           <children>
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d9d9d9" height="87.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="40.0" AnchorPane.leftAnchor="26.0" AnchorPane.topAnchor="5.0" />
+                              <Label text="14:00" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="35.0">
+                                 <font>
+                                    <Font name="System Bold" size="20.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </Group>
+                  <Group autoSizeChildren="false" layoutX="20.0" layoutY="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="693.0">
+                     <children>
+                        <AnchorPane prefHeight="114.0" prefWidth="74.0">
+                           <children>
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d9d9d9" height="87.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="40.0" AnchorPane.leftAnchor="26.0" AnchorPane.topAnchor="5.0" />
+                              <Label text="15:00" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="35.0">
+                                 <font>
+                                    <Font name="System Bold" size="20.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </Group>
+                  <Group autoSizeChildren="false" layoutX="20.0" layoutY="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="792.0">
+                     <children>
+                        <AnchorPane prefHeight="114.0" prefWidth="74.0">
+                           <children>
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d9d9d9" height="87.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="40.0" AnchorPane.leftAnchor="26.0" AnchorPane.topAnchor="5.0" />
+                              <Label text="16:00" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="35.0">
+                                 <font>
+                                    <Font name="System Bold" size="20.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </Group>
+                  <Group autoSizeChildren="false" layoutX="20.0" layoutY="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="891.0">
+                     <children>
+                        <AnchorPane prefHeight="114.0" prefWidth="74.0">
+                           <children>
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d9d9d9" height="87.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="40.0" AnchorPane.leftAnchor="26.0" AnchorPane.topAnchor="5.0" />
+                              <Label text="17:00" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="35.0">
+                                 <font>
+                                    <Font name="System Bold" size="20.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </Group>
+                  <Group autoSizeChildren="false" layoutX="30.0" layoutY="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="990.0">
+                     <children>
+                        <AnchorPane prefHeight="114.0" prefWidth="74.0">
+                           <children>
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d9d9d9" height="87.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="40.0" AnchorPane.leftAnchor="26.0" AnchorPane.topAnchor="5.0" />
+                              <Label text="18:00" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="35.0">
+                                 <font>
+                                    <Font name="System Bold" size="20.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </Group>
+                  <Group autoSizeChildren="false" layoutX="30.0" layoutY="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="1089.0">
+                     <children>
+                        <AnchorPane prefHeight="114.0" prefWidth="74.0">
+                           <children>
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d9d9d9" height="87.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="40.0" AnchorPane.leftAnchor="26.0" AnchorPane.topAnchor="5.0" />
+                              <Label text="19:00" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="35.0">
+                                 <font>
+                                    <Font name="System Bold" size="20.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </Group>
+                  <Group autoSizeChildren="false" layoutX="30.0" layoutY="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="1188.0">
+                     <children>
+                        <AnchorPane prefHeight="114.0" prefWidth="74.0">
+                           <children>
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d9d9d9" height="87.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="40.0" AnchorPane.leftAnchor="26.0" AnchorPane.topAnchor="5.0" />
+                              <Label text="20:00" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="35.0">
+                                 <font>
+                                    <Font name="System Bold" size="20.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </Group>
+                  <Group autoSizeChildren="false" layoutX="30.0" layoutY="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="1287.0">
+                     <children>
+                        <AnchorPane prefHeight="114.0" prefWidth="74.0">
+                           <children>
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d9d9d9" height="87.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="40.0" AnchorPane.leftAnchor="26.0" AnchorPane.topAnchor="5.0" />
+                              <Label text="21:00" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="35.0">
+                                 <font>
+                                    <Font name="System Bold" size="20.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </Group>
+                  <Group autoSizeChildren="false" layoutX="30.0" layoutY="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="1386.0">
+                     <children>
+                        <AnchorPane prefHeight="114.0" prefWidth="74.0">
+                           <children>
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d9d9d9" height="87.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="40.0" AnchorPane.leftAnchor="26.0" AnchorPane.topAnchor="5.0" />
+                              <Label text="22:00" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="35.0">
+                                 <font>
+                                    <Font name="System Bold" size="20.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </Group>
+               </children>
+            </AnchorPane>
+         </content>
+      </ScrollPane>
+      <ScrollPane fx:id="horizontalPane" hbarPolicy="NEVER" prefHeight="30.0" prefWidth="1319.0" style="-fx-background-color: transparent;" vbarPolicy="NEVER" AnchorPane.leftAnchor="91.0" AnchorPane.topAnchor="120.0">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="30.0" prefWidth="1800.0">
+               <children>
+                  <Label alignment="CENTER" prefWidth="227.0" text="Lunedì" AnchorPane.leftAnchor="38.0">
+                     <font>
+                        <Font name="System Bold" size="24.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="CENTER" layoutX="10.0" layoutY="10.0" prefWidth="227.0" text="Martedì" AnchorPane.leftAnchor="292.0" AnchorPane.topAnchor="0.0">
+                     <font>
+                        <Font name="System Bold" size="24.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="CENTER" layoutX="10.0" layoutY="10.0" prefWidth="227.0" text="Mercoledì" AnchorPane.leftAnchor="546.0" AnchorPane.topAnchor="0.0">
+                     <font>
+                        <Font name="System Bold" size="24.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="CENTER" layoutX="10.0" layoutY="10.0" prefWidth="227.0" text="Giovedì" AnchorPane.leftAnchor="800.0" AnchorPane.topAnchor="0.0">
+                     <font>
+                        <Font name="System Bold" size="24.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="CENTER" layoutX="10.0" layoutY="10.0" prefWidth="227.0" text="Venerdì" AnchorPane.leftAnchor="1054.0" AnchorPane.topAnchor="0.0">
+                     <font>
+                        <Font name="System Bold" size="24.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="CENTER" layoutX="10.0" layoutY="10.0" prefWidth="227.0" text="Sabato" AnchorPane.leftAnchor="1308.0" AnchorPane.topAnchor="0.0">
+                     <font>
+                        <Font name="System Bold" size="24.0" />
+                     </font>
+                  </Label>
+                  <Label alignment="CENTER" layoutX="10.0" layoutY="10.0" prefWidth="227.0" text="Domenica" AnchorPane.leftAnchor="1562.0" AnchorPane.topAnchor="0.0">
+                     <font>
+                        <Font name="System Bold" size="24.0" />
+                     </font>
+                  </Label>
+               </children>
+            </AnchorPane>
+        </content>
+      </ScrollPane>
+      <ScrollPane fx:id="verticalAndHorizonatalPane" hbarPolicy="NEVER" layoutX="27.0" layoutY="54.0" prefHeight="617.0" prefWidth="1319.0" style="-fx-background-color: transparent;" vbarPolicy="NEVER" AnchorPane.bottomAnchor="28.0" AnchorPane.leftAnchor="91.0" AnchorPane.topAnchor="155.0">
+        <content>
+          <AnchorPane fx:id="shiftsPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1485.0" prefWidth="1800.0" />
+        </content>
+      </ScrollPane>
+      <Group fx:id="profileIcon" layoutX="182.0" layoutY="151.0" onMouseClicked="#clickProfile" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0">
+         <children>
+            <Circle fill="#0038ff" radius="36.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" />
+            <Label fx:id="initialsLabel" alignment="CENTER" layoutX="-26.0" layoutY="-15.0" prefHeight="13.0" prefWidth="53.0" text="G L" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="20.0" />
+               </font>
+            </Label>
+         </children>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Group>
+      <Button fx:id="backButton" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#clickBack" prefHeight="46.0" prefWidth="128.0" style="-fx-background-color: #d9d9d9; -fx-background-radius: 6;" text="Indietro" AnchorPane.leftAnchor="21.0" AnchorPane.topAnchor="21.0">
+         <font>
+            <Font size="15.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <MenuButton fx:id="abstentionsMenu" alignment="CENTER" layoutX="919.0" layoutY="47.0" mnemonicParsing="false" prefHeight="46.0" prefWidth="128.0" text="Astensioni" textAlignment="CENTER" AnchorPane.leftAnchor="1042.0" AnchorPane.topAnchor="43.0">
+        <items>
+          <MenuItem fx:id="holidayButton" mnemonicParsing="false" onAction="#clickHoliday" text="Comunica Ferie" />
+          <MenuItem fx:id="strikesButton" mnemonicParsing="false" onAction="#clickStrikes" text="Scioperi" />
+            <MenuItem fx:id="parentalLeaveButton" mnemonicParsing="false" onAction="#clickParentalLeave" text="Comunica Cong. Paren." />
+            <MenuItem fx:id="leavesButton" mnemonicParsing="false" onAction="#clickLeave" text="Permessi" />
+            <MenuItem fx:id="illnessButton" mnemonicParsing="false" onAction="#clickIllness" text="Comunica Malattia" />
+        </items>
+         <font>
+            <Font size="15.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </MenuButton>
+      <Button fx:id="nextWeekButton" alignment="CENTER" contentDisplay="CENTER" layoutX="900.0" layoutY="47.0" mnemonicParsing="false" onAction="#clickNextWeek" prefHeight="40.0" prefWidth="40.0" style="-fx-background-radius: 100; -fx-background-color: #D9D9D9;" text="&gt;" wrapText="true" AnchorPane.rightAnchor="500.0" AnchorPane.topAnchor="47.0">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button fx:id="nextMonthButton" alignment="CENTER" contentDisplay="CENTER" layoutX="960.0" layoutY="47.0" mnemonicParsing="false" onAction="#clickNextMonth" prefHeight="40.0" prefWidth="40.0" style="-fx-background-radius: 100; -fx-background-color: #D9D9D9;" text="&gt;&gt;" wrapText="true" AnchorPane.topAnchor="47.0">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+   </children>
+</AnchorPane>

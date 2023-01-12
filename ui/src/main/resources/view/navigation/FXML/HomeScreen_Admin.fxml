@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1440.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.workers.HomeScreen">
+   <children>
+      <ImageView fitHeight="215.0" fitWidth="373.0" layoutX="58.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="58.0" AnchorPane.topAnchor="25.0">
+         <image>
+            <Image url="@../img/finalLogo.png" />
+         </image></ImageView>
+      <AnchorPane prefHeight="500.0" prefWidth="1324.0" style="-fx-background-color: rgba(217, 217, 217, 0.2);" AnchorPane.leftAnchor="58.0" AnchorPane.topAnchor="270.0">
+         <children>
+            <Group fx:id="salaryCard" layoutX="282.0" layoutY="20.0" onMouseClicked="#clickViewSalary" AnchorPane.leftAnchor="282.0" AnchorPane.topAnchor="20.0">
+               <children>
+                  <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="209.0" prefWidth="209.0" style="-fx-background-color: #ABABAB;">
+                     <children>
+                        <ImageView fitHeight="74.0" fitWidth="74.0" layoutX="86.0" layoutY="45.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="86.0" AnchorPane.topAnchor="45.0">
+                           <image>
+                              <Image url="@../img/salaryIcon.png" />
+                           </image>
+                        </ImageView>
+                        <Label alignment="TOP_LEFT" layoutX="10.0" layoutY="158.0" prefHeight="44.0" prefWidth="197.0" text="Consulta la tua situazione stipendiale mensile" textFill="WHITE" wrapText="true" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="158.0">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="13.0" layoutY="111.0" prefHeight="30.0" prefWidth="148.0" text="Stipendio" textFill="WHITE" AnchorPane.leftAnchor="9.0" AnchorPane.topAnchor="132.0">
+                           <font>
+                              <Font name="System Bold" size="20.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+               </children>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Group>
+            <Group fx:id="presencesCard" layoutX="35.0" layoutY="270.0" onMouseClicked="#clickPresences" AnchorPane.leftAnchor="35.0" AnchorPane.topAnchor="270.0">
+               <children>
+                  <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="209.0" prefWidth="209.0" style="-fx-background-color: #ABABAB;">
+                     <children>
+                        <ImageView fitHeight="74.0" fitWidth="74.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="67.0" AnchorPane.topAnchor="45.0">
+                           <image>
+                              <Image url="@../img/presencesIcon.png" />
+                           </image>
+                        </ImageView>
+                        <Label alignment="TOP_LEFT" layoutX="10.0" layoutY="158.0" prefHeight="44.0" prefWidth="197.0" text="Visualizza un report giornaliero sulle presenze dei dipendenti" textFill="WHITE" wrapText="true" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="158.0">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="13.0" layoutY="111.0" prefHeight="30.0" prefWidth="190.0" text="Riepilogo Presenze" textFill="WHITE" AnchorPane.leftAnchor="9.0" AnchorPane.topAnchor="132.0">
+                           <font>
+                              <Font name="System Bold" size="20.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+               </children>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Group>
+            <Group fx:id="workersCard" layoutX="281.0" layoutY="270.0" onMouseClicked="#clickWorkers" AnchorPane.leftAnchor="281.0" AnchorPane.topAnchor="270.0">
+               <children>
+                  <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="209.0" prefWidth="209.0" style="-fx-background-color: #ABABAB;">
+                     <children>
+                        <ImageView fitHeight="74.0" fitWidth="74.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="108.0" AnchorPane.leftAnchor="67.0">
+                           <image>
+                              <Image url="@../img/workersIcon.png" />
+                           </image>
+                        </ImageView>
+                        <Label alignment="TOP_LEFT" layoutX="10.0" layoutY="158.0" prefHeight="44.0" prefWidth="197.0" text="Visualizza e gestisci i dipendenti" textFill="WHITE" wrapText="true" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="158.0">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="13.0" layoutY="111.0" prefHeight="30.0" prefWidth="148.0" text="Dipendenti" textFill="WHITE" AnchorPane.leftAnchor="9.0" AnchorPane.topAnchor="132.0">
+                           <font>
+                              <Font name="System Bold" size="20.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+               </children>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Group>
+            <Group fx:id="shiftsRecapCard" layoutX="527.0" layoutY="270.0" onMouseClicked="#clickShiftsRecap" AnchorPane.leftAnchor="527.0" AnchorPane.topAnchor="270.0">
+               <children>
+                  <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="209.0" prefWidth="209.0" style="-fx-background-color: #ABABAB;">
+                     <children>
+                        <ImageView fitHeight="74.0" fitWidth="74.0" layoutX="67.0" layoutY="27.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="108.0" AnchorPane.leftAnchor="67.0" AnchorPane.topAnchor="27.0">
+                           <image>
+                              <Image url="@../img/shiftsRecapIcon.png" />
+                           </image>
+                        </ImageView>
+                        <Label alignment="TOP_LEFT" layoutX="10.0" layoutY="158.0" prefHeight="44.0" prefWidth="197.0" text="Visualizza i turni settimanali dei dipendenti dell’azienda" textFill="WHITE" wrapText="true" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="158.0">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="13.0" layoutY="111.0" prefHeight="30.0" prefWidth="148.0" text="Riepilogo turni" textFill="WHITE" AnchorPane.leftAnchor="9.0" AnchorPane.topAnchor="132.0">
+                           <font>
+                              <Font name="System Bold" size="20.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+               </children>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Group>
+            <Group fx:id="shiftsCard" layoutX="36.0" layoutY="20.0" onMouseClicked="#clickShowShifts" AnchorPane.leftAnchor="36.0" AnchorPane.topAnchor="20.0">
+               <children>
+                  <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="209.0" prefWidth="209.0" style="-fx-background-color: #ABABAB;">
+                     <children>
+                        <ImageView fitHeight="74.0" fitWidth="74.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="67.0" AnchorPane.topAnchor="45.0">
+                           <image>
+                              <Image url="@../img/shiftsIcon.png" />
+                           </image>
+                        </ImageView>
+                        <Label alignment="TOP_LEFT" layoutX="10.0" layoutY="158.0" prefHeight="44.0" prefWidth="197.0" text="Visualizza i turni settimanali" textAlignment="JUSTIFY" textFill="WHITE" wrapText="true" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="158.0">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="13.0" layoutY="111.0" prefHeight="30.0" prefWidth="148.0" text="Turnazione" textFill="WHITE" AnchorPane.leftAnchor="9.0" AnchorPane.topAnchor="132.0">
+                           <font>
+                              <Font name="System Bold" size="20.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+               </children>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Group>
+         </children>
+      </AnchorPane>
+      <Group fx:id="profileIcon" layoutX="162.0" layoutY="131.0" onMouseClicked="#clickProfile" AnchorPane.leftAnchor="1338.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0">
+         <children>
+            <Circle fill="#0038ff" radius="36.0" stroke="WHITE" strokeType="INSIDE" strokeWidth="0.0" />
+            <Label fx:id="initialsLabel" alignment="CENTER" layoutX="-26.0" layoutY="-15.0" prefHeight="13.0" prefWidth="53.0" text="G L" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="20.0" />
+               </font>
+            </Label>
+         </children>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Group>
+   </children>
+</AnchorPane>
