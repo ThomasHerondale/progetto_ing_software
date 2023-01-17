@@ -5,6 +5,8 @@ import control.SalaryHandler;
 import control.ShiftProposalHandler;
 import database.DBMSDaemon;
 import database.DBMSException;
+import entities.Worker;
+import mail.MailManager;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -136,6 +138,9 @@ public class TimerManager {
             var holidays = DBMSDaemon.getInstance().getRequestedHolidays(firstDayOfQuarter);
             var handler = new ShiftProposalHandler(firstDayOfQuarter, workers, holidays);
             handler.computeNewShiftsProposal();
+            MailManager.getInstance().notifyNewShiftProposal(
+                    workers.stream().map(Worker::getEmail).toList()
+            );
         } catch (DBMSException e) {
             throw new TimerException(e.getMessage());
         }

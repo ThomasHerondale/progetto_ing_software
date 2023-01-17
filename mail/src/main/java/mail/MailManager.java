@@ -53,7 +53,7 @@ public class MailManager {
             }
         });
 
-        TODO: session.setDebug(true);
+        session.setDebug(true);
     }
 
     /**

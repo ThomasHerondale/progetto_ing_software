@@ -106,7 +106,6 @@ public class ShiftProposalHandler {
                     }
 
                     if (availability.totalHours + shiftDuration > 18) {
-                        // TODO: che cazzo è?
                         //System.out.println("\tToo late to find a shift -> retrying next day");
                         currentDay = currentDay.plusDays(1);
                         startTime = 8;
@@ -114,7 +113,6 @@ public class ShiftProposalHandler {
                     }
 
                     if (availability.totalHours + shiftDuration < minShiftDuration) {
-                        // TODO: che cazzo è?
                         //System.out.println("\tToo little space remaining -> retrying next day");
                         currentDay = currentDay.plusDays(1);
                         startTime = 8;

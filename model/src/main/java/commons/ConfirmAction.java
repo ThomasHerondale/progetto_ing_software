@@ -6,7 +6,6 @@ package commons;
  * popup da mostrare a schermo.
  */
 public enum ConfirmAction {
-    // TODO: @link ConfirmPopup quando sarà possibile
     /**
      * Contrassegna il popup come <i>popup di conferma licenziamento</i>.
      */

@@ -3,6 +3,7 @@ package timer;
 import database.DBMSDaemon;
 import database.DBMSException;
 import entities.Shift;
+import mail.MailManager;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -28,6 +29,19 @@ class AutoExitTask extends TimerTask {
                     DBMSDaemon.getInstance().getExitMissingShifts(currentDate, LocalTime.now());
             System.out.println("[DEBUG - AUTO_EXIT - INFO] Expired shifts :" + expiredShifts);
             DBMSDaemon.getInstance().recordAutoExit(expiredShifts);
+            String adminMail = null;
+            for (Shift shift : expiredShifts) {
+                MailManager.getInstance().notifyAutoExitRecord(
+                        shift.getOwner().getEmail(), shift.getOwner().getFullName()
+                );
+                if (DBMSDaemon.getInstance().getAutoExitCounter(shift.getOwner().getId()) > 5) {
+                    if (adminMail == null)
+                        adminMail = DBMSDaemon.getInstance().getAdminEmail();
+                    MailManager.getInstance().notifyAutoExitLimitReached(
+                            adminMail, shift.getOwner().getEmail(), shift.getOwner().getFullName()
+                    );
+                }
+            }
             System.err.println(LocalTime.now() + actionLogString);
         } catch (DBMSException e) {
             System.err.println(LocalTime.now() + ": [DEBUG - AUTO_EXIT - DBMS ERROR]");

@@ -3,4 +3,5 @@ module time {
     exports control;
     requires database;
     requires model;
+    requires mail;
 }
