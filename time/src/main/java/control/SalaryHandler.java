@@ -77,6 +77,6 @@ public class SalaryHandler {
             dbms.setSalary(workerInfo.getKey().getId(), referencePeriod.end(), salary);
             salaries.put(workerInfo.getKey(), salary);
         }
-        MailManager.getInstance().notifyNewSalary(salaries);
+        // MailManager.getInstance().notifyNewSalary(salaries);
     }
 }

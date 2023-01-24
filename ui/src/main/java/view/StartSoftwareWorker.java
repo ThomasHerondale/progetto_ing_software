@@ -18,7 +18,7 @@ public class StartSoftwareWorker extends Application{
      */
     @Override
     public void start(Stage primaryStage) throws DBMSException {
-        DBMSDaemon.getInstance().dumpShifts();
+        DBMSDaemon.getInstance().dump();
         var manager = TimerManager.getInstance();
         manager.setDebugMode();
         manager.initialize();

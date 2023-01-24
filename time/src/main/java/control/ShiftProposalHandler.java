@@ -163,31 +163,14 @@ public class ShiftProposalHandler {
         }
     }
 
-    public static void main(String[] args) {
-        var w = new Worker("000", "", "", 'A', "", "", "");
-        var x = new Worker("111", "", "", 'A', "", "", "");
-        var y = new Worker("222", "", "", 'A', "", "", "");
-        var z = new Worker("333", "", "", 'A', "", "", "");
-        var t = new Worker("444", "", "", 'B', "", "", "");
-        var u = new Worker("555", "", "", 'B', "", "", "");
-        var a = new Worker("666", "", "", 'B', "", "", "");
-        var b = new Worker("777", "", "", 'B', "", "", "");
+    public static void main(String[] args) throws DBMSException {
+        var date = LocalDate.of(2022, 10, 3);
+        var workers = DBMSDaemon.getInstance().getWorkersList();
+        var holidays = DBMSDaemon.getInstance().getRequestedHolidays(date);
         var sh = new ShiftProposalHandler(
-                LocalDate.of(2023, 1, 2),
-                new ArrayList<>(List.of(w, x, y, z, t, u, a, b)),
-                Map.of(
-                        w.getId(), List.of(),
-                        x.getId(), List.of(),
-                        y.getId(), List.of(new Period(
-                                LocalDate.of(2023, 1, 2),
-                                LocalDate.of(2023, 1, 4)
-                        )),
-                        z.getId(), List.of(),
-                        t.getId(), List.of(),
-                        u.getId(), List.of(),
-                        a.getId(), List.of(),
-                        b.getId(), List.of()
-                )
+                date,
+                workers,
+                holidays
         );
         sh.computeNewShiftsProposal();
     }

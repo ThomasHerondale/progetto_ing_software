@@ -2117,13 +2117,18 @@ public class DBMSDaemon {
      * @implNote <b> - Solo per uso interno- </b>
      */
     @SuppressWarnings("SqlWithoutWhere")
-    public void dumpShifts() throws DBMSException {
+    public void dump() throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
                 DELETE FROM shift
+                WHERE shiftDate >= '2023-01-02'
+                """);
+                var st2 = connection.prepareStatement("""
+                DELETE FROM salary
                 """)
         ) {
             st.execute();
+            st2.execute();
         } catch (SQLException e) {
             throw new DBMSException(e);
         }
