@@ -22,7 +22,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
          <font>
-            <Font size="15.0" />
+            <Font size="14.0" />
          </font>
       </Button>
       <Label fx:id="idLabel" layoutX="32.0" layoutY="161.0" text="Matricola" AnchorPane.leftAnchor="32.0" AnchorPane.topAnchor="161.0">

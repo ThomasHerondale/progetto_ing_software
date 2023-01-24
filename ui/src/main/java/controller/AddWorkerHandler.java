@@ -49,9 +49,15 @@ public class AddWorkerHandler {
 
     public void clickedRecap(String idWorker, String name, String surname, char rank, LocalDate birthDate,
                              String birthPlace, String ssn, String iban, String phone, String email, char sex) {
-        Worker worker = new Worker(idWorker, name, surname, rank, phone, email, iban);
-        NavigationManager.getInstance().createScreen("New Worker Recap",
-                controller -> new NewWorkerRecapScreen(worker, birthDate, birthPlace, sex, ssn, this));
+        if (
+                iban.matches("IT\\d{2}\\w\\d{22}") &&
+                phone.matches("\\d{10}") &&
+                email.matches("\\w+@\\S+")
+            ) {
+            Worker worker = new Worker(idWorker, name, surname, rank, phone, email, iban);
+            NavigationManager.getInstance().createScreen("New Worker Recap",
+                    controller -> new NewWorkerRecapScreen(worker, birthDate, birthPlace, sex, ssn, this));
+        }
     }
 
     public void clickedConfirm(Worker worker, LocalDate birthDate, String birthPlace, char sex, String ssn) {

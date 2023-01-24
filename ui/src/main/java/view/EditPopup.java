@@ -38,7 +38,13 @@ public class EditPopup {
     }
     @FXML
     void clickConfirm(ActionEvent event) {
-        accountInfoHandler.clickedConfirmEdit(inputField.getText(), property);
+        var regexp = switch (property) {
+            case PHONE -> "\\d{10}";
+            case EMAIL -> "\\w+@\\S+";
+            case IBAN -> "IT\\d{2}\\w\\d{22}";
+        };
+        if (inputField.getText().matches(regexp))
+            accountInfoHandler.clickedConfirmEdit(inputField.getText(), property);
     }
 
 }

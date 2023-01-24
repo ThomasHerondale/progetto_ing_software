@@ -100,7 +100,7 @@
       </Button>
       <Button fx:id="insertPresenceButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#clickInsertPresence" prefHeight="52.0" prefWidth="128.0" style="-fx-background-color: #d9d9d9; -fx-background-radius: 6;" text="Aggiungi presenza" textAlignment="CENTER" wrapText="true" AnchorPane.leftAnchor="155.0" AnchorPane.rightAnchor="1157.0" AnchorPane.topAnchor="641.0">
          <font>
-            <Font size="15.0" />
+            <Font size="14.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />
