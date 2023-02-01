@@ -9,8 +9,7 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane prefHeight="800.0" prefWidth="1440.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.workers.WorkerInfoScreen">
+<AnchorPane prefHeight="800.0" prefWidth="1440.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.WorkerInfoScreen">
    <children>
       <Label alignment="CENTER" layoutY="150.0" prefHeight="35.0" prefWidth="1440.0" text="Informazioni dipendente" AnchorPane.topAnchor="26.0">
          <font>
@@ -140,7 +139,7 @@
       </Label>
       <Button fx:id="enableParentalLeaveButton" alignment="CENTER" contentDisplay="CENTER" layoutX="771.0" layoutY="579.0" mnemonicParsing="false" onAction="#clickEnableParentalLeave" prefHeight="52.0" prefWidth="128.0" style="-fx-background-color: #d9d9d9; -fx-background-radius: 6;" text="Autorizza congedo p." textAlignment="CENTER" wrapText="true" AnchorPane.bottomAnchor="61.0" AnchorPane.rightAnchor="383.0">
          <font>
-            <Font size="15.0" />
+            <Font size="14.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />
@@ -148,7 +147,7 @@
       </Button>
       <Button fx:id="removeButton" layoutX="1024.0" layoutY="601.0" mnemonicParsing="false" onAction="#clickRemove" prefHeight="52.0" prefWidth="128.0" style="-fx-background-color: #d9d9d9; -fx-background-radius: 6;" text="Rimuovi impiegato" textAlignment="CENTER" wrapText="true" AnchorPane.bottomAnchor="61.0" AnchorPane.rightAnchor="214.0">
          <font>
-            <Font size="15.0" />
+            <Font size="14.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />
@@ -156,7 +155,7 @@
       </Button>
       <Button fx:id="promoteButton" layoutX="1219.0" layoutY="670.0" mnemonicParsing="false" onAction="#clickPromote" prefHeight="52.0" prefWidth="128.0" style="-fx-background-color: #d9d9d9; -fx-background-radius: 6;" text="Promuovi impiegato" textAlignment="CENTER" wrapText="true" AnchorPane.bottomAnchor="61.0" AnchorPane.rightAnchor="45.0">
          <font>
-            <Font size="15.0" />
+            <Font size="14.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />

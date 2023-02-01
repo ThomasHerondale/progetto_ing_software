@@ -402,7 +402,7 @@
       </Button>
       <Button fx:id="authorizeStrikeButton" layoutX="1175.0" layoutY="43.0" mnemonicParsing="false" onAction="#clickAuthorizeStrike" prefHeight="52.0" prefWidth="128.0" style="-fx-background-color: #d9d9d9; -fx-background-radius: 6;" text="Autorizza sciopero" textAlignment="CENTER" wrapText="true" AnchorPane.leftAnchor="1175.0" AnchorPane.topAnchor="43.0">
          <font>
-            <Font size="15.0" />
+            <Font size="14.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />

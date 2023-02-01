@@ -6,7 +6,6 @@ package commons;
  * di esecuzione la descrizione e i suggerimenti dei campi di testo per il popup stesso.
  */
 public enum EditableProperty {
-    // TODO: link a EditPopup
     /**
      * Contrassegna il popup come <i>popup di modifica telefono</i>.
      */

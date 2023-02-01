@@ -22,7 +22,6 @@ public class AccountInfoHandler {
             Counters workerCounters = new Counters(autoExit, delay, holiday, parentalLeave);
             NavigationManager.getInstance().openAccountInfoScreen(workerCounters, this);
         } catch (DBMSException e) {
-            //TODO:
             e.printStackTrace();
         }
     }

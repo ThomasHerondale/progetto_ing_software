@@ -5,6 +5,8 @@ import control.SalaryHandler;
 import control.ShiftProposalHandler;
 import database.DBMSDaemon;
 import database.DBMSException;
+import entities.Worker;
+import mail.MailManager;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -105,6 +107,11 @@ public class TimerManager {
                 newShiftProposal(firstDay);
         }
 
+        currentDate = debugMode ?
+                LocalDate.of(2022, 12, 27)
+                :
+                currentDate;
+
         /* Controlla la data per calcolare gli stipendi e resettare i contatori*/
         /* Se è il 27 di un mese, e sono passate le 23 */
         if (currentDate.getDayOfMonth() == 27 &&
@@ -136,6 +143,9 @@ public class TimerManager {
             var holidays = DBMSDaemon.getInstance().getRequestedHolidays(firstDayOfQuarter);
             var handler = new ShiftProposalHandler(firstDayOfQuarter, workers, holidays);
             handler.computeNewShiftsProposal();
+            /*MailManager.getInstance().notifyNewShiftProposal(
+                    workers.stream().map(Worker::getEmail).toList()
+            );*/
         } catch (DBMSException e) {
             throw new TimerException(e.getMessage());
         }

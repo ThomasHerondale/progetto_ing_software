@@ -39,8 +39,6 @@ public class DBMSDaemon {
         return instance;
     }
 
-    // TODO: err cmmdbms
-
     /**
      * Verifica che le credenziali specificate esistano e corrispondano con quelle nel database.
      * @param id la matricola da controllare
@@ -351,8 +349,6 @@ public class DBMSDaemon {
         }
     }
 
-    // TODO: tre - ormai due - metodi getMailData da analizzare?
-
     /**
      * Ottiene le informazioni necessarie alla composizione di notifiche sottoforma di e-mail per il
      * dipendente specificato.
@@ -422,8 +418,8 @@ public class DBMSDaemon {
                 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """);
                 var countSt = connection.prepareStatement("""
-                INSERT INTO counters(refWorkerID)
-                VALUES (?)
+                INSERT INTO counters(refWorkerID, holidayCount)
+                VALUES (?, 32)
                 """)
         ) {
             st.setString(1, worker.getId());
@@ -757,7 +753,7 @@ public class DBMSDaemon {
         try (
                 var st = connection.prepareStatement("""
                 update Counters
-                set delayCount = 0 , autoExitCount = 0, holidayCount = 0, consumedParentalLeave = 0
+                set delayCount = 0 , autoExitCount = 0, consumedParentalLeave = 0
                 """)
         ) {
             st.execute();
@@ -1304,8 +1300,6 @@ public class DBMSDaemon {
         }
     }
 
-    // TODO: getWorkersDataList?
-
     /**
      * Ottiene la lista di tutti i turni memorizzati nel database.
      * @return una lista di tutti i turni presenti nel database
@@ -1369,7 +1363,6 @@ public class DBMSDaemon {
 
             List<HashMap<String, String>> maps = extractResults(resultSet);
 
-            // TODO: duplicato!
             List<Shift> shifts = new ArrayList<>(maps.size());
             for (var map : maps) {
                 /* Crea un turno coi dati estratti dal database */
@@ -1580,7 +1573,7 @@ public class DBMSDaemon {
         ) {
             /* Ottieni la data dell'ultimo stipendio e calcola il suo periodo di riferimento.
             Questo periodo andrà da un mese prima alla data ottenuta alla data ottenuta stessa. */
-            var endDate = getLastSalaryDate(id); // TODo: forse un giorno indietro...
+            var endDate = getLastSalaryDate(id);
             var startDate = endDate.minusMonths(1);
 
             st.setString(1, id);
@@ -2124,13 +2117,37 @@ public class DBMSDaemon {
      * @implNote <b> - Solo per uso interno- </b>
      */
     @SuppressWarnings("SqlWithoutWhere")
-    public void dumpShifts() throws DBMSException {
+    public void dump() throws DBMSException {
         try (
                 var st = connection.prepareStatement("""
                 DELETE FROM shift
+                WHERE shiftDate >= '2023-01-02'
+                """);
+                var st2 = connection.prepareStatement("""
+                DELETE FROM salary
                 """)
         ) {
             st.execute();
+            st2.execute();
+        } catch (SQLException e) {
+            throw new DBMSException(e);
+        }
+    }
+
+    public int getAutoExitCounter(String id) throws DBMSException {
+        try (
+                var st = connection.prepareStatement("""
+                SELECT autoExitCount
+                FROM counters
+                WHERE refWorkerID = ?
+                """)
+        ) {
+            st.setString(1, id);
+            var resultSet = st.executeQuery();
+            var maps = extractResults(resultSet);
+            assert maps.size() == 1;
+
+            return Integer.parseInt(maps.get(0).get("autoExitCount"));
         } catch (SQLException e) {
             throw new DBMSException(e);
         }

@@ -5,7 +5,9 @@ import commons.Period;
 import database.DBMSDaemon;
 import database.DBMSException;
 import entities.Worker;
+import mail.MailManager;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -69,9 +71,12 @@ public class SalaryHandler {
     public static void computeSalaries(Period referencePeriod) throws DBMSException {
         var dbms = DBMSDaemon.getInstance();
         Map<Worker, HoursRecap> salaryData = dbms.getWorkersData(referencePeriod);
+        Map<Worker, Double> salaries = new HashMap<>();
         for (var workerInfo : salaryData.entrySet()) {
             var salary = computeSalary(workerInfo.getKey().getRank(), workerInfo.getValue());
             dbms.setSalary(workerInfo.getKey().getId(), referencePeriod.end(), salary);
+            salaries.put(workerInfo.getKey(), salary);
         }
+        // MailManager.getInstance().notifyNewSalary(salaries);
     }
 }

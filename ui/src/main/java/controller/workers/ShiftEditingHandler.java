@@ -221,6 +221,7 @@ public class ShiftEditingHandler {
                 false);
         shiftProposal.remove(shift);
         shiftProposal.add(newShift);
+        MailManager.getInstance().notifyOvertime(w, shift.getOwner(), shift);
         try {
             DBMSDaemon.getInstance().setOvertime(shift, newShift);
         } catch (DBMSException e) {
@@ -247,6 +248,8 @@ public class ShiftEditingHandler {
             shiftProposal.remove(shift);
             shiftProposal.add(newShift1);
             shiftProposal.add(newShift2);
+            MailManager.getInstance().notifyOvertime(w1, shift.getOwner(), newShift1);
+            MailManager.getInstance().notifyOvertime(w2, shift.getOwner(), newShift2);
         } else {
             int duration1 = shift.getHours() - shift.getHours() / 2;
             newShift1 = new Shift(w1,
@@ -262,6 +265,8 @@ public class ShiftEditingHandler {
             shiftProposal.remove(shift);
             shiftProposal.add(newShift1);
             shiftProposal.add(newShift2);
+            MailManager.getInstance().notifyOvertime(w1, shift.getOwner(), newShift1);
+            MailManager.getInstance().notifyOvertime(w2, shift.getOwner(), newShift2);
         }
         try {
             DBMSDaemon.getInstance().setOvertime(shift, newShift1, newShift2);
